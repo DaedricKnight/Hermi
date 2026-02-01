@@ -1,3 +1,4 @@
 int drawable ic_hermo_launcher 0x0
-int string voice_error 0x0
+int string ai_keywords_food 0x0
+int string ai_keywords_vehicle 0x0
 int string voice_listening 0x0

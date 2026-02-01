@@ -1,5 +1,6 @@
 R_DEF: Internal format may change without notice
 local
 drawable ic_hermo_launcher
-string voice_error
+string ai_keywords_food
+string ai_keywords_vehicle
 string voice_listening
