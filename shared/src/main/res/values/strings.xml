@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="voice_listening">Listening...</string>
+    <string name="ai_keywords_food">eat,food,hungry,restaurant,cafe</string>
+    <string name="ai_keywords_vehicle">status,car,fuel,battery,check</string>
+</resources>

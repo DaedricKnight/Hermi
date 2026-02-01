@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Hermi</string>
+    <string name="header_title">Hermi: Your Guide</string>
+
+    <string name="row_find_food_title">Find places to eat</string>
+    <string name="row_find_food_subtitle">Hermi will find a restaurant nearby</string>
+
+    <string name="row_vehicle_status_title">Vehicle Status</string>
+    <string name="row_vehicle_status_subtitle">Check range and systems</string>
+</resources>

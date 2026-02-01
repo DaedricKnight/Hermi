@@ -1,0 +1,4 @@
+com.khateev.hermi.shared
+drawable ic_hermo_launcher
+string voice_error
+string voice_listening

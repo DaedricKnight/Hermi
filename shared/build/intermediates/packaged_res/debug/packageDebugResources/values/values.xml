@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="voice_error">Sorry, I didn\'t catch that.</string>
+    <string name="voice_listening">Listening...</string>
+</resources>

@@ -1,0 +1,42 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:1:1-19:12
+INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:1:1-19:12
+	package
+		INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:1:11-69
+application
+ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:3:5-17:19
+	android:appCategory
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:3:18-45
+service#com.khateev.hermi.HermiVoiceService
+ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:4:9-7:42
+	android:process
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:7:13-39
+	android:permission
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:6:13-75
+	android:name
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:5:13-63
+service#com.khateev.hermi.HermiRecognitionService
+ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:9:9-16:19
+	android:exported
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:11:13-36
+	android:permission
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:12:13-77
+	android:name
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:10:13-69
+intent-filter#action:name:android.speech.RecognitionService
+ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:13:13-15:29
+action#android.speech.RecognitionService
+ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:14:17-76
+	android:name
+		ADDED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml:14:25-73
+uses-sdk
+INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml
+INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/artemhateev/AndroidStudioProjects/Hermi/shared/src/main/AndroidManifest.xml
