@@ -42,9 +42,7 @@ class HermiMainScreen(carContext: androidx.car.app.CarContext) : Screen(carConte
                     .build()
             )
             .setOnClickListener {
-                VoiceInterfaceManager(carContext).startListening { command ->
-                    // Send command to AI
-                }
+
             }
             .build()
 

@@ -12,6 +12,10 @@ activity = "1.12.3"
 constraintlayout = "2.2.1"
 media = "1.7.1"
 material-icons-extended = "1.7.8"
+hilt = "2.52"
+hiltNavigationCompose = "1.2.0"
+ksp = "2.1.0-1.0.29"
+material3 = "1.4.0"
 
 [libraries]
 androidx-app = { module = "androidx.car.app:app", version.ref = "app" }
@@ -26,8 +30,14 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-media = { group = "androidx.media", name = "media", version.ref = "media" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material-icons-extended" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
