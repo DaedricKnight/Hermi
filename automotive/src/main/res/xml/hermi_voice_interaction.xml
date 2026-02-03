@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <voice-interaction-service
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sessionService="com.khateev.hermi.HermiVoiceSessionService"
+    android:sessionService="com.khateev.hermi.HermiVoiceInteractionSessionService"
     android:recognitionService="com.khateev.hermi.HermiRecognitionService"
+    android:settingsActivity="com.khateev.hermi.MainActivity"
     android:supportsAssist="true"
     android:supportsLocalInteraction="true" />

@@ -2,6 +2,7 @@ package com.khateev.hermi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khateev.hermi.repository.VhalReader
 import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.SpeechToTextManager
 import com.khateev.hermi.shared.VhalParamsState
@@ -53,16 +54,44 @@ class HermiViewModel @Inject constructor(
         viewModelScope.launch {
             speechToTextManager.spokenText.collect { text ->
                 _recognizedText.emit(text)
+
+                val command = aiProcessor.parseCommand(text)
+                executeCommand(command)
+            }
+        }
+    }
+
+    private fun executeCommand(command: HermiAIProcessor.Command) {
+        when (command) {
+            is HermiAIProcessor.HermiCommand.SwitchToReal -> {
+                toggleVhalSource(useMock = false)
+                voiceManager.speak("Switching to real vehicle data")
+            }
+            is HermiAIProcessor.HermiCommand.SwitchToMock -> {
+                toggleVhalSource(useMock = true)
+                voiceManager.speak("Simulation mode activated")
+            }
+            is HermiAIProcessor.HermiCommand.GetVehicleStatus -> {
+                val status = if (uiState.value.isCheckEngineOn) {
+                    "Alert! Check engine is on. Please scan for DTC codes."
+                } else {
+                    "Vehicle systems are normal. Fuel level is ${uiState.value.fuelLevel} milliliters."
+                }
+                voiceManager.speak(status)
+            }
+
+            else -> {
+                voiceManager.speak("I didn't quite get that command")
             }
         }
     }
 
     fun toggleVhalSource(useMock: Boolean) {
         viewModelScope.launch {
-            _isMockMode.value = useMock
+//            _isMockMode.value = useMock
 //            (vhalReader as? HybridVhalReader)?.toggleMode(useMock)
-            val msg = if (useMock) "Simulation Mode Active" else "Real VHAL Connected"
-            _events.emit(msg)
+//            val msg = if (useMock) "Simulation Mode Active" else "Real VHAL Connected"
+//            _events.emit(msg)
         }
     }
 

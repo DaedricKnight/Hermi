@@ -7,4 +7,10 @@
 
     <string name="row_vehicle_status_title">Vehicle Status</string>
     <string name="row_vehicle_status_subtitle">Check range and systems</string>
+
+    <string name="hermi_listening_title">Hermi is listening…</string>
+    <string name="hermi_listening_message">I\'m listening, tell me what to do</string>
+    <string name="stop_listening">Stop</string>
+    <string name="recognized_text_title">I heard you say:</string>
+    <string name="ok">OK</string>
 </resources>

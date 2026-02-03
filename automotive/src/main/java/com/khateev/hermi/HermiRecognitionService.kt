@@ -2,21 +2,14 @@ package com.khateev.hermi
 
 import android.content.Intent
 import android.speech.RecognitionService
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HermiRecognitionService : RecognitionService() {
-    override fun onCancel(p0: Callback?) {
-        TODO("Not yet implemented")
+    override fun onStartListening(intent: Intent?, callback: Callback?) {
+
     }
 
-    override fun onStartListening(
-        p0: Intent?,
-        p1: Callback?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onStopListening(p0: Callback?) {
-        TODO("Not yet implemented")
-    }
-
+    override fun onCancel(callback: Callback?) {}
+    override fun onStopListening(callback: Callback?) {}
 }

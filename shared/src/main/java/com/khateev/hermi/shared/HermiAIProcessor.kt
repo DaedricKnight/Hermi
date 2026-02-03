@@ -1,14 +1,23 @@
 package com.khateev.hermi.shared
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Singleton
 
-class HermiAIProcessor(private val context: Context): AIProcessor {
+@Singleton
+class HermiAIProcessor(@param:ApplicationContext private val context: Context): AIProcessor {
     sealed class Command {
         object FindFood : Command()
         object VehicleStatus : Command()
         data class Unknown(val rawText: String) : Command()
+    }
+
+    sealed class HermiCommand {
+        object SwitchToReal : Command()
+        object SwitchToMock : Command()
+        object GetVehicleStatus : Command()
     }
 
     fun parseCommand(input: String): Command {
@@ -22,6 +31,13 @@ class HermiAIProcessor(private val context: Context): AIProcessor {
 
             vehicleKeywords.any { text.contains(it) } ->
                 Command.VehicleStatus
+
+            text.contains("switch to real") || input.contains("real mode") ->
+                HermiCommand.SwitchToReal
+            text.contains("switch to mock") || input.contains("simulation mode") ->
+                HermiCommand.SwitchToMock
+            text.contains("check engine") || input.contains("status") ->
+                HermiCommand.GetVehicleStatus
 
             else -> Command.Unknown(input)
         }
@@ -42,7 +58,7 @@ class HermiAIProcessor(private val context: Context): AIProcessor {
 
         if (state.isCriticallyLowTirePressure) {
             state.tirePressures.forEach { (area, pressure) ->
-                if (pressure < 1.5f) { // Порог критического давления
+                if (pressure < 1.5f) { // Critical pressure
                     emit(context.getString(R.string.ai_tire_pressure_low, area))
                 }
             }

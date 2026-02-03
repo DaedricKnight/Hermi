@@ -1,4 +1,4 @@
-package com.khateev.hermi
+package com.khateev.hermi.repository
 
 import com.khateev.hermi.shared.VhalParamsState
 import kotlinx.coroutines.flow.StateFlow

@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -55,4 +57,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    val carJar = files("${android.sdkDirectory}/platforms/android-33/optional/android.car.jar")
+    compileOnly(carJar)
 }
