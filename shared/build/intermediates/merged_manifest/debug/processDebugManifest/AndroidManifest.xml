@@ -4,6 +4,8 @@
 
     <uses-sdk android:minSdkVersion="29" />
 
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <application android:appCategory="audio" >
     </application>
 

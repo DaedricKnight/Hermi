@@ -3,47 +3,105 @@
 3    package="com.khateev.hermi.shared.test" >
 4
 5    <uses-sdk
-5-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:5:5-74
+5-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:5:5-74
 6        android:minSdkVersion="29"
-6-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:5:15-41
+6-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:5:15-41
 7        android:targetSdkVersion="36" />
-7-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:5:42-71
+7-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:5:42-71
 8
 9    <instrumentation
-9-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:11:5-15:79
+9-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:11:5-15:79
 10        android:name="androidx.test.runner.AndroidJUnitRunner"
-10-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:11:22-76
+10-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:11:22-76
 11        android:functionalTest="false"
-11-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:14:22-52
+11-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:14:22-52
 12        android:handleProfiling="false"
-12-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:13:22-53
+12-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:13:22-53
 13        android:label="Tests for com.khateev.hermi.shared.test"
-13-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:15:22-77
+13-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:15:22-77
 14        android:targetPackage="com.khateev.hermi.shared.test" />
-14-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:12:22-75
+14-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:12:22-75
 15
-16    <permission
-16-->[androidx.core:core:1.9.0] /Users/artemhateev/.gradle/caches/8.13/transforms/5bd98af80bb3cb1b6dec4cc91855f8ae/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
-17        android:name="com.khateev.hermi.shared.test.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-17-->[androidx.core:core:1.9.0] /Users/artemhateev/.gradle/caches/8.13/transforms/5bd98af80bb3cb1b6dec4cc91855f8ae/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
-18        android:protectionLevel="signature" />
-18-->[androidx.core:core:1.9.0] /Users/artemhateev/.gradle/caches/8.13/transforms/5bd98af80bb3cb1b6dec4cc91855f8ae/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
-19
-20    <uses-permission android:name="com.khateev.hermi.shared.test.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-20-->[androidx.core:core:1.9.0] /Users/artemhateev/.gradle/caches/8.13/transforms/5bd98af80bb3cb1b6dec4cc91855f8ae/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
-20-->[androidx.core:core:1.9.0] /Users/artemhateev/.gradle/caches/8.13/transforms/5bd98af80bb3cb1b6dec4cc91855f8ae/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+16    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+16-->[:shared] /Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-71
+16-->[:shared] /Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:22-68
+17
+18    <permission
+18-->[androidx.core:core:1.17.0] /Users/artemhateev/.gradle/caches/8.13/transforms/c921d17756fec7f6c2cae093cc34d80f/transformed/core-1.17.0/AndroidManifest.xml:22:5-24:47
+19        android:name="com.khateev.hermi.shared.test.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+19-->[androidx.core:core:1.17.0] /Users/artemhateev/.gradle/caches/8.13/transforms/c921d17756fec7f6c2cae093cc34d80f/transformed/core-1.17.0/AndroidManifest.xml:23:9-81
+20        android:protectionLevel="signature" />
+20-->[androidx.core:core:1.17.0] /Users/artemhateev/.gradle/caches/8.13/transforms/c921d17756fec7f6c2cae093cc34d80f/transformed/core-1.17.0/AndroidManifest.xml:24:9-44
 21
-22    <application
-22-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:7:5-9:19
-23        android:appCategory="audio"
-23-->[:shared] /Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:18-45
-24        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-24-->[androidx.core:core:1.9.0] /Users/artemhateev/.gradle/caches/8.13/transforms/5bd98af80bb3cb1b6dec4cc91855f8ae/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
-25        android:debuggable="true"
-26        android:extractNativeLibs="false" >
-27        <uses-library android:name="android.test.runner" />
-27-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:8:9-60
-27-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17057954233767373465.xml:8:23-57
-28    </application>
-29
-30</manifest>
+22    <uses-permission android:name="com.khateev.hermi.shared.test.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+22-->[androidx.core:core:1.17.0] /Users/artemhateev/.gradle/caches/8.13/transforms/c921d17756fec7f6c2cae093cc34d80f/transformed/core-1.17.0/AndroidManifest.xml:26:5-97
+22-->[androidx.core:core:1.17.0] /Users/artemhateev/.gradle/caches/8.13/transforms/c921d17756fec7f6c2cae093cc34d80f/transformed/core-1.17.0/AndroidManifest.xml:26:22-94
+23
+24    <application
+24-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:7:5-9:19
+25        android:appCategory="audio"
+25-->[:shared] /Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:18-45
+26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+26-->[androidx.core:core:1.17.0] /Users/artemhateev/.gradle/caches/8.13/transforms/c921d17756fec7f6c2cae093cc34d80f/transformed/core-1.17.0/AndroidManifest.xml:28:18-86
+27        android:debuggable="true"
+28        android:extractNativeLibs="false" >
+29        <uses-library android:name="android.test.runner" />
+29-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:8:9-60
+29-->/Users/artemhateev/AndroidStudioProjects/Hermi/shared/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest11699253968078232626.xml:8:23-57
+30
+31        <provider
+31-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+32            android:name="androidx.startup.InitializationProvider"
+32-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:25:13-67
+33            android:authorities="com.khateev.hermi.shared.test.androidx-startup"
+33-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:26:13-68
+34            android:exported="false" >
+34-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:27:13-37
+35            <meta-data
+35-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+36                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+36-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+37                android:value="androidx.startup" />
+37-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+38        </provider>
+39
+40        <receiver
+40-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+41            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+41-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+42            android:directBootAware="false"
+42-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+43            android:enabled="true"
+43-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+44            android:exported="true"
+44-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+45            android:permission="android.permission.DUMP" >
+45-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+46            <intent-filter>
+46-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+47                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+47-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+47-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+48            </intent-filter>
+49            <intent-filter>
+49-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+50                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+50-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+50-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+51            </intent-filter>
+52            <intent-filter>
+52-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+53                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+53-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+53-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+54            </intent-filter>
+55            <intent-filter>
+55-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+56                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+56-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+56-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/artemhateev/.gradle/caches/8.13/transforms/88e54baedfac0841a6951df126a7c9a7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+57            </intent-filter>
+58        </receiver>
+59    </application>
+60
+61</manifest>

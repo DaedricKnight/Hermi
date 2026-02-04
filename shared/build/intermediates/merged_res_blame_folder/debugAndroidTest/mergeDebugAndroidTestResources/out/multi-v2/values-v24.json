@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.khateev.hermi.shared.test.shared-mergeDebugAndroidTestResources-5:/values-v24/values-v24.xml",
+            "outputFile": "com.khateev.hermi.shared.test.shared-mergeDebugAndroidTestResources-42:/values-v24/values-v24.xml",
             "map": [
                 {
-                    "source": "/Users/artemhateev/.gradle/caches/8.13/transforms/da115bf82f786404b1435c2963628890/transformed/media-1.7.1/res/values-v24/values-v24.xml",
+                    "source": "/Users/artemhateev/.gradle/caches/8.13/transforms/af8e16d3d765a7e84255abf4ad796637/transformed/media-1.7.1/res/values-v24/values-v24.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

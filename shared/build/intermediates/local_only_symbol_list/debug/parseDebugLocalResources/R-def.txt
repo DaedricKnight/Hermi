@@ -1,6 +1,10 @@
 R_DEF: Internal format may change without notice
 local
 drawable ic_hermo_launcher
+string ai_coolant_temp_warning
+string ai_ev_battery_low
+string ai_fuel_low_warning
 string ai_keywords_food
 string ai_keywords_vehicle
+string ai_tire_pressure_low
 string voice_listening

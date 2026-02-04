@@ -1,8 +1,23 @@
 com.khateev.hermi.shared.test
+anim fragment_fast_out_extra_slow_in
+animator fragment_close_enter
+animator fragment_close_exit
+animator fragment_fade_enter
+animator fragment_fade_exit
+animator fragment_open_enter
+animator fragment_open_exit
+attr action
 attr alpha
+attr argType
+attr data
+attr dataPattern
+attr destination
+attr enterAnim
+attr exitAnim
 attr font
 attr fontProviderAuthority
 attr fontProviderCerts
+attr fontProviderFallbackQuery
 attr fontProviderFetchStrategy
 attr fontProviderFetchTimeout
 attr fontProviderPackage
@@ -11,13 +26,30 @@ attr fontProviderSystemFontFamily
 attr fontStyle
 attr fontVariationSettings
 attr fontWeight
+attr graph
 attr lStar
+attr launchSingleTop
+attr mimeType
+attr navGraph
 attr nestedScrollViewStyle
+attr nullable
+attr popEnterAnim
+attr popExitAnim
+attr popUpTo
+attr popUpToInclusive
+attr popUpToSaveState
 attr queryPatterns
+attr restoreState
+attr route
 attr shortcutMatchRequired
+attr startDestination
+attr targetPackage
 attr ttcIndex
+attr uri
 color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
+color call_notification_answer_color
+color call_notification_decline_color
 color notification_action_color_filter
 color notification_icon_bg_color
 color notification_material_background_media_default_color
@@ -45,6 +77,12 @@ dimen notification_small_icon_size_as_large
 dimen notification_subtext_size
 dimen notification_top_pad
 dimen notification_top_pad_large_text
+drawable ic_call_answer
+drawable ic_call_answer_low
+drawable ic_call_answer_video
+drawable ic_call_answer_video_low
+drawable ic_call_decline
+drawable ic_call_decline_low
 drawable ic_hermo_launcher
 drawable notification_action_background
 drawable notification_bg
@@ -54,6 +92,7 @@ drawable notification_bg_low_pressed
 drawable notification_bg_normal
 drawable notification_bg_normal_pressed
 drawable notification_icon_background
+drawable notification_oversize_large_icon_bg
 drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
@@ -97,37 +136,48 @@ id action_divider
 id action_image
 id action_text
 id actions
+id androidx_compose_ui_view_composition_context
 id async
 id blocking
 id cancel_action
 id chronometer
+id compose_view_saveable_id_tag
 id dialog_button
+id edit_text_id
 id end_padder
 id forever
+id fragment_container_view_tag
+id hide_ime_id
+id hide_in_inspector_tag
 id icon
 id icon_group
 id info
+id inspection_slot_table_set
 id italic
 id line1
 id line3
 id media_actions
 id media_controller_compat_view_tag
+id nav_controller_view_tag
 id normal
 id notification_background
 id notification_main_column
 id notification_main_column_container
 id right_icon
 id right_side
+id special_effects_controller_view_tag
 id status_bar_latest_event_content
 id tag_accessibility_actions
 id tag_accessibility_clickable_spans
 id tag_accessibility_heading
 id tag_accessibility_pane_title
+id tag_compat_insets_dispatch
 id tag_on_apply_window_listener
 id tag_on_receive_content_listener
 id tag_on_receive_content_mime_types
 id tag_screen_reader_focusable
 id tag_state_description
+id tag_system_bar_state_monitor
 id tag_transition_group
 id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
@@ -136,10 +186,18 @@ id text
 id text2
 id time
 id title
+id view_tree_disjoint_parent
 id view_tree_lifecycle_owner
+id view_tree_on_back_pressed_dispatcher_owner
+id view_tree_saved_state_registry_owner
+id view_tree_view_model_store_owner
+id visible_removing_fragment_view_tag
+id wrapped_composition_tag
 integer cancel_button_image_alpha
 integer status_bar_notification_info_maxnum
 layout custom_dialog
+layout ime_base_split_test_activity
+layout ime_secondary_split_test_activity
 layout notification_action
 layout notification_action_tombstone
 layout notification_media_action
@@ -155,10 +213,35 @@ layout notification_template_media
 layout notification_template_media_custom
 layout notification_template_part_chronometer
 layout notification_template_part_time
+string ai_coolant_temp_warning
+string ai_ev_battery_low
+string ai_fuel_low_warning
 string ai_keywords_food
 string ai_keywords_vehicle
+string ai_tire_pressure_low
+string androidx_startup
+string call_notification_answer_action
+string call_notification_answer_video_action
+string call_notification_decline_action
+string call_notification_hang_up_action
+string call_notification_incoming_text
+string call_notification_ongoing_text
+string call_notification_screening_text
+string close_drawer
+string close_sheet
+string default_error_message
+string in_progress
+string indeterminate
+string navigation_menu
+string not_selected
+string off
+string on
+string selected
 string status_bar_notification_info_overflow
+string tab
+string template_percent
 string voice_listening
+style DialogWindowTheme
 style TextAppearance_Compat_Notification
 style TextAppearance_Compat_Notification_Info
 style TextAppearance_Compat_Notification_Info_Media
@@ -171,9 +254,20 @@ style TextAppearance_Compat_Notification_Title
 style TextAppearance_Compat_Notification_Title_Media
 style Widget_Compat_NotificationActionContainer
 style Widget_Compat_NotificationActionText
+styleable ActivityNavigator android_name action data dataPattern targetPackage
 styleable Capability queryPatterns shortcutMatchRequired
 styleable ColorStateListItem android_color android_alpha android_lStar alpha lStar
-styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFetchStrategy fontProviderFetchTimeout fontProviderPackage fontProviderQuery fontProviderSystemFontFamily
+styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFallbackQuery fontProviderFetchStrategy fontProviderFetchTimeout fontProviderPackage fontProviderQuery fontProviderSystemFontFamily
 styleable FontFamilyFont android_font android_fontWeight android_fontStyle android_ttcIndex android_fontVariationSettings font fontStyle fontVariationSettings fontWeight ttcIndex
+styleable FontFamilyProviderFallback fontProviderQuery fontProviderSystemFontFamily fontVariationSettings
+styleable Fragment android_name android_id android_tag
+styleable FragmentContainerView android_name android_tag
 styleable GradientColor android_startColor android_endColor android_type android_centerX android_centerY android_gradientRadius android_tileMode android_centerColor android_startX android_startY android_endX android_endY
 styleable GradientColorItem android_color android_offset
+styleable NavAction android_id destination enterAnim exitAnim launchSingleTop popEnterAnim popExitAnim popUpTo popUpToInclusive popUpToSaveState restoreState
+styleable NavArgument android_name android_defaultValue argType nullable
+styleable NavDeepLink android_autoVerify action mimeType uri
+styleable NavGraphNavigator startDestination
+styleable NavHost navGraph
+styleable NavInclude graph
+styleable Navigator android_label android_id route
