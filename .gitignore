@@ -1,5 +1,10 @@
-*.iml
-.gradle
+# Сборка и временные файлы
+build/
+bin/
+gen/
+out/
+.gradle/
+
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -8,8 +13,25 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Результаты компиляции Java/Kotlin
+*.class
+*.dex
+*.jar
+*.aar
+*.apk
+*.properties
+
+# Кэши и таблицы поиска (из вашего списка)
+*.tab
+*.tab_i
+*.keystream
+*.len
+*.at
+*.bin
+
+# Специфичные файлы Android Studio / Gradle
+capture/
+memory_heap_dump.hprof
+*.ap_
+*.flat
