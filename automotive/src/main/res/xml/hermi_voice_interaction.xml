@@ -2,6 +2,6 @@
 <voice-interaction-service
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:sessionService="com.khateev.hermi.service.HermiVoiceInteractionSessionService"
-    android:recognitionService="com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"
+    android:recognitionService="com.khateev.hermi.service.HermiRecognitionService"
     android:supportsAssist="true"
     android:supportsLocalInteraction="true"/>

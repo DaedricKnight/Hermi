@@ -3,6 +3,7 @@ package com.khateev.hermi.shared
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -42,51 +43,46 @@ class SpeechToTextManager @Inject constructor(
         Log.d("HermiSTT", "ensureRecognizer start")
         if (speechRecognizer == null) {
             if (SpeechRecognizer.isRecognitionAvailable(context)) {
-
-                val serviceComponent = ComponentName(
-                    "com.google.android.googlequicksearchbox",
-                    "com.google.android.voicesearch.serviceapi.GoogleRecognitionService"
-                )
-
-                android.os.Handler(Looper.getMainLooper()).post {
+                Handler(Looper.getMainLooper()).post {
                     try {
-                        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context, serviceComponent).apply {
-                            setRecognitionListener(this@SpeechToTextManager)
-                        }
-                        Log.d("HermiSTT", "SpeechRecognizer initialized with Google Service")
-                    } catch (e: Exception) {
-                        Log.e("HermiSTT", "Failed to init Google Service, falling back", e)
                         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
                             setRecognitionListener(this@SpeechToTextManager)
                         }
+                        Log.d("HermiSTT", "SpeechRecognizer initialized with default service")
+                    } catch (e: Exception) {
+                        Log.e("HermiSTT", "Failed to init SpeechRecognizer", e)
                     }
                 }
-            } else {
-                Log.e("HermiSTT", "Speech recognition is NOT available")
             }
         }
     }
 
     fun startListening() {
         val isAvailable = SpeechRecognizer.isRecognitionAvailable(context)
-        Log.d("HermiSTT", "Is recognition available: $isAvailable")
+        Log.d("HermiSTT", "Recognition available: $isAvailable")
+
+        // Проверьте разрешения
+        val hasPermission = context.checkSelfPermission(
+            android.Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+        Log.d("HermiSTT", "RECORD_AUDIO permission: $hasPermission")
+
+        if (!hasPermission) {
+            Log.e("HermiSTT", "No RECORD_AUDIO permission!")
+            return
+        }
+
+        // Используйте дефолтный сервис
         android.os.Handler(Looper.getMainLooper()).post {
             ensureRecognizer()
-
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
-                putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
             }
 
-            try {
-                Log.d("HermiSTT", "Calling speechRecognizer.startListening(intent)")
-                startListeningWithFocus(intent)
-            } catch (e: Exception) {
-                Log.e("HermiSTT", "Start listening failed", e)
-            }
+            startListeningWithFocus(intent)
         }
 //        if (speechRecognizer == null) return
 //

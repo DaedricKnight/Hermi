@@ -11,7 +11,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -24,10 +23,10 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.khateev.hermi.di.HermiSessionEntryPoint
+import com.khateev.hermi.shared.SpeechToTextManager
 import com.khateev.hermi.ui.HermiAssistantActivity
 import com.khateev.hermi.ui.HermiAssistantOverlay
 import com.khateev.hermi.viewmodel.HermiViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 
 class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(context),
@@ -38,6 +37,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
     override val viewModelStore = ViewModelStore()
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry = savedStateRegistryController.savedStateRegistry
+    private val speechToTextManager = SpeechToTextManager(context)
 
     override fun onCreate() {
         savedStateRegistryController.performRestore(null)
@@ -69,7 +69,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
                             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                                 return HermiViewModel(
-                                    speechToTextManager = entryPoint.getSTT(),
+                                    speechToTextManager = speechToTextManager,
                                     vhalReader = entryPoint.getVhalReader(),
                                     aiProcessor = entryPoint.getAiProcessor(),
                                     voiceManager = entryPoint.getVoiceManager(),
@@ -90,21 +90,19 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // Запускаем Activity специально для разрешений
             val intent = Intent(context, HermiAssistantActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("REQUEST_PERMISSIONS", true)
             }
             startAssistantActivity(intent)
-            // Закрываем окно сессии на время запроса, чтобы не мешало
             // hide()
         } else {
-            // Настраиваем окно, если права уже есть
             getWindow()?.window?.let { win ->
                 win.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
                 win.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
         }
+        speechToTextManager.startListening()
     }
 
     override fun onHide() {

@@ -49,19 +49,30 @@
             android:name=".service.HermiVoiceInteractionService"
             android:permission="android.permission.BIND_VOICE_INTERACTION"
             android:exported="true">
-            <meta-data
-                android:name="android.voice_interaction"
-                android:resource="@xml/hermi_voice_interaction" />
             <intent-filter>
                 <action android:name="android.service.voice.VoiceInteractionService" />
             </intent-filter>
+            <meta-data
+                android:name="android.voice_interaction"
+                android:resource="@xml/hermi_voice_interaction" />
         </service>
 
         <service
             android:name=".service.HermiVoiceInteractionSessionService"
             android:permission="android.permission.BIND_VOICE_INTERACTION"
-            android:process=":assistant"
             android:exported="true">
+        </service>
+
+        <service
+            android:name=".service.HermiRecognitionService"
+            android:permission="android.permission.BIND_RECOGNITION_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.speech"
+                android:resource="@xml/hermi_recognition_config" />
         </service>
 
         <meta-data

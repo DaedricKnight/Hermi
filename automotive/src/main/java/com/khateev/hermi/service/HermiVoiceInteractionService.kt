@@ -12,10 +12,10 @@ class HermiVoiceInteractionService : VoiceInteractionService() {
 
     override fun onReady() {
         super.onReady()
-        Log.d("HermiVoiceService", "Service is ready")
+        Log.d("HermiVoiceInteractionService", "Service is ready")
 
         if (!isActiveService(this, ComponentName(this, this::class.java))) {
-            Log.w("HermiVoiceService", "Hermi is NOT the active assistant!")
+            Log.w("HermiVoiceInteractionService", "Hermi is NOT the active assistant!")
         }
     }
 
