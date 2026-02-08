@@ -8,7 +8,7 @@ import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.SpeechToTextManager
 import com.khateev.hermi.shared.VhalParamsState
 import com.khateev.hermi.shared.VoiceInterfaceManager
-import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class HermiViewModel (
     private val speechToTextManager: SpeechToTextManager,
@@ -38,7 +37,7 @@ class HermiViewModel (
     private val _currentSpokenText = MutableStateFlow("")
     val currentSpokenText: StateFlow<String> = _currentSpokenText.asStateFlow()
 
-    private val _recognizedText = MutableSharedFlow<String>()
+    private val _recognizedText = MutableSharedFlow<String>(replay = 1)
     val recognizedText = _recognizedText.asSharedFlow()
 
     private val _events = MutableSharedFlow<String>()
@@ -58,14 +57,16 @@ class HermiViewModel (
             speechToTextManager.spokenText.collect { text ->
                 _currentSpokenText.value = text
                 _recognizedText.emit(text)
-
                 val command = aiProcessor.parseCommand(text)
                 executeCommand(command)
+                delay(5000)
+                _recognizedText.emit("")
             }
         }
     }
 
     private fun executeCommand(command: HermiAIProcessor.Command) {
+        Log.d("HermiVM", "speechToTextManager.spokenText executeCommand $command")
         when (command) {
             is HermiAIProcessor.HermiCommand.SwitchToReal -> {
                 toggleVhalSource(useMock = false)
@@ -75,12 +76,13 @@ class HermiViewModel (
                 toggleVhalSource(useMock = true)
                 voiceManager.speak("Simulation mode activated")
             }
-            is HermiAIProcessor.HermiCommand.GetVehicleStatus -> {
+            is HermiAIProcessor.Command.VehicleStatus -> {
                 val status = if (uiState.value.isCheckEngineOn) {
                     "Alert! Check engine is on. Please scan for DTC codes."
                 } else {
                     "Vehicle systems are normal. Fuel level is ${uiState.value.fuelLevel} milliliters."
                 }
+                Log.d("HermiVM", "speechToTextManager.spokenText HermiCommand.GetVehicleStatus $status")
                 voiceManager.speak(status)
             }
 

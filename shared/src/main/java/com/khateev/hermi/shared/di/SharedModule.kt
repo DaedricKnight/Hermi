@@ -31,7 +31,7 @@ object SharedModule {
 
         @Provides
     @Singleton
-    fun provideVoiceInterfaceManager(@ApplicationContext context: Context): TextToSpeech.OnInitListener {
+    fun provideVoiceInterfaceManager(@ApplicationContext context: Context): VoiceInterfaceManager {
         return VoiceInterfaceManager(context)
     }
 

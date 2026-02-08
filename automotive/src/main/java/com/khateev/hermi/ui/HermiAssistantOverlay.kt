@@ -9,7 +9,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,9 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.khateev.hermi.viewmodel.HermiViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun HermiAssistantOverlay(
@@ -47,10 +42,8 @@ fun HermiAssistantOverlay(
     onClose: () -> Unit
 ) {
     val carState by viewModel.uiState.collectAsState()
-    val spokenText by viewModel.currentSpokenText.collectAsState()
+    val spokenText by viewModel.recognizedText.collectAsState(initial = "")
     val isListening by viewModel.isListening.collectAsState()
-
-    var currentText by remember { mutableStateOf("") }
 
     LaunchedEffect(isListening) {
         Log.d("HermiUI_Compose", "Compose saw change: $isListening")
@@ -58,9 +51,6 @@ fun HermiAssistantOverlay(
 
     LaunchedEffect(Unit) {
         viewModel.startVoiceInput()
-        viewModel.recognizedText.collect { text ->
-            currentText = text
-        }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.7f))) {
@@ -106,7 +96,6 @@ fun HermiAssistantOverlay(
 
 @Composable
 fun PulseAnimation(isListening: Boolean) {
-    Log.d("Pulse", "Is pulse running: $isListening")
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
 
     val progress by infiniteTransition.animateFloat(

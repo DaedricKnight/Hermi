@@ -37,7 +37,7 @@ class HermiAIProcessor(@param:ApplicationContext private val context: Context): 
             text.contains("switch to mock") || input.contains("simulation mode") ->
                 HermiCommand.SwitchToMock
             text.contains("check engine") || input.contains("status") ->
-                HermiCommand.GetVehicleStatus
+                Command.VehicleStatus
 
             else -> Command.Unknown(input)
         }

@@ -3,6 +3,7 @@ package com.khateev.hermi.shared
 import android.content.Context
 import android.media.AudioAttributes
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
@@ -11,8 +12,7 @@ import javax.inject.Singleton
 @Singleton
 class VoiceInterfaceManager @Inject constructor(
     @param:ApplicationContext val context: Context
-) : TextToSpeech.OnInitListener {
-
+) {
     private var tts: TextToSpeech? = null
     private var isReady = false
 
@@ -25,32 +25,31 @@ class VoiceInterfaceManager @Inject constructor(
                     .build()
 
                 tts?.setAudioAttributes(audioAttributes)
-                tts?.language = Locale.getDefault()
+
+                val result = tts?.setLanguage(Locale.US)
+                if (result != TextToSpeech.LANG_MISSING_DATA &&
+                    result != TextToSpeech.LANG_NOT_SUPPORTED) {
+                    isReady = true
+                    Log.d("VoiceInterfaceManager", "TTS initialized successfully, isReady = true")
+                } else {
+                    Log.e("VoiceInterfaceManager", "Language not supported, result = $result")
+                }
+            } else {
+                Log.e("VoiceInterfaceManager", "TTS initialization failed, status = $status")
             }
         }
     }
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale.US)
-            if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-                isReady = true
-            }
-        }
-    }
-
-    /**
-     * Text to speech
-     */
     fun speak(text: String) {
+        Log.d("VoiceInterfaceManager", "speak() called, text: $text, isReady: $isReady")
         if (isReady) {
             tts?.speak(text, TextToSpeech.QUEUE_ADD, null, text.hashCode().toString())
+            Log.d("VoiceInterfaceManager", "TTS speaking: $text")
+        } else {
+            Log.w("VoiceInterfaceManager", "TTS not ready yet, skipping: $text")
         }
     }
 
-    /**
-     * Clear resources
-     */
     fun shutdown() {
         tts?.stop()
         tts?.shutdown()
