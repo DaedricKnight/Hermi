@@ -1,6 +1,7 @@
-package com.khateev.hermi
+package com.khateev.hermi.ui
 
 import android.content.Intent
+import androidx.car.app.CarContext
 import androidx.car.app.Screen
 import androidx.car.app.Session
 import androidx.car.app.model.Action
@@ -10,6 +11,7 @@ import androidx.car.app.model.ListTemplate
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
+import com.khateev.hermi.R
 
 class HermiSession : Session() {
     override fun onCreateScreen(intent: Intent): Screen {
@@ -17,7 +19,7 @@ class HermiSession : Session() {
     }
 }
 
-class HermiMainScreen(carContext: androidx.car.app.CarContext) : Screen(carContext) {
+class HermiMainScreen(carContext: CarContext) : Screen(carContext) {
 
     override fun onGetTemplate(): Template {
         val rowEat = Row.Builder()

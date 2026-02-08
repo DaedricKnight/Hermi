@@ -6,8 +6,6 @@ import android.car.hardware.CarPropertyValue
 import android.car.hardware.property.CarPropertyManager
 import android.content.Context
 import android.util.Log
-import com.khateev.hermi.mapPropertyToState
-import com.khateev.hermi.readStaticValue
 import com.khateev.hermi.shared.VhalParamsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-package com.khateev.hermi
+package com.khateev.hermi.service
 
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession

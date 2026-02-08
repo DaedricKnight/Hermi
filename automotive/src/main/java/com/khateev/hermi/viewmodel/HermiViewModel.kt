@@ -1,5 +1,6 @@
-package com.khateev.hermi
+package com.khateev.hermi.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khateev.hermi.repository.VhalReader
@@ -19,8 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class HermiViewModel @Inject constructor(
+class HermiViewModel (
     private val speechToTextManager: SpeechToTextManager,
     private val vhalReader: VhalReader,
     private val aiProcessor: HermiAIProcessor,
@@ -33,7 +33,10 @@ class HermiViewModel @Inject constructor(
     val isMockMode: StateFlow<Boolean> = _isMockMode.asStateFlow()
 
     val isListening: StateFlow<Boolean> = speechToTextManager.listeningState
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), false)
+
+    private val _currentSpokenText = MutableStateFlow("")
+    val currentSpokenText: StateFlow<String> = _currentSpokenText.asStateFlow()
 
     private val _recognizedText = MutableSharedFlow<String>()
     val recognizedText = _recognizedText.asSharedFlow()
@@ -53,6 +56,7 @@ class HermiViewModel @Inject constructor(
 
         viewModelScope.launch {
             speechToTextManager.spokenText.collect { text ->
+                _currentSpokenText.value = text
                 _recognizedText.emit(text)
 
                 val command = aiProcessor.parseCommand(text)
@@ -95,7 +99,11 @@ class HermiViewModel @Inject constructor(
         }
     }
 
-    fun startVoiceInput() = speechToTextManager.startListening()
+    fun startVoiceInput() {
+        Log.d("HermiVM", "startVoiceInput called")
+        speechToTextManager.startListening()
+    }
+
     fun stopVoiceInput() = speechToTextManager.stopListening()
 
     override fun onCleared() {

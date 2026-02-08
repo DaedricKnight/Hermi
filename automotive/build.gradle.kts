@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.khateev.hermi"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -54,4 +54,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    val carJar = files("${android.sdkDirectory}/platforms/android-33/optional/android.car.jar")
+    compileOnly(carJar)
 }

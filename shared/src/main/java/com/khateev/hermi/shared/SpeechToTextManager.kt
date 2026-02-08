@@ -1,16 +1,25 @@
 package com.khateev.hermi.shared
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.util.Locale
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,33 +28,98 @@ class SpeechToTextManager @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : RecognitionListener {
 
+    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
     private var speechRecognizer: SpeechRecognizer? = null
 
-    private val _spokenText = MutableSharedFlow<String>()
+    private val _spokenText = MutableSharedFlow<String>(replay = 1)
     val spokenText: SharedFlow<String> = _spokenText.asSharedFlow()
 
-    private val _listeningState = MutableSharedFlow<Boolean>()
-    val listeningState: SharedFlow<Boolean> = _listeningState.asSharedFlow()
+    private val _listeningState = MutableStateFlow<Boolean>(false)
+    val listeningState: StateFlow<Boolean> = _listeningState.asStateFlow()
 
-    init {
-        if (SpeechRecognizer.isRecognitionAvailable(context)) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-            speechRecognizer?.setRecognitionListener(this)
-        } else {
+    private fun ensureRecognizer() {
+        Log.d("HermiSTT", "ensureRecognizer start")
+        if (speechRecognizer == null) {
+            if (SpeechRecognizer.isRecognitionAvailable(context)) {
 
+                val serviceComponent = ComponentName(
+                    "com.google.android.googlequicksearchbox",
+                    "com.google.android.voicesearch.serviceapi.GoogleRecognitionService"
+                )
+
+                android.os.Handler(Looper.getMainLooper()).post {
+                    try {
+                        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context, serviceComponent).apply {
+                            setRecognitionListener(this@SpeechToTextManager)
+                        }
+                        Log.d("HermiSTT", "SpeechRecognizer initialized with Google Service")
+                    } catch (e: Exception) {
+                        Log.e("HermiSTT", "Failed to init Google Service, falling back", e)
+                        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
+                            setRecognitionListener(this@SpeechToTextManager)
+                        }
+                    }
+                }
+            } else {
+                Log.e("HermiSTT", "Speech recognition is NOT available")
+            }
         }
     }
 
     fun startListening() {
-        if (speechRecognizer == null) return
+        val isAvailable = SpeechRecognizer.isRecognitionAvailable(context)
+        Log.d("HermiSTT", "Is recognition available: $isAvailable")
+        android.os.Handler(Looper.getMainLooper()).post {
+            ensureRecognizer()
 
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
+                putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
+                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+            }
+
+            try {
+                Log.d("HermiSTT", "Calling speechRecognizer.startListening(intent)")
+                startListeningWithFocus(intent)
+            } catch (e: Exception) {
+                Log.e("HermiSTT", "Start listening failed", e)
+            }
         }
-        speechRecognizer?.startListening(intent)
+//        if (speechRecognizer == null) return
+//
+//        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+//            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+//            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+//            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
+//            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+//        }
+//        speechRecognizer?.startListening(intent)
+    }
+
+    fun startListeningWithFocus(intent: Intent) {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE) // Важно для AAOS
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .build()
+
+        val focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        val result = audioManager.requestAudioFocus(focusRequest)
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.d("HermiSTT", "AudioManager.AUDIOFOCUS_REQUEST_GRANTED")
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                Log.d("HermiSTT", "Calling startListening after delay")
+                speechRecognizer?.startListening(intent)
+            }, 500)
+        } else {
+            Log.d("HermiSTT", "Focus denied")
+        }
     }
 
     fun stopListening() {
@@ -60,21 +134,24 @@ class SpeechToTextManager @Inject constructor(
     // --- RecognitionListener Callbacks ---
 
     override fun onReadyForSpeech(params: Bundle?) {
-        _listeningState.tryEmit(true)
+        Log.d("HermiSTT", "REAL TALK: Microphone is open now!")
+        _listeningState.value = true // Теперь Compose точно увидит
     }
 
-    override fun onBeginningOfSpeech() {  }
+    override fun onBeginningOfSpeech() {
+        _listeningState.value = true
+    }
 
-    override fun onRmsChanged(rmsdB: Float) {  }
+    override fun onRmsChanged(rmsdB: Float) {}
 
-    override fun onBufferReceived(buffer: ByteArray?) {  }
+    override fun onBufferReceived(buffer: ByteArray?) {}
 
     override fun onEndOfSpeech() {
-        _listeningState.tryEmit(false)
+        _listeningState.value = false
     }
 
     override fun onError(error: Int) {
-        _listeningState.tryEmit(false)
+        _listeningState.value = false
         val errorMessage = when (error) {
             SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
             SpeechRecognizer.ERROR_CLIENT -> "Client side error"
@@ -87,19 +164,17 @@ class SpeechToTextManager @Inject constructor(
             SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No speech input"
             else -> "Unknown speech recognition error"
         }
-        _spokenText.tryEmit("Error: $errorMessage") // Отправляем ошибку в UI
+        _spokenText.tryEmit("Error: $errorMessage")
+        Log.e("HermiSTT", "Speech Error: $errorMessage")
     }
 
     override fun onResults(results: Bundle?) {
         val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-        val bestResult = matches?.getOrNull(0)
-        bestResult?.let {
-            _spokenText.tryEmit(it)
-        }
-        _listeningState.tryEmit(false)
+        matches?.getOrNull(0)?.let { _spokenText.tryEmit(it) }
+        _listeningState.value = false
     }
 
-    override fun onPartialResults(partialResults: Bundle?) {  }
+    override fun onPartialResults(partialResults: Bundle?) {}
 
-    override fun onEvent(eventType: Int, params: Bundle?) {  }
+    override fun onEvent(eventType: Int, params: Bundle?) {}
 }

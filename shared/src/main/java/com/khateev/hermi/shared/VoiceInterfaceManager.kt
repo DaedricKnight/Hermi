@@ -1,6 +1,7 @@
 package com.khateev.hermi.shared
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.speech.tts.TextToSpeech
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
@@ -16,7 +17,17 @@ class VoiceInterfaceManager @Inject constructor(
     private var isReady = false
 
     init {
-        tts = TextToSpeech(context, this)
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+
+                tts?.setAudioAttributes(audioAttributes)
+                tts?.language = Locale.getDefault()
+            }
+        }
     }
 
     override fun onInit(status: Int) {
