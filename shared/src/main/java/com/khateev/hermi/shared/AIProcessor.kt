@@ -1,7 +1,8 @@
 package com.khateev.hermi.shared
 
+import com.khateev.hermi.shared.HermiAIProcessor.Command
 import kotlinx.coroutines.flow.Flow
 
 interface AIProcessor {
-    fun processVehicleData(state: VhalParamsState): Flow<String>
+    fun parseCommand(input: String): Command
 }

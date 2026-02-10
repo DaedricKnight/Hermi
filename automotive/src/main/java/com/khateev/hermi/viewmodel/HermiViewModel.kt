@@ -3,7 +3,9 @@ package com.khateev.hermi.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khateev.hermi.NavigationEvent
 import com.khateev.hermi.repository.VhalReader
+import com.khateev.hermi.shared.AIProcessor
 import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.SpeechToTextManager
 import com.khateev.hermi.shared.VhalParamsState
@@ -11,18 +13,18 @@ import com.khateev.hermi.shared.VoiceInterfaceManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HermiViewModel (
     private val speechToTextManager: SpeechToTextManager,
     private val vhalReader: VhalReader,
-    private val aiProcessor: HermiAIProcessor,
+    private val aiProcessor: AIProcessor,
     private val voiceManager: VoiceInterfaceManager
 ) : ViewModel() {
 
@@ -40,19 +42,10 @@ class HermiViewModel (
     private val _recognizedText = MutableSharedFlow<String>(replay = 1)
     val recognizedText = _recognizedText.asSharedFlow()
 
-    private val _events = MutableSharedFlow<String>()
-    val events = _events.asSharedFlow()
+    private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
+    val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
 
     init {
-        viewModelScope.launch {
-            uiState.collectLatest { state ->
-                aiProcessor.processVehicleData(state).collect { aiMessage ->
-                    voiceManager.speak(aiMessage)
-                    _events.emit(aiMessage)
-                }
-            }
-        }
-
         viewModelScope.launch {
             speechToTextManager.spokenText.collect { text ->
                 _currentSpokenText.value = text
@@ -66,28 +59,215 @@ class HermiViewModel (
     }
 
     private fun executeCommand(command: HermiAIProcessor.Command) {
-        Log.d("HermiVM", "speechToTextManager.spokenText executeCommand $command")
-        when (command) {
-            is HermiAIProcessor.HermiCommand.SwitchToReal -> {
-                toggleVhalSource(useMock = false)
-                voiceManager.speak("Switching to real vehicle data")
-            }
-            is HermiAIProcessor.HermiCommand.SwitchToMock -> {
-                toggleVhalSource(useMock = true)
-                voiceManager.speak("Simulation mode activated")
-            }
-            is HermiAIProcessor.Command.VehicleStatus -> {
-                val status = if (uiState.value.isCheckEngineOn) {
-                    "Alert! Check engine is on. Please scan for DTC codes."
-                } else {
-                    "Vehicle systems are normal. Fuel level is ${uiState.value.fuelLevel} milliliters."
-                }
-                Log.d("HermiVM", "speechToTextManager.spokenText HermiCommand.GetVehicleStatus $status")
-                voiceManager.speak(status)
-            }
+        Log.d("HermiVM", "executeCommand: $command")
 
-            else -> {
-                voiceManager.speak("I didn't quite get that command")
+        viewModelScope.launch {
+            when (command) {
+                // Navigation commands
+                is HermiAIProcessor.Command.FindFood -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("restaurants"))
+                    voiceManager.speak("Searching for nearby restaurants and cafes")
+                }
+
+                is HermiAIProcessor.Command.FindGasStation -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("gas stations"))
+                    voiceManager.speak("Finding gas stations near you")
+                }
+
+                is HermiAIProcessor.Command.FindChargingStation -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("EV charging stations"))
+                    voiceManager.speak("Locating charging stations nearby")
+                }
+
+                is HermiAIProcessor.Command.FindParking -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("parking"))
+                    voiceManager.speak("Searching for parking areas")
+                }
+
+                // Vehicle status commands
+                is HermiAIProcessor.Command.VehicleStatus -> {
+                    val status = buildVehicleStatusReport()
+                    voiceManager.speak(status)
+                }
+
+                is HermiAIProcessor.Command.CheckEngine -> {
+                    val engineStatus = buildEngineStatusReport()
+                    voiceManager.speak(engineStatus)
+                }
+
+                is HermiAIProcessor.Command.CheckTires -> {
+                    val tireStatus = buildTireStatusReport()
+                    voiceManager.speak(tireStatus)
+                }
+
+                is HermiAIProcessor.Command.CheckFuelLevel -> {
+                    val fuelStatus = buildFuelStatusReport()
+                    voiceManager.speak(fuelStatus)
+                }
+
+                is HermiAIProcessor.Command.CheckBatteryLevel -> {
+                    val batteryStatus = buildBatteryStatusReport()
+                    voiceManager.speak(batteryStatus)
+                }
+
+                // Control commands
+                is HermiAIProcessor.Command.LockDoors -> {
+                    sendVehicleCommand(VehicleCommand.LOCK_DOORS)
+                    voiceManager.speak("Locking all doors")
+                }
+
+                is HermiAIProcessor.Command.UnlockDoors -> {
+                    sendVehicleCommand(VehicleCommand.UNLOCK_DOORS)
+                    voiceManager.speak("Unlocking all doors")
+                }
+
+                is HermiAIProcessor.Command.TurnOnLights -> {
+                    sendVehicleCommand(VehicleCommand.LIGHTS_ON)
+                    voiceManager.speak("Turning on headlights")
+                }
+
+                is HermiAIProcessor.Command.TurnOffLights -> {
+                    sendVehicleCommand(VehicleCommand.LIGHTS_OFF)
+                    voiceManager.speak("Turning off headlights")
+                }
+
+                // Information commands
+                is HermiAIProcessor.Command.GetRange -> {
+                    val range = uiState.value.range
+                    voiceManager.speak("Your current range is ${range.toInt()} kilometers")
+                }
+
+                is HermiAIProcessor.Command.GetOdometer -> {
+                    val odometer = uiState.value.odometer
+                    voiceManager.speak("Total mileage is ${odometer.toInt()} kilometers")
+                }
+
+                is HermiAIProcessor.Command.GetSpeed -> {
+                    val speed = uiState.value.speed
+                    voiceManager.speak("Current speed is ${speed.toInt()} kilometers per hour")
+                }
+
+                is HermiAIProcessor.Command.GetOutsideTemp -> {
+                    val temp = uiState.value.outsideTemp
+                    val unit = uiState.value.tempUnit.ifEmpty { "°C" }
+                    voiceManager.speak("Outside temperature is ${temp.toInt()} degrees $unit")
+                }
+
+                // Mode switching
+                is HermiAIProcessor.Command.SwitchToReal -> {
+                    toggleVhalSource(useMock = false)
+                    voiceManager.speak("Switching to real vehicle data")
+                }
+
+                is HermiAIProcessor.Command.SwitchToMock -> {
+                    toggleVhalSource(useMock = true)
+                    voiceManager.speak("Simulation mode activated")
+                }
+
+                is HermiAIProcessor.Command.Unknown -> {
+                    voiceManager.speak("I didn't quite understand that command. Please try again")
+                }
+            }
+        }
+    }
+
+    // Helper functions to build status reports
+    private fun buildVehicleStatusReport(): String {
+        val state = uiState.value
+        return buildString {
+            if (state.isCheckEngineOn) {
+                append("Warning! Check engine light is on. ")
+            }
+            if (state.isCriticallyLowTirePressure) {
+                append("Critical tire pressure detected. ")
+            }
+            if (state.isFuelLow) {
+                append("Fuel level is low. ")
+            }
+            if (isEmpty()) {
+                append("All vehicle systems are operating normally. ")
+            }
+            append("Fuel level is ${state.fuelLevel.toInt()} percent. ")
+            append("Range is ${state.range.toInt()} kilometers.")
+        }
+    }
+
+    private fun buildEngineStatusReport(): String {
+        val state = uiState.value
+        return if (state.isCheckEngineOn) {
+            val dtcInfo = if (state.activeDTCs.isNotEmpty()) {
+                "Active diagnostic codes: ${state.activeDTCs.joinToString(", ")}"
+            } else {
+                "Please perform a diagnostic scan"
+            }
+            "Check engine light is on. $dtcInfo"
+        } else {
+            "Engine is running normally. " +
+                    "Coolant temperature is ${state.coolantTemp.toInt()} degrees. " +
+                    "Oil level is ${state.oilLevel.toInt()} percent."
+        }
+    }
+
+    private fun buildTireStatusReport(): String {
+        val state = uiState.value
+        return if (state.isCriticallyLowTirePressure) {
+            val lowTires = state.tirePressures.filter { it.value < 2.0f }
+            "Warning! Low tire pressure detected in ${lowTires.size} tire(s). Please check immediately."
+        } else if (state.tirePressures.isNotEmpty()) {
+            "All tire pressures are within normal range"
+        } else {
+            "Tire pressure data is not available"
+        }
+    }
+
+    private fun buildFuelStatusReport(): String {
+        val state = uiState.value
+        return buildString {
+            append("Fuel level is ${state.fuelLevel.toInt()} percent. ")
+            if (state.isFuelLow) {
+                append("Warning: fuel is low. ")
+            }
+            append("Range is ${state.range.toInt()} kilometers.")
+        }
+    }
+
+    private fun buildBatteryStatusReport(): String {
+        val state = uiState.value
+        return if (state.evBatteryLevel > 0) {
+            buildString {
+                append("Battery charge is ${state.evBatteryLevel.toInt()} percent. ")
+                if (state.isEvChargePortConnected) {
+                    append("Charging port is connected. ")
+                    if (state.evChargeTime > 0) {
+                        append("Estimated time to full charge: ${state.evChargeTime} minutes.")
+                    }
+                } else if (state.evBatteryLevel < 20) {
+                    append("Warning: battery is low. Please charge soon.")
+                }
+            }
+        } else {
+            "This vehicle does not have an electric battery"
+        }
+    }
+
+    // Enum for vehicle commands
+    enum class VehicleCommand {
+        LOCK_DOORS,
+        UNLOCK_DOORS,
+        LIGHTS_ON,
+        LIGHTS_OFF
+    }
+
+    // Function to send commands to vehicle HAL
+    private fun sendVehicleCommand(command: VehicleCommand) {
+        viewModelScope.launch {
+            try {
+                // TODO: Implement actual vehicle HAL command sending
+                // vhalManager.sendCommand(command)
+                Log.d("HermiVM", "Sending vehicle command: $command")
+            } catch (e: Exception) {
+                Log.e("HermiVM", "Failed to send vehicle command: ${e.message}")
+                voiceManager.speak("Failed to execute command")
             }
         }
     }
@@ -110,6 +290,7 @@ class HermiViewModel (
 
     override fun onCleared() {
         super.onCleared()
+        stopVoiceInput()
         voiceManager.shutdown()
         speechToTextManager.destroy()
     }

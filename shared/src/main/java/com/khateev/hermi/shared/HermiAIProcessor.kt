@@ -41,12 +41,7 @@ class HermiAIProcessor(@param:ApplicationContext private val context: Context): 
         data class Unknown(val rawText: String) : Command()
     }
 
-    sealed class HermiCommand {
-        object SwitchToReal : Command()
-        object SwitchToMock : Command()
-    }
-
-    fun parseCommand(input: String): Command {
+    override fun parseCommand(input: String): Command {
         val text = input.lowercase()
 
         return when {
@@ -114,41 +109,6 @@ class HermiAIProcessor(@param:ApplicationContext private val context: Context): 
                 Command.SwitchToMock
 
             else -> Command.Unknown(input)
-        }
-    }
-
-    override fun processVehicleData(state: VhalParamsState): Flow<String> = flow {
-        // Critical warnings
-        if (state.isFuelLow && state.range < 50f) {
-            emit("Low fuel level! Range remaining: ${state.range.toInt()} km")
-        }
-
-        if (state.coolantTemp > 105f) {
-            emit("WARNING! High coolant temperature: ${state.coolantTemp}°C")
-        }
-
-        if (state.evBatteryLevel < 20f && !state.isEvChargePortConnected) {
-            emit("Low battery charge: ${state.evBatteryLevel.toInt()}%. I recommend finding a charging station")
-        }
-
-        if (state.isCriticallyLowTirePressure) {
-            emit("CRITICAL tire pressure! Inspection required")
-        }
-
-        if (state.isCheckEngineOn) {
-            val dtcInfo = if (state.activeDTCs.isNotEmpty()) {
-                " Error codes: ${state.activeDTCs.joinToString()}"
-            } else ""
-            emit("Check Engine light is on.$dtcInfo")
-        }
-
-        // Reminders
-        if (!state.isDoorLocked && state.ignitionState == 0) {
-            emit("Doors are unlocked")
-        }
-
-        if (state.isParkingBrakeOn && state.speed > 5f) {
-            emit("Parking brake is engaged!")
         }
     }
 }
