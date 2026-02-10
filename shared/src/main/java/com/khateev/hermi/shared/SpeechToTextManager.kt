@@ -61,7 +61,6 @@ class SpeechToTextManager @Inject constructor(
         val isAvailable = SpeechRecognizer.isRecognitionAvailable(context)
         Log.d("HermiSTT", "Recognition available: $isAvailable")
 
-        // Проверьте разрешения
         val hasPermission = context.checkSelfPermission(
             android.Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
@@ -72,7 +71,6 @@ class SpeechToTextManager @Inject constructor(
             return
         }
 
-        // Используйте дефолтный сервис
         android.os.Handler(Looper.getMainLooper()).post {
             ensureRecognizer()
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -84,15 +82,6 @@ class SpeechToTextManager @Inject constructor(
 
             startListeningWithFocus(intent)
         }
-//        if (speechRecognizer == null) return
-//
-//        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-//            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-//            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-//            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-//            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-//        }
-//        speechRecognizer?.startListening(intent)
     }
 
     fun startListeningWithFocus(intent: Intent) {
@@ -131,7 +120,7 @@ class SpeechToTextManager @Inject constructor(
 
     override fun onReadyForSpeech(params: Bundle?) {
         Log.d("HermiSTT", "REAL TALK: Microphone is open now!")
-        _listeningState.value = true // Теперь Compose точно увидит
+        _listeningState.value = true
     }
 
     override fun onBeginningOfSpeech() {

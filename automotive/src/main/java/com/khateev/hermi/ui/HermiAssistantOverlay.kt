@@ -15,6 +15,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,6 +58,11 @@ fun HermiAssistantOverlay(
     val isListening by viewModel.isListening.collectAsState()
     val context = LocalContext.current
 
+    val handleDismiss = {
+        viewModel.stopVoiceInput()
+        onClose()
+    }
+
     LaunchedEffect(isListening) {
         Log.d("HermiUI_Compose", "Compose saw change: $isListening")
     }
@@ -70,7 +78,16 @@ fun HermiAssistantOverlay(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.7f))) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.7f))
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                handleDismiss()
+            }) {
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -95,20 +112,8 @@ fun HermiAssistantOverlay(
                 )
             }
         }
-
-        IconButton(
-            onClick = { onClose() },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .background(Color.Red)
-                .padding(16.dp)
-                .zIndex(1f)
-        ) {
-            Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
-        }
     }
 }
-
 
 
 @Composable
@@ -165,7 +170,10 @@ private fun openNavigationFor(context: Context, searchQuery: String) {
             PackageManager.MATCH_DEFAULT_ONLY
         )
 
-        Log.d("Navigation", "Available apps for geo intent: ${availableApps.map { it.activityInfo.packageName }}")
+        Log.d(
+            "Navigation",
+            "Available apps for geo intent: ${availableApps.map { it.activityInfo.packageName }}"
+        )
 
         if (availableApps.isNotEmpty()) {
             context.startActivity(mapIntent)
@@ -186,7 +194,10 @@ private fun tryAlternativeNavigation(context: Context, searchQuery: String) {
     // Try different intent types
     val alternatives = listOf(
         // Try Google Maps with different URI schemes
-        Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=$searchQuery")),
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://www.google.com/maps/search/?api=1&query=$searchQuery")
+        ),
 
         // Try generic search intent
         Intent(Intent.ACTION_WEB_SEARCH).apply {
@@ -214,5 +225,6 @@ private fun tryAlternativeNavigation(context: Context, searchQuery: String) {
 
     Log.e("Navigation", "All navigation alternatives failed")
     // Last resort - show in-app message
-    Toast.makeText(context, "Navigation not available. Showing results in-app.", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, "Navigation not available. Showing results in-app.", Toast.LENGTH_SHORT)
+        .show()
 }

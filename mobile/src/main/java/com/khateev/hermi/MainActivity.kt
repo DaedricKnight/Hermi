@@ -23,7 +23,6 @@ class MainActivity : ComponentActivity() {
             )
         } else {
             Log.d("HermiAssistant", "Разрешение уже есть, стартуем STT")
-            // Здесь можно вызвать запуск распознавания, если нужно сразу
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,9 +37,6 @@ class MainActivity : ComponentActivity() {
         ), 101)
 
         setContent {
-            // Твоя тема оформления
-                // Тот самый экран, который мы создали
-//                HermiParamsScreen()
         }
     }
 }

@@ -34,7 +34,7 @@ class HermiViewModel (
     val isMockMode: StateFlow<Boolean> = _isMockMode.asStateFlow()
 
     val isListening: StateFlow<Boolean> = speechToTextManager.listeningState
-        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _currentSpokenText = MutableStateFlow("")
     val currentSpokenText: StateFlow<String> = _currentSpokenText.asStateFlow()
@@ -48,9 +48,10 @@ class HermiViewModel (
     init {
         viewModelScope.launch {
             speechToTextManager.spokenText.collect { text ->
-                _currentSpokenText.value = text
-                _recognizedText.emit(text)
-                val command = aiProcessor.parseCommand(text)
+                val testText = text
+                _currentSpokenText.value = testText
+                _recognizedText.emit(testText)
+                val command = aiProcessor.parseCommand(testText)
                 executeCommand(command)
                 delay(5000)
                 _recognizedText.emit("")
@@ -165,7 +166,7 @@ class HermiViewModel (
                 }
 
                 is HermiAIProcessor.Command.Unknown -> {
-                    voiceManager.speak("I didn't quite understand that command. Please try again")
+
                 }
             }
         }

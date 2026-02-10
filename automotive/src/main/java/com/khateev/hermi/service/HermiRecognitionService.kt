@@ -8,8 +8,6 @@ class HermiRecognitionService : RecognitionService() {
 
     override fun onStartListening(intent: Intent?, listener: Callback?) {
         Log.d("HermiRecognition", "onStartListening")
-        // Здесь можно реализовать свою логику,
-        // но для "валидации" приложения системой достаточно просто наличия сервиса.
     }
 
     override fun onCancel(listener: Callback?) {

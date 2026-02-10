@@ -2,6 +2,7 @@ package com.khateev.hermi
 
 import android.Manifest
 import android.R
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +18,7 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
@@ -28,6 +30,7 @@ import com.khateev.hermi.ui.HermiAssistantActivity
 import com.khateev.hermi.ui.HermiAssistantOverlay
 import com.khateev.hermi.viewmodel.HermiViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.launch
 
 class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(context),
     LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
@@ -36,7 +39,8 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
     override val lifecycle: Lifecycle = lifecycleRegistry
     override val viewModelStore = ViewModelStore()
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
-    override val savedStateRegistry: SavedStateRegistry = savedStateRegistryController.savedStateRegistry
+    override val savedStateRegistry: SavedStateRegistry =
+        savedStateRegistryController.savedStateRegistry
     private val speechToTextManager = SpeechToTextManager(context)
 
     override fun onCreate() {
@@ -48,12 +52,17 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreateContentView(): View {
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(this@HermiVoiceInteractionSession)
             setViewTreeSavedStateRegistryOwner(this@HermiVoiceInteractionSession)
 
-            val tagId = context.resources.getIdentifier("view_tree_view_model_store_owner", "id", context.packageName)
+            val tagId = context.resources.getIdentifier(
+                "view_tree_view_model_store_owner",
+                "id",
+                context.packageName
+            )
             setTag(tagId, this@HermiVoiceInteractionSession)
 
             setContent {
@@ -79,6 +88,14 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                     )
 
                     HermiAssistantOverlay(viewModel = viewModel, onClose = { hide() })
+
+                    viewModel.viewModelScope.launch {
+                        viewModel.isListening.collect { isListening ->
+                            if (!isListening) {
+                                hide()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -95,7 +112,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                 putExtra("REQUEST_PERMISSIONS", true)
             }
             startAssistantActivity(intent)
-            // hide()
+            hide()
         } else {
             getWindow()?.window?.let { win ->
                 win.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
