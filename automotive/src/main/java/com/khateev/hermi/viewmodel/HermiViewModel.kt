@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khateev.hermi.NavigationEvent
-import com.khateev.hermi.repository.VhalReader
 import com.khateev.hermi.shared.AIProcessor
 import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.SpeechToTextManager
-import com.khateev.hermi.shared.VhalParamsState
 import com.khateev.hermi.shared.VoiceInterfaceManager
+import com.qubit.core_vhal.VhalParamsState
+import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

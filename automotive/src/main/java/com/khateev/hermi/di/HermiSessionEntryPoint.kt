@@ -1,9 +1,9 @@
 package com.khateev.hermi.di
 
-import com.khateev.hermi.repository.VhalReader
 import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.SpeechToTextManager
 import com.khateev.hermi.shared.VoiceInterfaceManager
+import com.qubit.core_vhal.repository.VhalReader
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent

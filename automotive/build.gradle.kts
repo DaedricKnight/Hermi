@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(files("libs/core_vhal-release.aar"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(project(":shared"))
