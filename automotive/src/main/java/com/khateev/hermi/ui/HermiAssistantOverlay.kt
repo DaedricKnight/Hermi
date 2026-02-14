@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.khateev.hermi.NavigationEvent
 import com.khateev.hermi.viewmodel.HermiViewModel
 import kotlinx.coroutines.flow.collectLatest
+import androidx.core.net.toUri
 
 @Composable
 fun HermiAssistantOverlay(
@@ -159,8 +160,10 @@ fun PulseAnimation(isListening: Boolean) {
 private fun openNavigationFor(context: Context, searchQuery: String) {
     try {
         // First, let's see what apps are available
-        val gmmIntentUri = Uri.parse("geo:0,0?q=$searchQuery")
-        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
+        val uri = "https://www.google.com/maps/search/?api=1&query=$searchQuery&open_now=true".toUri()
+
+        val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+            setPackage("com.google.android.apps.maps")
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
