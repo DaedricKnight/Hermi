@@ -24,10 +24,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,12 +38,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.khateev.hermi.NavigationEvent
 import com.khateev.hermi.viewmodel.HermiViewModel
 import kotlinx.coroutines.flow.collectLatest
-import androidx.core.net.toUri
 
 @Composable
 fun HermiAssistantOverlay(
@@ -56,20 +51,17 @@ fun HermiAssistantOverlay(
 ) {
     val carState by viewModel.uiState.collectAsState()
     val spokenText by viewModel.recognizedText.collectAsState(initial = "")
-    val isListening by viewModel.isListening.collectAsState()
+    val isListening by viewModel.isRecording.collectAsState()
+    val isProcessing by viewModel.isProcessing.collectAsState()
+    val hasError by viewModel.hasError.collectAsState()
     val context = LocalContext.current
 
     val handleDismiss = {
-        viewModel.stopVoiceInput()
+        viewModel.stopRecordingAndTranscribe()
         onClose()
     }
 
-    LaunchedEffect(isListening) {
-        Log.d("HermiUI_Compose", "Compose saw change: $isListening")
-    }
-
     LaunchedEffect(Unit) {
-        viewModel.startVoiceInput()
         viewModel.navigationEvent.collectLatest { event ->
             when (event) {
                 is NavigationEvent.OpenNavigation -> {
@@ -93,7 +85,7 @@ fun HermiAssistantOverlay(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            PulseAnimation(isListening)
+            PulseAnimation(isListening, isProcessing, hasError != null)
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -118,8 +110,17 @@ fun HermiAssistantOverlay(
 
 
 @Composable
-fun PulseAnimation(isListening: Boolean) {
+fun PulseAnimation(isListening: Boolean, isProcessing: Boolean, hasError: Boolean) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+
+    val colorScheme = MaterialTheme.colorScheme
+
+    val color = when {
+        hasError -> colorScheme.error
+        isProcessing -> colorScheme.primary
+        isListening -> colorScheme.error
+        else -> colorScheme.secondary
+    }
 
     val progress by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -137,7 +138,7 @@ fun PulseAnimation(isListening: Boolean) {
     ) {
         Canvas(modifier = Modifier.size(80.dp)) {
             drawCircle(
-                color = Color(0xFF00E5FF),
+                color = color,
                 radius = size.minDimension / 2
             )
         }
@@ -147,7 +148,7 @@ fun PulseAnimation(isListening: Boolean) {
                 val delayProgress = (progress + (i * 0.3f)) % 1f
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     drawCircle(
-                        color = Color(0xFF00E5FF).copy(alpha = 1f - delayProgress),
+                        color = color.copy(alpha = 1f - delayProgress),
                         radius = (size.minDimension / 2) * delayProgress,
                         style = Stroke(width = 4.dp.toPx())
                     )

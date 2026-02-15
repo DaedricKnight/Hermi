@@ -15,13 +15,13 @@ class HermiAssistantActivity : ComponentActivity() {
         if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
             != android.content.pm.PackageManager.PERMISSION_GRANTED) {
 
-            Log.d("HermiAssistant", "Request permission for mic")
+            log("Request permission for mic")
             requestPermissions(
                 arrayOf(android.Manifest.permission.RECORD_AUDIO),
                 REQUEST_RECORD_AUDIO_PERMISSION
             )
         } else {
-            Log.d("HermiAssistant", "Start STT")
+            log("Start STT")
         }
     }
 
@@ -46,9 +46,9 @@ class HermiAssistantActivity : ComponentActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                Log.d("HermiAssistant", "Granted")
+                log("Granted")
             } else {
-                Log.e("HermiAssistant", "Not granted")
+                log("Not granted")
             }
         }
     }
@@ -58,3 +58,5 @@ class HermiAssistantActivity : ComponentActivity() {
         overridePendingTransition(0, 0)
     }
 }
+
+private fun log(message: String) = Log.d("HermiAssistant", message)

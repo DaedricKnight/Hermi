@@ -7,14 +7,16 @@ import android.util.Log
 class HermiRecognitionService : RecognitionService() {
 
     override fun onStartListening(intent: Intent?, listener: Callback?) {
-        Log.d("HermiRecognition", "onStartListening")
+        log("onStartListening")
     }
 
     override fun onCancel(listener: Callback?) {
-        Log.d("HermiRecognition", "onCancel")
+        log("onCancel")
     }
 
     override fun onStopListening(listener: Callback?) {
-        Log.d("HermiRecognition", "onStopListening")
+        log("onStopListening")
     }
 }
+
+private fun log(message: String) = Log.d("HermiRecognition", message)

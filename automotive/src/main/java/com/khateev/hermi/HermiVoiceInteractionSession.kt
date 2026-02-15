@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.compose.runtime.CompositionLocalProvider
@@ -25,11 +26,13 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.khateev.hermi.di.HermiSessionEntryPoint
-import com.khateev.hermi.shared.SpeechToTextManager
+import com.khateev.hermi.shared.AudioRecorder
+import com.khateev.hermi.shared.VoskManager
 import com.khateev.hermi.ui.HermiAssistantActivity
 import com.khateev.hermi.ui.HermiAssistantOverlay
 import com.khateev.hermi.viewmodel.HermiViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(context),
@@ -41,7 +44,18 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry =
         savedStateRegistryController.savedStateRegistry
-    private val speechToTextManager = SpeechToTextManager(context)
+
+    private val voskManager by lazy {
+        Log.d("HermiSession", "Creating VoskManager with context")
+        VoskManager(context)
+    }
+
+    private val audioRecorder by lazy {
+        Log.d("HermiSession", "Creating AudioRecorder")
+        AudioRecorder()
+    }
+
+    private var hermiViewModel: HermiViewModel? = null
 
     override fun onCreate() {
         savedStateRegistryController.performRestore(null)
@@ -50,10 +64,14 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         getWindow()?.window?.setBackgroundDrawableResource(R.color.transparent)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+
+        Log.d("HermiSession", "Session onCreate completed")
     }
 
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreateContentView(): View {
+        Log.d("HermiSession", "onCreateContentView called")
+
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(this@HermiVoiceInteractionSession)
             setViewTreeSavedStateRegistryOwner(this@HermiVoiceInteractionSession)
@@ -74,11 +92,15 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                         HermiSessionEntryPoint::class.java
                     )
 
+                    Log.d("HermiSession", "Creating ViewModel...")
+
                     val viewModel: HermiViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
                             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                                Log.d("HermiSession", "Factory creating ViewModel with dependencies")
                                 return HermiViewModel(
-                                    speechToTextManager = speechToTextManager,
+                                    voskManager = voskManager,
+                                    audioRecorder = audioRecorder,
                                     vhalReader = entryPoint.getVhalReader(),
                                     aiProcessor = entryPoint.getAiProcessor(),
                                     voiceManager = entryPoint.getVoiceManager(),
@@ -87,10 +109,13 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                         }
                     )
 
+                    Log.d("HermiSession", "ViewModel created, setting hermiViewModel")
+                    hermiViewModel = viewModel
+
                     HermiAssistantOverlay(viewModel = viewModel, onClose = { hide() })
 
                     viewModel.viewModelScope.launch {
-                        viewModel.isListening.collect { isListening ->
+                        viewModel.isRecording.collect { isListening ->
                             if (!isListening) {
                                 hide()
                             }
@@ -104,9 +129,11 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
 
     override fun onShow(args: Bundle?, showFlags: Int) {
         super.onShow(args, showFlags)
+        Log.d("HermiSession", "onShow called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("HermiSession", "No RECORD_AUDIO permission, requesting...")
             val intent = Intent(context, HermiAssistantActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("REQUEST_PERMISSIONS", true)
@@ -114,22 +141,35 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
             startAssistantActivity(intent)
             hide()
         } else {
+            Log.d("HermiSession", "RECORD_AUDIO permission granted")
             getWindow()?.window?.let { win ->
                 win.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
                 win.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
+
+            Log.d("HermiSession", "Starting recording...")
+            hermiViewModel?.let { viewModel ->
+                viewModel.viewModelScope.launch {
+                    viewModel.startRecording()
+                    delay(5000)
+                    viewModel.stopRecordingAndTranscribe()
+                    hide()
+                }
+            }
         }
-        speechToTextManager.startListening()
     }
 
     override fun onHide() {
         super.onHide()
+        Log.d("HermiSession", "onHide called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("HermiSession", "onDestroy called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        voskManager.release()
         viewModelStore.clear()
     }
 }

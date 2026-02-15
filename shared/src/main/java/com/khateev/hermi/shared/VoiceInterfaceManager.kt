@@ -30,23 +30,23 @@ class VoiceInterfaceManager @Inject constructor(
                 if (result != TextToSpeech.LANG_MISSING_DATA &&
                     result != TextToSpeech.LANG_NOT_SUPPORTED) {
                     isReady = true
-                    Log.d("VoiceInterfaceManager", "TTS initialized successfully, isReady = true")
+                    log("TTS initialized successfully, isReady = true")
                 } else {
-                    Log.e("VoiceInterfaceManager", "Language not supported, result = $result")
+                    log("Language not supported, result = $result")
                 }
             } else {
-                Log.e("VoiceInterfaceManager", "TTS initialization failed, status = $status")
+                log("TTS initialization failed, status = $status")
             }
         }
     }
 
     fun speak(text: String) {
-        Log.d("VoiceInterfaceManager", "speak() called, text: $text, isReady: $isReady")
+        log("speak() called, text: $text, isReady: $isReady")
         if (isReady) {
             tts?.speak(text, TextToSpeech.QUEUE_ADD, null, text.hashCode().toString())
-            Log.d("VoiceInterfaceManager", "TTS speaking: $text")
+            log("TTS speaking: $text")
         } else {
-            Log.w("VoiceInterfaceManager", "TTS not ready yet, skipping: $text")
+            log("TTS not ready yet, skipping: $text")
         }
     }
 
@@ -56,3 +56,5 @@ class VoiceInterfaceManager @Inject constructor(
         isReady = false
     }
 }
+
+private fun log(message: String) = Log.d("VoiceInterfaceManager", message)

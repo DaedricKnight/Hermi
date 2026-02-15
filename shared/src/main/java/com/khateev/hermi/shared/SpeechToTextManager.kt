@@ -1,6 +1,5 @@
 package com.khateev.hermi.shared
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -40,7 +39,7 @@ class SpeechToTextManager @Inject constructor(
     val listeningState: StateFlow<Boolean> = _listeningState.asStateFlow()
 
     private fun ensureRecognizer() {
-        Log.d("HermiSTT", "ensureRecognizer start")
+        log("ensureRecognizer start")
         if (speechRecognizer == null) {
             if (SpeechRecognizer.isRecognitionAvailable(context)) {
                 Handler(Looper.getMainLooper()).post {
@@ -48,9 +47,9 @@ class SpeechToTextManager @Inject constructor(
                         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
                             setRecognitionListener(this@SpeechToTextManager)
                         }
-                        Log.d("HermiSTT", "SpeechRecognizer initialized with default service")
+                        log("SpeechRecognizer initialized with default service")
                     } catch (e: Exception) {
-                        Log.e("HermiSTT", "Failed to init SpeechRecognizer", e)
+                        log("Failed to init SpeechRecognizer $e")
                     }
                 }
             }
@@ -59,19 +58,19 @@ class SpeechToTextManager @Inject constructor(
 
     fun startListening() {
         val isAvailable = SpeechRecognizer.isRecognitionAvailable(context)
-        Log.d("HermiSTT", "Recognition available: $isAvailable")
+        log("Recognition available: $isAvailable")
 
         val hasPermission = context.checkSelfPermission(
             android.Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
-        Log.d("HermiSTT", "RECORD_AUDIO permission: $hasPermission")
+        log("RECORD_AUDIO permission: $hasPermission")
 
         if (!hasPermission) {
-            Log.e("HermiSTT", "No RECORD_AUDIO permission!")
+            log("No RECORD_AUDIO permission!")
             return
         }
 
-        android.os.Handler(Looper.getMainLooper()).post {
+        Handler(Looper.getMainLooper()).post {
             ensureRecognizer()
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -96,14 +95,14 @@ class SpeechToTextManager @Inject constructor(
 
         val result = audioManager.requestAudioFocus(focusRequest)
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.d("HermiSTT", "AudioManager.AUDIOFOCUS_REQUEST_GRANTED")
+            log("AudioManager.AUDIOFOCUS_REQUEST_GRANTED")
 
             Handler(Looper.getMainLooper()).postDelayed({
-                Log.d("HermiSTT", "Calling startListening after delay")
+                log("Calling startListening after delay")
                 speechRecognizer?.startListening(intent)
             }, 500)
         } else {
-            Log.d("HermiSTT", "Focus denied")
+            log("Focus denied")
         }
     }
 
@@ -150,7 +149,7 @@ class SpeechToTextManager @Inject constructor(
             else -> "Unknown speech recognition error"
         }
         _spokenText.tryEmit("Error: $errorMessage")
-        Log.e("HermiSTT", "Speech Error: $errorMessage")
+        log("Speech Error: $errorMessage")
     }
 
     override fun onResults(results: Bundle?) {
@@ -163,3 +162,5 @@ class SpeechToTextManager @Inject constructor(
 
     override fun onEvent(eventType: Int, params: Bundle?) {}
 }
+
+private fun log(message: String) = Log.d("HermiSTT", message)

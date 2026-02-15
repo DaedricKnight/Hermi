@@ -16,6 +16,7 @@ hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
 ksp = "2.1.0-1.0.29"
 material3 = "1.4.0"
+voskAndroid = "0.3.47"
 
 [libraries]
 androidx-app = { module = "androidx.car.app:app", version.ref = "app" }
@@ -34,6 +35,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3"}
+vosk-android = { group = "com.alphacephei", name = "vosk-android", version.ref = "voskAndroid"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

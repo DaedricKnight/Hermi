@@ -1,28 +1,31 @@
 package com.khateev.hermi.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khateev.hermi.NavigationEvent
 import com.khateev.hermi.shared.AIProcessor
+import com.khateev.hermi.shared.AudioRecorder
 import com.khateev.hermi.shared.HermiAIProcessor
-import com.khateev.hermi.shared.SpeechToTextManager
 import com.khateev.hermi.shared.VoiceInterfaceManager
+import com.khateev.hermi.shared.VoskManager
 import com.qubit.core_vhal.VhalParamsState
 import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HermiViewModel (
-    private val speechToTextManager: SpeechToTextManager,
+    private val voskManager: VoskManager,
+    private val audioRecorder: AudioRecorder,
     private val vhalReader: VhalReader,
     private val aiProcessor: AIProcessor,
     private val voiceManager: VoiceInterfaceManager
@@ -33,8 +36,23 @@ class HermiViewModel (
     private val _isMockMode = MutableStateFlow(true)
     val isMockMode: StateFlow<Boolean> = _isMockMode.asStateFlow()
 
-    val isListening: StateFlow<Boolean> = speechToTextManager.listeningState
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    var _isRecording = MutableStateFlow(false)
+
+    val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
+
+    var transcription by mutableStateOf("")
+        private set
+
+    var isInitialized by mutableStateOf(false)
+        private set
+
+    var _isProcessing = MutableStateFlow(false)
+
+    val isProcessing = _isProcessing.asStateFlow()
+
+    var _hasError =  MutableStateFlow<Exception?>(null)
+
+    val hasError = _hasError.asStateFlow()
 
     private val _currentSpokenText = MutableStateFlow("")
     val currentSpokenText: StateFlow<String> = _currentSpokenText.asStateFlow()
@@ -45,16 +63,81 @@ class HermiViewModel (
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
 
+    private val TAG = "HermiVM"
+
     init {
         viewModelScope.launch {
-            speechToTextManager.spokenText.collect { text ->
-                val testText = text
-                _currentSpokenText.value = testText
-                _recognizedText.emit(testText)
-                val command = aiProcessor.parseCommand(testText)
-                executeCommand(command)
-                delay(5000)
-                _recognizedText.emit("")
+            try {
+                transcription = "Loading Vosk model..."
+                Log.d(TAG, "Calling voskManager.initialize()...")
+
+                delay(100)
+
+                isInitialized = voskManager.initialize()
+
+                if (isInitialized) {
+                    Log.d(TAG, "VoskManager initialized successfully!")
+                    transcription = "🎤 Ready to record"
+                } else {
+                    Log.e(TAG, "VoskManager initialization FAILED")
+                    transcription = "Initialization failed"
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception during initialization", e)
+                transcription = "Error: ${e.message}"
+            }
+        }
+    }
+
+    fun startRecording() {
+        if (!isInitialized) {
+            Log.e("HermiVM", "Cannot record: Vosk not initialized")
+            transcription = "Not initialized yet"
+            return
+        }
+
+        viewModelScope.launch {
+            _isRecording.value  = true
+            transcription = "Recording..."
+            audioRecorder.startRecording()
+        }
+    }
+
+    fun stopRecordingAndTranscribe() {
+
+        if (!isInitialized) {
+            Log.e("HermiVM", "Cannot transcribe: Vosk not initialized")
+            return
+        }
+
+        _isRecording.value = false
+        val samples = audioRecorder.stopRecording()
+
+        Log.d("HermiVM", "Got ${samples.size} samples, starting transcription...")
+
+        viewModelScope.launch {
+            try {
+                _isProcessing.value = true
+                transcription = "Transcribing..."
+
+                val result = voskManager.recognizeAudio(samples)
+
+                if (result != null) {
+                    Log.d("HermiVM", "Transcription: $result")
+                    transcription = result
+                    val command = aiProcessor.parseCommand(result)
+                    executeCommand(command)
+                    delay(5000)
+                    _recognizedText.emit("")
+                } else {
+                    Log.e("HermiVM", "Transcription returned null")
+                    transcription = "Failed to transcribe"
+                }
+            } catch (e: Exception) {
+                Log.e("HermiVM", "Transcription error", e)
+                transcription = "Error: ${e.message}"
+            } finally {
+                _isProcessing.value = false
             }
         }
     }
@@ -268,6 +351,7 @@ class HermiViewModel (
                 Log.d("HermiVM", "Sending vehicle command: $command")
             } catch (e: Exception) {
                 Log.e("HermiVM", "Failed to send vehicle command: ${e.message}")
+                _hasError.value = Exception("Failed to send vehicle command: ${e.message}")
                 voiceManager.speak("Failed to execute command")
             }
         }
@@ -282,17 +366,8 @@ class HermiViewModel (
         }
     }
 
-    fun startVoiceInput() {
-        Log.d("HermiVM", "startVoiceInput called")
-        speechToTextManager.startListening()
-    }
-
-    fun stopVoiceInput() = speechToTextManager.stopListening()
-
     override fun onCleared() {
         super.onCleared()
-        stopVoiceInput()
         voiceManager.shutdown()
-        speechToTextManager.destroy()
     }
 }
