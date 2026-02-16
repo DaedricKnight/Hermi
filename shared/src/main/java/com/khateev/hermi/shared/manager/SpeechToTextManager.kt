@@ -1,5 +1,6 @@
-package com.khateev.hermi.shared
+package com.khateev.hermi.shared.manager
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -61,7 +62,7 @@ class SpeechToTextManager @Inject constructor(
         log("Recognition available: $isAvailable")
 
         val hasPermission = context.checkSelfPermission(
-            android.Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
         log("RECORD_AUDIO permission: $hasPermission")
 

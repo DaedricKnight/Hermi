@@ -1,7 +1,8 @@
-package com.khateev.hermi.shared
+package com.khateev.hermi.shared.manager
 
 import android.content.Context
 import android.util.Log
+import com.khateev.hermi.shared.interfaces.RecognitionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -10,7 +11,7 @@ import org.vosk.Recognizer
 import java.io.File
 import java.io.FileOutputStream
 
-class VoskManager(private val context: Context) {
+class VoskManager(private val context: Context): RecognitionManager {
 
     private var model: Model? = null
     private var recognizer: Recognizer? = null
@@ -21,7 +22,7 @@ class VoskManager(private val context: Context) {
         private const val MODEL_NAME = "vosk-model-small-en-us-0.15"
     }
 
-    suspend fun initialize(): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun initialize(): Boolean = withContext(Dispatchers.IO) {
         try {
             Log.d(TAG, "Initializing Vosk...")
 
@@ -37,6 +38,35 @@ class VoskManager(private val context: Context) {
             Log.e(TAG, "Failed to initialize Vosk", e)
             false
         }
+    }
+
+    override fun recognizeAudio(audioData: FloatArray): String? {
+        val rec = recognizer ?: return null
+
+        return try {
+            val shortData = ShortArray(audioData.size) {
+                (audioData[it] * 32767f).toInt().coerceIn(-32768, 32767).toShort()
+            }
+
+            if (rec.acceptWaveForm(shortData, shortData.size)) {
+                val result = rec.result
+                parseResult(result)
+            } else {
+                val final = rec.result
+                parseResult(final)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Recognition error", e)
+            null
+        }
+    }
+
+    override fun release() {
+        recognizer?.close()
+        model?.close()
+        recognizer = null
+        model = null
+        Log.d(TAG, "Vosk released")
     }
 
     private fun getModelDirectory(): File {
@@ -99,26 +129,6 @@ class VoskManager(private val context: Context) {
         }
     }
 
-    fun recognizeAudio(audioData: FloatArray): String? {
-        val rec = recognizer ?: return null
-
-        return try {
-            val shortData = ShortArray(audioData.size) {
-                (audioData[it] * 32767f).toInt().coerceIn(-32768, 32767).toShort()
-            }
-
-            if (rec.acceptWaveForm(shortData, shortData.size)) {
-                val result = rec.result
-                parseResult(result)
-            } else {
-                val final = rec.result
-                parseResult(final)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Recognition error", e)
-            null
-        }
-    }
 
     private fun parseResult(json: String): String {
         return try {
@@ -127,13 +137,5 @@ class VoskManager(private val context: Context) {
         } catch (e: Exception) {
             ""
         }
-    }
-
-    fun release() {
-        recognizer?.close()
-        model?.close()
-        recognizer = null
-        model = null
-        Log.d(TAG, "Vosk released")
     }
 }

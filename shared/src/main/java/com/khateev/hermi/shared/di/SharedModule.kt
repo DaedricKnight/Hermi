@@ -2,10 +2,14 @@ package com.khateev.hermi.shared.di
 
 import android.content.Context
 import android.speech.RecognitionListener
-import android.speech.tts.TextToSpeech
+import com.khateev.hermi.shared.AudioRecorderImpl
+import com.khateev.hermi.shared.interfaces.AIProcessor
 import com.khateev.hermi.shared.HermiAIProcessor
-import com.khateev.hermi.shared.SpeechToTextManager
-import com.khateev.hermi.shared.VoiceInterfaceManager
+import com.khateev.hermi.shared.interfaces.AudioRecorder
+import com.khateev.hermi.shared.interfaces.RecognitionManager
+import com.khateev.hermi.shared.manager.SpeechToTextManager
+import com.khateev.hermi.shared.manager.VoiceInterfaceManager
+import com.khateev.hermi.shared.manager.VoskManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +23,7 @@ object SharedModule {
 
     @Provides
     @Singleton
-    fun provideHermiAIProcessor(@ApplicationContext context: Context): HermiAIProcessor {
+    fun provideHermiAIProcessor(@ApplicationContext context: Context): AIProcessor {
         return HermiAIProcessor(context)
     }
 
@@ -29,11 +33,22 @@ object SharedModule {
         return SpeechToTextManager(context)
     }
 
-        @Provides
+    @Provides
     @Singleton
     fun provideVoiceInterfaceManager(@ApplicationContext context: Context): VoiceInterfaceManager {
         return VoiceInterfaceManager(context)
     }
 
+    @Provides
+    @Singleton
+    fun provideRecognitionManager(@ApplicationContext context: Context): RecognitionManager {
+        return VoskManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAudioRecorder(): AudioRecorder {
+        return AudioRecorderImpl()
+    }
 
 }

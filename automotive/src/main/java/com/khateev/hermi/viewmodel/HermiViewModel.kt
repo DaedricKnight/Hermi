@@ -7,11 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khateev.hermi.NavigationEvent
-import com.khateev.hermi.shared.AIProcessor
-import com.khateev.hermi.shared.AudioRecorder
 import com.khateev.hermi.shared.HermiAIProcessor
-import com.khateev.hermi.shared.VoiceInterfaceManager
-import com.khateev.hermi.shared.VoskManager
+import com.khateev.hermi.shared.interfaces.AIProcessor
+import com.khateev.hermi.shared.interfaces.AudioRecorder
+import com.khateev.hermi.shared.interfaces.RecognitionManager
+import com.khateev.hermi.shared.manager.VoiceInterfaceManager
 import com.qubit.core_vhal.VhalParamsState
 import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.delay
@@ -24,8 +24,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class HermiViewModel (
-    private val voskManager: VoskManager,
-    private val audioRecorder: AudioRecorder,
+    private val voskManager: RecognitionManager,
+    private val audioRecorderImpl: AudioRecorder,
     private val vhalReader: VhalReader,
     private val aiProcessor: AIProcessor,
     private val voiceManager: VoiceInterfaceManager
@@ -99,7 +99,7 @@ class HermiViewModel (
         viewModelScope.launch {
             _isRecording.value  = true
             transcription = "Recording..."
-            audioRecorder.startRecording()
+            audioRecorderImpl.startRecording()
         }
     }
 
@@ -111,7 +111,7 @@ class HermiViewModel (
         }
 
         _isRecording.value = false
-        val samples = audioRecorder.stopRecording()
+        val samples = audioRecorderImpl.stopRecording()
 
         Log.d("HermiVM", "Got ${samples.size} samples, starting transcription...")
 
@@ -369,5 +369,6 @@ class HermiViewModel (
     override fun onCleared() {
         super.onCleared()
         voiceManager.shutdown()
+        voskManager.release()
     }
 }

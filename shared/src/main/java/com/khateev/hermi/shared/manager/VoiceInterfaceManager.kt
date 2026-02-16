@@ -1,4 +1,4 @@
-package com.khateev.hermi.shared
+package com.khateev.hermi.shared.manager
 
 import android.content.Context
 import android.media.AudioAttributes

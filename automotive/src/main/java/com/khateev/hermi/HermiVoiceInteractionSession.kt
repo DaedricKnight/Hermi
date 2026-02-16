@@ -26,8 +26,6 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.khateev.hermi.di.HermiSessionEntryPoint
-import com.khateev.hermi.shared.AudioRecorder
-import com.khateev.hermi.shared.VoskManager
 import com.khateev.hermi.ui.HermiAssistantActivity
 import com.khateev.hermi.ui.HermiAssistantOverlay
 import com.khateev.hermi.viewmodel.HermiViewModel
@@ -44,16 +42,6 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry =
         savedStateRegistryController.savedStateRegistry
-
-    private val voskManager by lazy {
-        Log.d("HermiSession", "Creating VoskManager with context")
-        VoskManager(context)
-    }
-
-    private val audioRecorder by lazy {
-        Log.d("HermiSession", "Creating AudioRecorder")
-        AudioRecorder()
-    }
 
     private var hermiViewModel: HermiViewModel? = null
 
@@ -99,8 +87,8 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                                 Log.d("HermiSession", "Factory creating ViewModel with dependencies")
                                 return HermiViewModel(
-                                    voskManager = voskManager,
-                                    audioRecorder = audioRecorder,
+                                    voskManager = entryPoint.getRecognitionManager(),
+                                    audioRecorderImpl = entryPoint.getAudioRecorder(),
                                     vhalReader = entryPoint.getVhalReader(),
                                     aiProcessor = entryPoint.getAiProcessor(),
                                     voiceManager = entryPoint.getVoiceManager(),
@@ -169,7 +157,6 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         super.onDestroy()
         Log.d("HermiSession", "onDestroy called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        voskManager.release()
         viewModelStore.clear()
     }
 }

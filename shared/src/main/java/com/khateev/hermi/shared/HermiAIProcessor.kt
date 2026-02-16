@@ -1,6 +1,7 @@
 package com.khateev.hermi.shared
 
 import android.content.Context
+import com.khateev.hermi.shared.interfaces.AIProcessor
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

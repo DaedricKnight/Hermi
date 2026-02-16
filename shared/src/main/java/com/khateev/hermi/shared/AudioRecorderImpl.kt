@@ -4,10 +4,11 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import com.khateev.hermi.shared.interfaces.AudioRecorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AudioRecorder {
+class AudioRecorderImpl: AudioRecorder {
 
     private var audioRecord: AudioRecord? = null
     private var isRecording = false
@@ -20,7 +21,7 @@ class AudioRecorder {
         private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
     }
 
-    suspend fun startRecording() = withContext(Dispatchers.IO) {
+    override suspend fun startRecording() = withContext(Dispatchers.IO) {
         try {
             val bufferSize = AudioRecord.getMinBufferSize(
                 SAMPLE_RATE,
@@ -57,7 +58,7 @@ class AudioRecorder {
         }
     }
 
-    fun stopRecording(): FloatArray {
+    override fun stopRecording(): FloatArray {
         isRecording = false
         audioRecord?.stop()
         audioRecord?.release()
@@ -67,5 +68,5 @@ class AudioRecorder {
         return recordedSamples.toFloatArray()
     }
 
-    fun isRecording(): Boolean = isRecording
+    override fun isRecording(): Boolean = isRecording
 }
