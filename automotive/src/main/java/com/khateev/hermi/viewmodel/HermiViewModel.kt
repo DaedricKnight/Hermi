@@ -28,7 +28,7 @@ class HermiViewModel (
     private val audioRecorderImpl: AudioRecorder,
     private val vhalReader: VhalReader,
     private val aiProcessor: AIProcessor,
-    private val voiceManager: VoiceInterfaceManager
+    private val voiceManager: VoiceInterfaceManager,
 ) : ViewModel() {
 
     val uiState: StateFlow<VhalParamsState> = vhalReader.carState
@@ -120,7 +120,7 @@ class HermiViewModel (
                 _isProcessing.value = true
                 transcription = "Transcribing..."
 
-                val result = voskManager.recognizeAudio(samples)
+                val result = "i'm hungry"//voskManager.recognizeAudio(samples)
 
                 if (result != null) {
                     Log.d("HermiVM", "Transcription: $result")

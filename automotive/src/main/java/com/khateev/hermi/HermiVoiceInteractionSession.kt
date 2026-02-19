@@ -49,7 +49,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         savedStateRegistryController.performRestore(null)
         super.onCreate()
 
-        getWindow()?.window?.setBackgroundDrawableResource(R.color.transparent)
+        window?.window?.setBackgroundDrawableResource(R.color.transparent)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
 

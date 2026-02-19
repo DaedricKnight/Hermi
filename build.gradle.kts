@@ -6,3 +6,9 @@ plugins {
     alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.ksp) apply false
 }
+
+configurations.all {
+    exclude(group = "org.tensorflow", module = "tensorflow-lite")
+    exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+    exclude(group = "org.tensorflow", module = "tensorflow-lite-support")
+}

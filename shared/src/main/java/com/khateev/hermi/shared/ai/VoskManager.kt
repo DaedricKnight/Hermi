@@ -1,4 +1,4 @@
-package com.khateev.hermi.shared.manager
+package com.khateev.hermi.shared.ai
 
 import android.content.Context
 import android.util.Log

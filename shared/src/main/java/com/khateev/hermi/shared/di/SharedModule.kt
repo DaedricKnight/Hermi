@@ -3,13 +3,13 @@ package com.khateev.hermi.shared.di
 import android.content.Context
 import android.speech.RecognitionListener
 import com.khateev.hermi.shared.AudioRecorderImpl
+import com.khateev.hermi.shared.ai.TFLiteAIProcessor
+import com.khateev.hermi.shared.ai.VoskManager
 import com.khateev.hermi.shared.interfaces.AIProcessor
-import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.interfaces.AudioRecorder
 import com.khateev.hermi.shared.interfaces.RecognitionManager
 import com.khateev.hermi.shared.manager.SpeechToTextManager
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
-import com.khateev.hermi.shared.manager.VoskManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +24,7 @@ object SharedModule {
     @Provides
     @Singleton
     fun provideHermiAIProcessor(@ApplicationContext context: Context): AIProcessor {
-        return HermiAIProcessor(context)
+        return TFLiteAIProcessor(context)
     }
 
     @Provides
