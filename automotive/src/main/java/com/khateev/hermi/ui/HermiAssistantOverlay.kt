@@ -41,68 +41,72 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.khateev.hermi.NavigationEvent
+import com.khateev.hermi.ui.theme.Blue48
 import com.khateev.hermi.viewmodel.HermiViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HermiAssistantOverlay(
     viewModel: HermiViewModel = hiltViewModel(),
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    audioPermission: Boolean
 ) {
-    val carState by viewModel.uiState.collectAsState()
-    val spokenText by viewModel.recognizedText.collectAsState(initial = "")
-    val isListening by viewModel.isRecording.collectAsState()
-    val isProcessing by viewModel.isProcessing.collectAsState()
-    val hasError by viewModel.hasError.collectAsState()
-    val context = LocalContext.current
+    if (audioPermission) {
+        val carState by viewModel.uiState.collectAsState()
+        val spokenText by viewModel.recognizedText.collectAsState(initial = "")
+        val isListening by viewModel.isRecording.collectAsState()
+        val isProcessing by viewModel.isProcessing.collectAsState()
+        val hasError by viewModel.hasError.collectAsState()
+        val context = LocalContext.current
 
-    val handleDismiss = {
-        viewModel.stopRecordingAndTranscribe()
-        onClose()
-    }
+        val handleDismiss = {
+            viewModel.stopRecordingAndTranscribe()
+            onClose()
+        }
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvent.collectLatest { event ->
-            when (event) {
-                is NavigationEvent.OpenNavigation -> {
-                    openNavigationFor(context, event.searchQuery)
+        LaunchedEffect(Unit) {
+            viewModel.navigationEvent.collectLatest { event ->
+                when (event) {
+                    is NavigationEvent.OpenNavigation -> {
+                        openNavigationFor(context, event.searchQuery)
+                    }
                 }
             }
         }
-    }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f))
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.7f))
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    handleDismiss()
+                }) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                handleDismiss()
-            }) {
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            PulseAnimation(isListening, isProcessing, hasError != null)
+                PulseAnimation(isListening, isProcessing, hasError != null)
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = if (spokenText.isEmpty() && isListening) "Listening..." else spokenText,
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 24.dp)
-            )
-
-            if (carState.fuelLevel > 0) {
                 Text(
-                    text = "Fuel: ${carState.fuelLevel} ml",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall
+                    text = if (spokenText.isEmpty() && isListening) "Listening..." else spokenText,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 )
+
+                if (carState.fuelLevel > 0) {
+                    Text(
+                        text = "Fuel: ${carState.fuelLevel} ml",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
     }
@@ -118,7 +122,7 @@ fun PulseAnimation(isListening: Boolean, isProcessing: Boolean, hasError: Boolea
     val color = when {
         hasError -> colorScheme.error
         isProcessing -> colorScheme.primary
-        isListening -> colorScheme.error
+        isListening -> Blue48
         else -> colorScheme.secondary
     }
 
@@ -160,15 +164,14 @@ fun PulseAnimation(isListening: Boolean, isProcessing: Boolean, hasError: Boolea
 
 private fun openNavigationFor(context: Context, searchQuery: String) {
     try {
-        // First, let's see what apps are available
-        val uri = "https://www.google.com/maps/search/?api=1&query=$searchQuery&open_now=true".toUri()
+        val uri =
+            "https://www.google.com/maps/search/?api=1&query=$searchQuery&open_now=true".toUri()
 
         val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
             setPackage("com.google.android.apps.maps")
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-        // Check available apps
         val availableApps = context.packageManager.queryIntentActivities(
             mapIntent,
             PackageManager.MATCH_DEFAULT_ONLY
@@ -183,7 +186,6 @@ private fun openNavigationFor(context: Context, searchQuery: String) {
             context.startActivity(mapIntent)
             Log.d("Navigation", "Opened navigation successfully")
         } else {
-            // No navigation app available - try alternative approaches
             Log.w("Navigation", "No navigation app available, trying alternatives")
             tryAlternativeNavigation(context, searchQuery)
         }
@@ -200,7 +202,7 @@ private fun tryAlternativeNavigation(context: Context, searchQuery: String) {
         // Try Google Maps with different URI schemes
         Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("https://www.google.com/maps/search/?api=1&query=$searchQuery")
+            "https://www.google.com/maps/search/?api=1&query=$searchQuery".toUri()
         ),
 
         // Try generic search intent
@@ -209,7 +211,7 @@ private fun tryAlternativeNavigation(context: Context, searchQuery: String) {
         },
 
         // Try browser with Google Maps URL
-        Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/$searchQuery"))
+        Intent(Intent.ACTION_VIEW, "https://www.google.com/maps/search/$searchQuery".toUri())
     )
 
     for ((index, intent) in alternatives.withIndex()) {

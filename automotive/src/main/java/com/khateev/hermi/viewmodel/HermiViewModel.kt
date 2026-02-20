@@ -7,11 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khateev.hermi.NavigationEvent
-import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.interfaces.AIProcessor
 import com.khateev.hermi.shared.interfaces.AudioRecorder
 import com.khateev.hermi.shared.interfaces.RecognitionManager
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
+import com.khateev.hermi.shared.model.Command
 import com.qubit.core_vhal.VhalParamsState
 import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.delay
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HermiViewModel (
+class HermiViewModel(
     private val voskManager: RecognitionManager,
     private val audioRecorderImpl: AudioRecorder,
     private val vhalReader: VhalReader,
@@ -32,9 +32,6 @@ class HermiViewModel (
 ) : ViewModel() {
 
     val uiState: StateFlow<VhalParamsState> = vhalReader.carState
-
-    private val _isMockMode = MutableStateFlow(true)
-    val isMockMode: StateFlow<Boolean> = _isMockMode.asStateFlow()
 
     var _isRecording = MutableStateFlow(false)
 
@@ -50,7 +47,7 @@ class HermiViewModel (
 
     val isProcessing = _isProcessing.asStateFlow()
 
-    var _hasError =  MutableStateFlow<Exception?>(null)
+    var _hasError = MutableStateFlow<Exception?>(null)
 
     val hasError = _hasError.asStateFlow()
 
@@ -97,7 +94,7 @@ class HermiViewModel (
         }
 
         viewModelScope.launch {
-            _isRecording.value  = true
+            _isRecording.value = true
             transcription = "Recording..."
             audioRecorderImpl.startRecording()
         }
@@ -120,7 +117,7 @@ class HermiViewModel (
                 _isProcessing.value = true
                 transcription = "Transcribing..."
 
-                val result = "i'm hungry"//voskManager.recognizeAudio(samples)
+                val result = voskManager.recognizeAudio(samples)
 
                 if (result != null) {
                     Log.d("HermiVM", "Transcription: $result")
@@ -142,114 +139,103 @@ class HermiViewModel (
         }
     }
 
-    private fun executeCommand(command: HermiAIProcessor.Command) {
+    private fun executeCommand(command: Command) {
         Log.d("HermiVM", "executeCommand: $command")
 
         viewModelScope.launch {
             when (command) {
                 // Navigation commands
-                is HermiAIProcessor.Command.FindFood -> {
+                is Command.FindFood -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("restaurants"))
                     voiceManager.speak("Searching for nearby restaurants and cafes")
                 }
 
-                is HermiAIProcessor.Command.FindGasStation -> {
+                is Command.FindGasStation -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("gas stations"))
                     voiceManager.speak("Finding gas stations near you")
                 }
 
-                is HermiAIProcessor.Command.FindChargingStation -> {
+                is Command.FindChargingStation -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("EV charging stations"))
                     voiceManager.speak("Locating charging stations nearby")
                 }
 
-                is HermiAIProcessor.Command.FindParking -> {
+                is Command.FindParking -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("parking"))
                     voiceManager.speak("Searching for parking areas")
                 }
 
                 // Vehicle status commands
-                is HermiAIProcessor.Command.VehicleStatus -> {
+                is Command.VehicleStatus -> {
                     val status = buildVehicleStatusReport()
                     voiceManager.speak(status)
                 }
 
-                is HermiAIProcessor.Command.CheckEngine -> {
+                is Command.CheckEngine -> {
                     val engineStatus = buildEngineStatusReport()
                     voiceManager.speak(engineStatus)
                 }
 
-                is HermiAIProcessor.Command.CheckTires -> {
+                is Command.CheckTires -> {
                     val tireStatus = buildTireStatusReport()
                     voiceManager.speak(tireStatus)
                 }
 
-                is HermiAIProcessor.Command.CheckFuelLevel -> {
+                is Command.CheckFuelLevel -> {
                     val fuelStatus = buildFuelStatusReport()
                     voiceManager.speak(fuelStatus)
                 }
 
-                is HermiAIProcessor.Command.CheckBatteryLevel -> {
+                is Command.CheckBatteryLevel -> {
                     val batteryStatus = buildBatteryStatusReport()
                     voiceManager.speak(batteryStatus)
                 }
 
                 // Control commands
-                is HermiAIProcessor.Command.LockDoors -> {
+                is Command.LockDoors -> {
                     sendVehicleCommand(VehicleCommand.LOCK_DOORS)
                     voiceManager.speak("Locking all doors")
                 }
 
-                is HermiAIProcessor.Command.UnlockDoors -> {
+                is Command.UnlockDoors -> {
                     sendVehicleCommand(VehicleCommand.UNLOCK_DOORS)
                     voiceManager.speak("Unlocking all doors")
                 }
 
-                is HermiAIProcessor.Command.TurnOnLights -> {
+                is Command.TurnOnLights -> {
                     sendVehicleCommand(VehicleCommand.LIGHTS_ON)
                     voiceManager.speak("Turning on headlights")
                 }
 
-                is HermiAIProcessor.Command.TurnOffLights -> {
+                is Command.TurnOffLights -> {
                     sendVehicleCommand(VehicleCommand.LIGHTS_OFF)
                     voiceManager.speak("Turning off headlights")
                 }
 
                 // Information commands
-                is HermiAIProcessor.Command.GetRange -> {
+                is Command.GetRange -> {
                     val range = uiState.value.range
                     voiceManager.speak("Your current range is ${range.toInt()} kilometers")
                 }
 
-                is HermiAIProcessor.Command.GetOdometer -> {
+                is Command.GetOdometer -> {
                     val odometer = uiState.value.odometer
                     voiceManager.speak("Total mileage is ${odometer.toInt()} kilometers")
                 }
 
-                is HermiAIProcessor.Command.GetSpeed -> {
+                is Command.GetSpeed -> {
                     val speed = uiState.value.speed
                     voiceManager.speak("Current speed is ${speed.toInt()} kilometers per hour")
                 }
 
-                is HermiAIProcessor.Command.GetOutsideTemp -> {
+                is Command.GetOutsideTemp -> {
                     val temp = uiState.value.outsideTemp
-                    val unit = uiState.value.tempUnit.ifEmpty { "°C" }
-                    voiceManager.speak("Outside temperature is ${temp.toInt()} degrees $unit")
+                    val unit = uiState.value.tempUnit.ifEmpty { "°Celcium" }
+                    voiceManager.speak("Outside temperature is ${temp.toInt()} $unit")
                 }
 
-                // Mode switching
-                is HermiAIProcessor.Command.SwitchToReal -> {
-                    toggleVhalSource(useMock = false)
-                    voiceManager.speak("Switching to real vehicle data")
-                }
-
-                is HermiAIProcessor.Command.SwitchToMock -> {
-                    toggleVhalSource(useMock = true)
-                    voiceManager.speak("Simulation mode activated")
-                }
-
-                is HermiAIProcessor.Command.Unknown -> {
-
+                is Command.Unknown -> {
+                    voiceManager.speak("Unknown command")
                 }
             }
         }
@@ -334,7 +320,6 @@ class HermiViewModel (
         }
     }
 
-    // Enum for vehicle commands
     enum class VehicleCommand {
         LOCK_DOORS,
         UNLOCK_DOORS,
@@ -354,15 +339,6 @@ class HermiViewModel (
                 _hasError.value = Exception("Failed to send vehicle command: ${e.message}")
                 voiceManager.speak("Failed to execute command")
             }
-        }
-    }
-
-    fun toggleVhalSource(useMock: Boolean) {
-        viewModelScope.launch {
-//            _isMockMode.value = useMock
-//            (vhalReader as? HybridVhalReader)?.toggleMode(useMock)
-//            val msg = if (useMock) "Simulation Mode Active" else "Real VHAL Connected"
-//            _events.emit(msg)
         }
     }
 

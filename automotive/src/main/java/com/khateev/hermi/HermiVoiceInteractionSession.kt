@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -45,6 +46,8 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
 
     private var hermiViewModel: HermiViewModel? = null
 
+    val audioPermission = mutableStateOf(false)
+
     override fun onCreate() {
         savedStateRegistryController.performRestore(null)
         super.onCreate()
@@ -52,8 +55,6 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         window?.window?.setBackgroundDrawableResource(R.color.transparent)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-
-        Log.d("HermiSession", "Session onCreate completed")
     }
 
     @SuppressLint("CoroutineCreationDuringComposition")
@@ -96,11 +97,9 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                             }
                         }
                     )
-
                     Log.d("HermiSession", "ViewModel created, setting hermiViewModel")
                     hermiViewModel = viewModel
-
-                    HermiAssistantOverlay(viewModel = viewModel, onClose = { hide() })
+                    HermiAssistantOverlay(audioPermission = audioPermission.value, viewModel = viewModel, onClose = { hide() })
 
                     viewModel.viewModelScope.launch {
                         viewModel.isRecording.collect { isListening ->
@@ -117,8 +116,8 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
 
     override fun onShow(args: Bundle?, showFlags: Int) {
         super.onShow(args, showFlags)
-        Log.d("HermiSession", "onShow called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        audioPermission.value = context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             Log.d("HermiSession", "No RECORD_AUDIO permission, requesting...")
@@ -149,13 +148,11 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
 
     override fun onHide() {
         super.onHide()
-        Log.d("HermiSession", "onHide called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("HermiSession", "onDestroy called")
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         viewModelStore.clear()
     }

@@ -2,8 +2,8 @@ package com.khateev.hermi.shared.ai
 
 import android.content.Context
 import android.util.Log
-import com.khateev.hermi.shared.HermiAIProcessor
 import com.khateev.hermi.shared.interfaces.AIProcessor
+import com.khateev.hermi.shared.model.Command
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -85,8 +85,8 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
         return res
     }
 
-    override fun parseCommand(input: String): HermiAIProcessor.Command {
-        if (input.isBlank()) return HermiAIProcessor.Command.Unknown(input)
+    override fun parseCommand(input: String): Command {
+        if (input.isBlank()) return Command.Unknown(input)
 
         return try {
             val inputIds = tokenizeToLongArray(input)
@@ -123,7 +123,7 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
 
         } catch (e: Exception) {
             Log.e(TAG, "Inference failure", e)
-            HermiAIProcessor.Command.Unknown(input)
+            Command.Unknown(input)
         }
     }
 
@@ -135,34 +135,34 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
         }
     }
 
-    private fun mapIndexToCommand(index: Int, confidence: Float, rawText: String): HermiAIProcessor.Command {
+    private fun mapIndexToCommand(index: Int, confidence: Float, rawText: String): Command {
         if (confidence < 0.7f) {
             Log.w(TAG, "Low confidence ($confidence) for index $index. Returning Unknown.")
-            return HermiAIProcessor.Command.Unknown(rawText)
+            return Command.Unknown(rawText)
         }
 
         return when (index) {
-            0  -> HermiAIProcessor.Command.CheckBatteryLevel
-            1  -> HermiAIProcessor.Command.CheckEngine
-            2  -> HermiAIProcessor.Command.CheckFuelLevel
-            3  -> HermiAIProcessor.Command.CheckTires
-            4  -> HermiAIProcessor.Command.FindChargingStation
-            5  -> HermiAIProcessor.Command.FindFood
-            6  -> HermiAIProcessor.Command.FindGasStation
-            7  -> HermiAIProcessor.Command.FindParking
-            8  -> HermiAIProcessor.Command.GetOdometer
-            9  -> HermiAIProcessor.Command.GetOutsideTemp
-            10 -> HermiAIProcessor.Command.GetRange
-            11 -> HermiAIProcessor.Command.GetSpeed
-            12 -> HermiAIProcessor.Command.LockDoors
-            13 -> HermiAIProcessor.Command.SwitchToMock
-            14 -> HermiAIProcessor.Command.SwitchToReal
-            15 -> HermiAIProcessor.Command.TurnOffLights
-            16 -> HermiAIProcessor.Command.TurnOnLights
-            17 -> HermiAIProcessor.Command.Unknown(rawText)
-            18 -> HermiAIProcessor.Command.UnlockDoors
-            19 -> HermiAIProcessor.Command.VehicleStatus
-            else -> HermiAIProcessor.Command.Unknown(rawText)
+            0  -> Command.CheckBatteryLevel
+            1  -> Command.CheckEngine
+            2  -> Command.CheckFuelLevel
+            3  -> Command.CheckTires
+            4  -> Command.FindChargingStation
+            5  -> Command.FindFood
+            6  -> Command.FindGasStation
+            7  -> Command.FindParking
+            8  -> Command.GetOdometer
+            9  -> Command.GetOutsideTemp
+            10 -> Command.GetRange
+            11 -> Command.GetSpeed
+            12 -> Command.LockDoors
+            13 -> Command.SwitchToMock
+            14 -> Command.SwitchToReal
+            15 -> Command.TurnOffLights
+            16 -> Command.TurnOnLights
+            17 -> Command.Unknown(rawText)
+            18 -> Command.UnlockDoors
+            19 -> Command.VehicleStatus
+            else -> Command.Unknown(rawText)
         }
     }
     private fun tokenizeToLongArray(text: String): LongArray {
