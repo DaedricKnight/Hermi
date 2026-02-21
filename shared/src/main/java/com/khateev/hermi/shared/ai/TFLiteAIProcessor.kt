@@ -19,7 +19,7 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
 
     companion object {
         private const val TAG = "TFLiteAIProcessor"
-        private const val MODEL_FILE = "mobilebert_sim_float32.tflite"
+        private const val MODEL_FILE = "distilbert_intent.tflite"
         private const val VOCAB_FILE = "vocab.txt"
     }
 
@@ -91,24 +91,18 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
         return try {
             val inputIds = tokenizeToLongArray(input)
             val attentionMask = LongArray(MAX_SEQ_LEN) { if (inputIds[it] != 0L) 1L else 0L }
-            val tokenTypeIds = LongArray(MAX_SEQ_LEN) { 0L }
 
-            // Используем ByteBuffer для прямого доступа к памяти
-            // 32 (длина) * 8 (байтов в Long) = 256 байт на каждый тензор
             val idBuffer = ByteBuffer.allocateDirect(MAX_SEQ_LEN * 8).order(ByteOrder.nativeOrder())
             val maskBuffer = ByteBuffer.allocateDirect(MAX_SEQ_LEN * 8).order(ByteOrder.nativeOrder())
-            val typeBuffer = ByteBuffer.allocateDirect(MAX_SEQ_LEN * 8).order(ByteOrder.nativeOrder())
 
             for (i in 0 until MAX_SEQ_LEN) {
                 idBuffer.putLong(inputIds[i])
                 maskBuffer.putLong(attentionMask[i])
-                typeBuffer.putLong(tokenTypeIds[i])
             }
 
             val output = Array(1) { FloatArray(20) }
 
-            // Порядок строго по логам: 0-Mask, 1-IDs, 2-Types
-            val inputMap = arrayOf(maskBuffer, idBuffer, typeBuffer)
+            val inputMap = arrayOf(maskBuffer, idBuffer)
             val outputMap = mapOf(0 to output)
 
             interpreter?.runForMultipleInputsOutputs(inputMap, outputMap)
@@ -155,8 +149,6 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
             10 -> Command.GetRange
             11 -> Command.GetSpeed
             12 -> Command.LockDoors
-            13 -> Command.SwitchToMock
-            14 -> Command.SwitchToReal
             15 -> Command.TurnOffLights
             16 -> Command.TurnOnLights
             17 -> Command.Unknown(rawText)
@@ -168,22 +160,18 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
     private fun tokenizeToLongArray(text: String): LongArray {
         val resultIds = mutableListOf<Long>()
 
-        // 1. Добавляем обязательный токен начала предложения [CLS]
         resultIds.add(vocab["[CLS]"]?.toLong() ?: 101L)
 
-        // 2. Базовая очистка и разбиение на слова
         val words = text.lowercase().trim().split(Regex("\\s+"))
 
         for (word in words) {
             if (resultIds.size >= MAX_SEQ_LEN - 1) break
 
-            // 3. Алгоритм WordPiece
             var remaining = word
             while (remaining.isNotEmpty()) {
                 var subword = ""
                 var end = remaining.length
 
-                // Ищем самое длинное подслово, которое есть в словаре
                 while (end > 0) {
                     val candidate =
                         if (subword.isEmpty() && resultIds.size > 1 && remaining == word) {
@@ -215,12 +203,10 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
             }
         }
 
-        // 4. Добавляем токен конца предложения [SEP]
         if (resultIds.size < MAX_SEQ_LEN) {
             resultIds.add(vocab["[SEP]"]?.toLong() ?: 102L)
         }
 
-        // 5. Формируем финальный массив фиксированной длины (32) с Padding (0)
         val finalIds = LongArray(MAX_SEQ_LEN) { 0L }
         for (i in 0 until resultIds.size.coerceAtMost(MAX_SEQ_LEN)) {
             finalIds[i] = resultIds[i]
