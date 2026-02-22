@@ -66,14 +66,14 @@ class HermiViewModel(
         viewModelScope.launch {
             try {
                 transcription = "Loading Vosk model..."
-                Log.d(TAG, "Calling voskManager.initialize()...")
+                log("Calling voskManager.initialize()...")
 
                 delay(100)
 
                 isInitialized = voskManager.initialize()
 
                 if (isInitialized) {
-                    Log.d(TAG, "VoskManager initialized successfully!")
+                    log("VoskManager initialized successfully!")
                     transcription = "🎤 Ready to record"
                 } else {
                     Log.e(TAG, "VoskManager initialization FAILED")
@@ -110,7 +110,7 @@ class HermiViewModel(
         _isRecording.value = false
         val samples = audioRecorderImpl.stopRecording()
 
-        Log.d("HermiVM", "Got ${samples.size} samples, starting transcription...")
+        log("Got ${samples.size} samples, starting transcription...")
 
         viewModelScope.launch {
             try {
@@ -120,14 +120,14 @@ class HermiViewModel(
                 val result = voskManager.recognizeAudio(samples)
 
                 if (result != null) {
-                    Log.d("HermiVM", "Transcription: $result")
+                    log("Transcription: $result")
                     transcription = result
                     val command = aiProcessor.parseCommand(result)
                     executeCommand(command)
                     delay(5000)
                     _recognizedText.emit("")
                 } else {
-                    Log.e("HermiVM", "Transcription returned null")
+                    log("Transcription returned null")
                     transcription = "Failed to transcribe"
                 }
             } catch (e: Exception) {
@@ -140,7 +140,7 @@ class HermiViewModel(
     }
 
     private fun executeCommand(command: Command) {
-        Log.d("HermiVM", "executeCommand: $command")
+        log("executeCommand: $command")
 
         viewModelScope.launch {
             when (command) {
@@ -333,7 +333,7 @@ class HermiViewModel(
             try {
                 // TODO: Implement actual vehicle HAL command sending
                 // vhalManager.sendCommand(command)
-                Log.d("HermiVM", "Sending vehicle command: $command")
+                log("Sending vehicle command: $command")
             } catch (e: Exception) {
                 Log.e("HermiVM", "Failed to send vehicle command: ${e.message}")
                 _hasError.value = Exception("Failed to send vehicle command: ${e.message}")
@@ -348,3 +348,5 @@ class HermiViewModel(
         voskManager.release()
     }
 }
+
+private fun log(message: String) = Log.d("HermiViewModel", message)

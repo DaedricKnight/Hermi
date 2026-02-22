@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.vosk.android)
     implementation(libs.tensorflow.lite)
     implementation (libs.tensorflow.lite.select.tf.ops)
+    testImplementation(libs.junit)
+    testImplementation (libs.json)
 //    implementation(libs.tensorflow.lite.support)
 //    implementation(libs.tensorflow.lite.metadata)
 //    implementation(libs.tensorflow.lite.task.text)

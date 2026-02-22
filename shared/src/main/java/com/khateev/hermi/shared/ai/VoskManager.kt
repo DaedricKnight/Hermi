@@ -73,7 +73,7 @@ class VoskManager(private val context: Context): RecognitionManager {
         val modelDir = File(context.filesDir, MODEL_NAME)
 
         if (!modelDir.exists()) {
-            Log.d(TAG, "🔄 Copying model from assets...")
+            Log.d(TAG, "Copying model from assets...")
             copyModelFromAssets(modelDir)
         }
 
@@ -101,7 +101,7 @@ class VoskManager(private val context: Context): RecognitionManager {
         val files = context.assets.list(assetPath) ?: emptyArray()
 
         if (files.isEmpty()) {
-            Log.d(TAG, "📄 Copying file: $assetPath")
+            Log.d(TAG, "Copying file: $assetPath")
             context.assets.open(assetPath).use { input ->
                 FileOutputStream(targetDir).use { output ->
                     input.copyTo(output)
@@ -122,7 +122,7 @@ class VoskManager(private val context: Context): RecognitionManager {
                         }
                     }
                 } else {
-                    Log.d(TAG, "opying folder: $fileName")
+                    Log.d(TAG, "Copying folder: $fileName")
                     copyAssetFolder(assetFilePath, targetFile)
                 }
             }
