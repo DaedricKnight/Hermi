@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Hermi</string>
+    <string name="start_voice_input">Start Voice Input</string>
+    <string name="hermi_listening_title">Hermi is Listening...</string>
+    <string name="hermi_listening_message">Speak now...</string>
+    <string name="stop_listening">Stop</string>
+    <string name="recognized_text_title">Recognized Text</string>
+    <string name="ok">OK</string>
+</resources>

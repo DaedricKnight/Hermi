@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
+    alias(libs.plugins.ksp)
+}
+android {
+    namespace 'com.khateev.hermi.shared'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 29
+        targetSdk 34
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+}
+dependencies {
+    implementation (libs.androidx.media)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.vosk.android)
+    implementation(libs.tensorflow.lite)
+    implementation (libs.tensorflow.lite.select.tf.ops)
+    testImplementation(libs.junit)
+    testImplementation (libs.json)
+//    implementation(libs.tensorflow.lite.support)
+//    implementation(libs.tensorflow.lite.metadata)
+//    implementation(libs.tensorflow.lite.task.text)
+}

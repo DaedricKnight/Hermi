@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="voice_listening">Listening...</string>
+    <string name="ai_keywords_food">eat,food,hungry,restaurant,cafe</string>
+    <string name="ai_keywords_vehicle">status,car,fuel,battery,check</string>
+    <string name="ai_fuel_low_warning">Attention: Low fuel level. Remaining range is less than %1$.0f km. Nearest gas station is within 5 km.</string>
+    <string name="ai_coolant_temp_warning">Warning: Engine coolant temperature is too high (%1$.1f °C). Please check the cooling system.</string>
+    <string name="ai_ev_battery_low">Battery low (%1$.0f%%). It is recommended to find a charging station.</string>
+    <string name="ai_tire_pressure_low">Critical: Low tire pressure detected in area %1$d. Please check your tires.</string>
+</resources>
