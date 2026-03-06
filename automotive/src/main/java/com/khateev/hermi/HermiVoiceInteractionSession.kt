@@ -27,6 +27,7 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.khateev.hermi.di.HermiSessionEntryPoint
+import com.khateev.hermi.shared.manager.VersionManagerImpl
 import com.khateev.hermi.ui.HermiAssistantActivity
 import com.khateev.hermi.ui.HermiAssistantOverlay
 import com.khateev.hermi.viewmodel.HermiViewModel
@@ -93,6 +94,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                                     vhalReader = entryPoint.getVhalReader(),
                                     aiProcessor = entryPoint.getAiProcessor(),
                                     voiceManager = entryPoint.getVoiceManager(),
+                                    versionManager = VersionManagerImpl(context)
                                 ) as T
                             }
                         }

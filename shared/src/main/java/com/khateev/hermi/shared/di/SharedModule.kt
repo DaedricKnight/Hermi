@@ -7,6 +7,8 @@ import com.khateev.hermi.shared.ai.VoskManager
 import com.khateev.hermi.shared.interfaces.AIProcessor
 import com.khateev.hermi.shared.interfaces.AudioRecorder
 import com.khateev.hermi.shared.interfaces.RecognitionManager
+import com.khateev.hermi.shared.interfaces.VersionManager
+import com.khateev.hermi.shared.manager.VersionManagerImpl
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
 import dagger.Module
 import dagger.Provides
@@ -41,6 +43,12 @@ object SharedModule {
     @Singleton
     fun provideAudioRecorder(): AudioRecorder {
         return AudioRecorderImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideVersionManager(@ApplicationContext context: Context): VersionManager {
+        return VersionManagerImpl(context)
     }
 
 }

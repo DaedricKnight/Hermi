@@ -1,12 +1,14 @@
 package com.khateev.hermi.shared.model
 
 sealed class Command {
+    // ==================== FREE VERSION (4 commands) ====================
     // Navigation and search
     object FindFood : Command()
     object FindGasStation : Command()
     object FindChargingStation : Command()
     object FindParking : Command()
 
+    // ==================== PRO VERSION (13 commands) ====================
     // Car status
     object VehicleStatus : Command()
     object CheckEngine : Command()

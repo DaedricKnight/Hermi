@@ -10,8 +10,11 @@ import com.khateev.hermi.NavigationEvent
 import com.khateev.hermi.shared.interfaces.AIProcessor
 import com.khateev.hermi.shared.interfaces.AudioRecorder
 import com.khateev.hermi.shared.interfaces.RecognitionManager
+import com.khateev.hermi.shared.interfaces.VersionManager
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
 import com.khateev.hermi.shared.model.Command
+import com.khateev.hermi.shared.model.CommandValidator
+import com.khateev.hermi.shared.model.CommandAccessResult
 import com.qubit.core_vhal.VhalParamsState
 import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.delay
@@ -29,6 +32,7 @@ class HermiViewModel(
     private val vhalReader: VhalReader,
     private val aiProcessor: AIProcessor,
     private val voiceManager: VoiceInterfaceManager,
+    private val versionManager: VersionManager,
 ) : ViewModel() {
 
     val uiState: StateFlow<VhalParamsState> = vhalReader.carState
@@ -143,6 +147,26 @@ class HermiViewModel(
         log("executeCommand: $command")
 
         viewModelScope.launch {
+            // Check if command is available for current version
+            val isPro = versionManager.isProNow()
+            val accessResult = CommandValidator.checkCommandAccess(command, isPro)
+
+            // Handle version access restrictions
+            if (accessResult == CommandAccessResult.RequiresPro) {
+                voiceManager.speak(
+                    "This command is not included in the free package. " +
+                    "You can upgrade to Pro subscription to access this feature"
+                )
+                log("Pro command attempted by free user: $command")
+                return@launch
+            }
+
+            if (accessResult == CommandAccessResult.Unavailable) {
+                voiceManager.speak("This command is not available at the moment")
+                log("Unavailable command attempted: $command")
+                return@launch
+            }
+
             when (command) {
                 // Navigation commands
                 is Command.FindFood -> {
@@ -230,8 +254,8 @@ class HermiViewModel(
 
                 is Command.GetOutsideTemp -> {
                     val temp = uiState.value.outsideTemp
-                    val unit = uiState.value.tempUnit.ifEmpty { "°Celcium" }
-                    voiceManager.speak("Outside temperature is ${temp.toInt()} $unit")
+                    val unit = uiState.value.tempUnit.ifEmpty { "Celsius" }
+                    voiceManager.speak("Outside temperature is ${temp.toInt()} degrees $unit")
                 }
 
                 is Command.Unknown -> {
