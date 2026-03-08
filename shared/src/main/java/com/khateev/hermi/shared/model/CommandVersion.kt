@@ -63,7 +63,10 @@ object CommandAccessControl {
 
         // Find (PRO Extended) (2)
         "FindService" to CommandVersion.PRO,
-        "FindCarWash" to CommandVersion.PRO
+        "FindCarWash" to CommandVersion.PRO,
+
+        // Fallback
+        "Unknown" to CommandVersion.FREE
     )
 
     /**
