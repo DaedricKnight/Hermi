@@ -168,7 +168,9 @@ class HermiViewModel(
             }
 
             when (command) {
-                // Navigation commands
+
+                // ==================== FREE VERSION ====================
+
                 is Command.FindFood -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("restaurants"))
                     voiceManager.speak("Searching for nearby restaurants and cafes")
@@ -181,7 +183,7 @@ class HermiViewModel(
 
                 is Command.FindChargingStation -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("EV charging stations"))
-                    voiceManager.speak("Locating charging stations nearby")
+                    voiceManager.speak("Locating EV charging stations nearby")
                 }
 
                 is Command.FindParking -> {
@@ -189,77 +191,192 @@ class HermiViewModel(
                     voiceManager.speak("Searching for parking areas")
                 }
 
-                // Vehicle status commands
-                is Command.VehicleStatus -> {
-                    val status = buildVehicleStatusReport()
-                    voiceManager.speak(status)
+                is Command.FindRestStop -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("rest stops"))
+                    voiceManager.speak("Finding rest areas nearby")
                 }
 
-                is Command.CheckEngine -> {
-                    val engineStatus = buildEngineStatusReport()
-                    voiceManager.speak(engineStatus)
+                // ==================== PRO: ENGINE & POWERTRAIN ====================
+
+                is Command.CheckEngineStatus -> {
+                    // VHAL fields: isCheckEngineOn, activeDTCs, coolantTemp
+                    voiceManager.speak(buildEngineStatusReport())
                 }
 
-                is Command.CheckTires -> {
-                    val tireStatus = buildTireStatusReport()
-                    voiceManager.speak(tireStatus)
+                is Command.CheckOilLevel -> {
+                    // VHAL fields: oilLevel (Float), oilTemp (Float)
+                    val state = uiState.value
+                    val oilLevelPct = state.oilLevel.toInt()
+                    val oilTemp = state.oilTemp.toInt()
+                    voiceManager.speak("Oil level is at $oilLevelPct percent. Oil temperature is $oilTemp degrees")
                 }
+
+                is Command.CheckTransmissionStatus -> {
+                    // No direct VHAL field — using gear + rpm as proxy
+                    val state = uiState.value
+                    val gear = state.gear
+                    val rpm = state.rpm
+                    voiceManager.speak("Current gear is $gear, engine RPM is $rpm")
+                }
+
+                is Command.CheckRpm -> {
+                    // VHAL field: rpm (Int) — NEW COMMAND
+                    val rpm = uiState.value.rpm
+                    voiceManager.speak("Engine RPM is $rpm")
+                }
+
+                is Command.CheckBrakePadWear -> {
+                    // No VHAL field — OBD2 only. isAbsActive used as context
+                    val absStatus = if (uiState.value.isAbsActive) "ABS is currently active" else "ABS is on standby"
+                    voiceManager.speak("Brake pad wear data requires OBD2 connection. $absStatus")
+                }
+
+                is Command.CheckSparkPlugCondition -> {
+                    // No VHAL field — OBD2 only. activeDTCs used as context
+                    val hasDtc = uiState.value.activeDTCs.isNotEmpty()
+                    val dtcHint = if (hasDtc) "Active fault codes detected. Check engine diagnostics." else "No ignition-related fault codes detected"
+                    voiceManager.speak("Spark plug data requires OBD2 connection. $dtcHint")
+                }
+
+                // ==================== PRO: FUEL & BATTERY ====================
 
                 is Command.CheckFuelLevel -> {
-                    val fuelStatus = buildFuelStatusReport()
-                    voiceManager.speak(fuelStatus)
+                    // VHAL fields: fuelLevel, isFuelLow, fuelCapacity, fuelCapacityType
+                    voiceManager.speak(buildFuelStatusReport())
                 }
 
-                is Command.CheckBatteryLevel -> {
-                    val batteryStatus = buildBatteryStatusReport()
-                    voiceManager.speak(batteryStatus)
+                is Command.CheckFuelConsumption -> {
+                    // No VHAL field — OBD2 only
+                    voiceManager.speak("Fuel consumption data requires OBD2 connection")
                 }
 
-                // Control commands
-                is Command.LockDoors -> {
-                    sendVehicleCommand(VehicleCommand.LOCK_DOORS)
-                    voiceManager.speak("Locking all doors")
+                is Command.CheckBatteryVoltage -> {
+                    // No direct batteryVoltage in VHAL — using evBatteryLevel + evBatteryCapacity as context
+                    val state = uiState.value
+                    val level = state.evBatteryLevel.toInt()
+                    val capacity = state.evBatteryCapacity
+                    val units = state.evBatteryUnits
+                    voiceManager.speak("Battery level is $level percent. Capacity is $capacity $units")
                 }
 
-                is Command.UnlockDoors -> {
-                    sendVehicleCommand(VehicleCommand.UNLOCK_DOORS)
-                    voiceManager.speak("Unlocking all doors")
+                is Command.CheckBatteryHealth -> {
+                    // No VHAL field — using evBatteryCapacity + evBatteryLevel as indirect indicators
+                    voiceManager.speak(buildBatteryStatusReport())
                 }
 
-                is Command.TurnOnLights -> {
-                    sendVehicleCommand(VehicleCommand.LIGHTS_ON)
-                    voiceManager.speak("Turning on headlights")
+                is Command.CheckEvStatus -> {
+                    // VHAL fields: evBatteryLevel, isEvChargePortConnected, evChargeTime, evCharge
+                    val state = uiState.value
+                    val level = state.evBatteryLevel.toInt()
+                    val charge = state.evCharge
+                    val connected = state.isEvChargePortConnected
+                    val chargeTime = state.evChargeTime
+                    val range = state.range.toInt()
+                    val connectionStatus = if (connected) "connected" else "not connected"
+                    val chargeInfo = if (connected) "Full charge in $chargeTime minutes." else ""
+                    voiceManager.speak(
+                        "EV battery is at $level percent, charging at $charge percent rate. " +
+                                "Charge port is $connectionStatus. " +
+                                "Estimated range is $range kilometers. $chargeInfo"
+                    )
                 }
 
-                is Command.TurnOffLights -> {
-                    sendVehicleCommand(VehicleCommand.LIGHTS_OFF)
-                    voiceManager.speak("Turning off headlights")
+                // ==================== PRO: TIRES & SUSPENSION ====================
+
+                is Command.CheckTireStatus -> {
+                    // VHAL fields: tirePressures (Map<Int, Float>), isCriticallyLowTirePressure
+                    voiceManager.speak(buildTireStatusReport())
                 }
 
-                // Information commands
-                is Command.GetRange -> {
-                    val range = uiState.value.range
-                    voiceManager.speak("Your current range is ${range.toInt()} kilometers")
+                is Command.CheckTireWear -> {
+                    // No VHAL field — OBD2 only. isCriticallyLowTirePressure used as context
+                    val critical = uiState.value.isCriticallyLowTirePressure
+                    val pressureHint = if (critical) "Warning: critically low tire pressure detected." else "Tire pressure is within normal range."
+                    voiceManager.speak("Tire wear data requires OBD2 connection. $pressureHint")
                 }
 
-                is Command.GetOdometer -> {
-                    val odometer = uiState.value.odometer
-                    voiceManager.speak("Total mileage is ${odometer.toInt()} kilometers")
+                is Command.CheckSuspensionHealth -> {
+                    // No VHAL field — OBD2 only
+                    voiceManager.speak("Suspension health data requires OBD2 connection")
                 }
 
-                is Command.GetSpeed -> {
-                    val speed = uiState.value.speed
-                    voiceManager.speak("Current speed is ${speed.toInt()} kilometers per hour")
+                is Command.CheckWheelAlignment -> {
+                    // No VHAL field — OBD2 only
+                    voiceManager.speak("Wheel alignment data requires OBD2 connection")
                 }
 
-                is Command.GetOutsideTemp -> {
-                    val temp = uiState.value.outsideTemp
+                is Command.CheckSteeringStatus -> {
+                    // No VHAL field — OBD2 only. isTractionControlActive used as context
+                    val tcs = uiState.value.isTractionControlActive
+                    val tcsStatus = if (tcs) "Traction control is currently active." else "Traction control is on standby."
+                    voiceManager.speak("Steering sensor data requires OBD2 connection. $tcsStatus")
+                }
+
+                // ==================== PRO: FLUIDS & FILTERS ====================
+
+                is Command.CheckTransmissionFluid -> {
+                    // No VHAL field — OBD2 only
+                    voiceManager.speak("Transmission fluid data requires OBD2 connection")
+                }
+
+                is Command.CheckBrakeFluid -> {
+                    // No VHAL field — OBD2 only
+                    voiceManager.speak("Brake fluid data requires OBD2 connection")
+                }
+
+                is Command.CheckCoolantLevel -> {
+                    // No coolantLevel in VHAL — coolantTemp used as context
+                    val temp = uiState.value.coolantTemp.toInt()
+                    voiceManager.speak("Coolant level data requires OBD2 connection. Current coolant temperature is $temp degrees")
+                }
+
+                is Command.CheckAirFilter -> {
+                    // No VHAL field — OBD2 only
+                    voiceManager.speak("Air filter data requires OBD2 connection")
+                }
+
+                // ==================== PRO: DRIVING STATS ====================
+
+                is Command.CheckOdometer -> {
+                    // VHAL field: odometer (Float)
+                    val odometer = uiState.value.odometer.toInt()
+                    voiceManager.speak("Total mileage is $odometer kilometers")
+                }
+
+                is Command.CheckDrivingRange -> {
+                    // VHAL field: range (Float)
+                    val range = uiState.value.range.toInt()
+                    voiceManager.speak("Current driving range is $range kilometers")
+                }
+
+                // ==================== PRO: ENVIRONMENTAL ====================
+
+                is Command.CheckOutsideTemperature -> {
+                    // VHAL fields: outsideTemp (Float), tempUnit (String)
+                    val temp = uiState.value.outsideTemp.toInt()
                     val unit = uiState.value.tempUnit.ifEmpty { "Celsius" }
-                    voiceManager.speak("Outside temperature is ${temp.toInt()} degrees $unit")
+                    voiceManager.speak("Outside temperature is $temp degrees $unit")
                 }
+
+                // ==================== PRO: FIND (EXTENDED) ====================
+
+                is Command.FindService -> {
+                    // Smart trigger: mention active DTCs if any present
+                    val dtcCount = uiState.value.activeDTCs.size
+                    val dtcHint = if (dtcCount > 0) "You have $dtcCount active fault code${if (dtcCount > 1) "s" else ""}." else ""
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("auto repair"))
+                    voiceManager.speak("$dtcHint Searching for nearby service stations")
+                }
+
+                is Command.FindCarWash -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("car wash"))
+                    voiceManager.speak("Finding car washes near you")
+                }
+
+                // ==================== FALLBACK ====================
 
                 is Command.Unknown -> {
-                    voiceManager.speak("Unknown command")
+                    voiceManager.speak("Sorry, I didn't understand that command")
                 }
             }
         }
@@ -341,28 +458,6 @@ class HermiViewModel(
             }
         } else {
             "This vehicle does not have an electric battery"
-        }
-    }
-
-    enum class VehicleCommand {
-        LOCK_DOORS,
-        UNLOCK_DOORS,
-        LIGHTS_ON,
-        LIGHTS_OFF
-    }
-
-    // Function to send commands to vehicle HAL
-    private fun sendVehicleCommand(command: VehicleCommand) {
-        viewModelScope.launch {
-            try {
-                // TODO: Implement actual vehicle HAL command sending
-                // vhalManager.sendCommand(command)
-                log("Sending vehicle command: $command")
-            } catch (e: Exception) {
-                Log.e("HermiVM", "Failed to send vehicle command: ${e.message}")
-                _hasError.value = Exception("Failed to send vehicle command: ${e.message}")
-                voiceManager.speak("Failed to execute command")
-            }
         }
     }
 

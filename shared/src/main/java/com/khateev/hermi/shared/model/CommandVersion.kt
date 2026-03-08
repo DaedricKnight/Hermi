@@ -17,26 +17,53 @@ object CommandAccessControl {
      * Карта команд и их версионности
      */
     private val commandVersionMap = mapOf(
-        // === FREE версия (4 команды) ===
+        // === FREE версия (5 команд) ===
+        // Navigation — local, no internet needed
         "FindFood" to CommandVersion.FREE,
         "FindGasStation" to CommandVersion.FREE,
         "FindChargingStation" to CommandVersion.FREE,
         "FindParking" to CommandVersion.FREE,
+        "FindRestStop" to CommandVersion.FREE,
 
-        // === PRO версия (13 команд) ===
-        "VehicleStatus" to CommandVersion.PRO,
-        "CheckEngine" to CommandVersion.PRO,
-        "CheckTires" to CommandVersion.PRO,
+        // === PRO версия (24 команды) ===
+        // Engine & Powertrain (5)
+        "CheckEngineStatus" to CommandVersion.PRO,
+        "CheckOilLevel" to CommandVersion.PRO,
+        "CheckTransmissionStatus" to CommandVersion.PRO,
+        "CheckBrakePadWear" to CommandVersion.PRO,
+        "CheckSparkPlugCondition" to CommandVersion.PRO,
+        "CheckRpm" to CommandVersion.PRO,
+
+        // Fuel & Battery (5)
         "CheckFuelLevel" to CommandVersion.PRO,
-        "CheckBatteryLevel" to CommandVersion.PRO,
-        "LockDoors" to CommandVersion.PRO,
-        "UnlockDoors" to CommandVersion.PRO,
-        "TurnOnLights" to CommandVersion.PRO,
-        "TurnOffLights" to CommandVersion.PRO,
-        "GetRange" to CommandVersion.PRO,
-        "GetOdometer" to CommandVersion.PRO,
-        "GetSpeed" to CommandVersion.PRO,
-        "GetOutsideTemp" to CommandVersion.PRO
+        "CheckFuelConsumption" to CommandVersion.PRO,
+        "CheckBatteryVoltage" to CommandVersion.PRO,
+        "CheckBatteryHealth" to CommandVersion.PRO,
+        "CheckEvStatus" to CommandVersion.PRO,
+
+        // Tires & Suspension (5)
+        "CheckTireStatus" to CommandVersion.PRO,
+        "CheckTireWear" to CommandVersion.PRO,
+        "CheckSuspensionHealth" to CommandVersion.PRO,
+        "CheckWheelAlignment" to CommandVersion.PRO,
+        "CheckSteeringStatus" to CommandVersion.PRO,
+
+        // Fluids & Filters (4)
+        "CheckTransmissionFluid" to CommandVersion.PRO,
+        "CheckBrakeFluid" to CommandVersion.PRO,
+        "CheckCoolantLevel" to CommandVersion.PRO,
+        "CheckAirFilter" to CommandVersion.PRO,
+
+        // Driving Stats (2)
+        "CheckOdometer" to CommandVersion.PRO,
+        "CheckDrivingRange" to CommandVersion.PRO,
+
+        // Environmental (1)
+        "CheckOutsideTemperature" to CommandVersion.PRO,
+
+        // Find (PRO Extended) (2)
+        "FindService" to CommandVersion.PRO,
+        "FindCarWash" to CommandVersion.PRO
     )
 
     /**
@@ -71,30 +98,51 @@ object CommandAccessControl {
      */
     fun getCommandName(command: Command): String {
         return when (command) {
-            // Navigation and search
+            // Navigation and search (FREE)
             Command.FindFood -> "FindFood"
             Command.FindGasStation -> "FindGasStation"
             Command.FindChargingStation -> "FindChargingStation"
             Command.FindParking -> "FindParking"
+            Command.FindRestStop -> "FindRestStop"
 
-            // Car status
-            Command.VehicleStatus -> "VehicleStatus"
-            Command.CheckEngine -> "CheckEngine"
-            Command.CheckTires -> "CheckTires"
+            // Engine & Powertrain (PRO)
+            Command.CheckEngineStatus -> "CheckEngineStatus"
+            Command.CheckOilLevel -> "CheckOilLevel"
+            Command.CheckTransmissionStatus -> "CheckTransmissionStatus"
+            Command.CheckBrakePadWear -> "CheckBrakePadWear"
+            Command.CheckSparkPlugCondition -> "CheckSparkPlugCondition"
+            Command.CheckRpm -> "CheckRpm"
+
+            // Fuel & Battery (PRO)
             Command.CheckFuelLevel -> "CheckFuelLevel"
-            Command.CheckBatteryLevel -> "CheckBatteryLevel"
+            Command.CheckFuelConsumption -> "CheckFuelConsumption"
+            Command.CheckBatteryVoltage -> "CheckBatteryVoltage"
+            Command.CheckBatteryHealth -> "CheckBatteryHealth"
+            Command.CheckEvStatus -> "CheckEvStatus"
 
-            // Management
-            Command.LockDoors -> "LockDoors"
-            Command.UnlockDoors -> "UnlockDoors"
-            Command.TurnOnLights -> "TurnOnLights"
-            Command.TurnOffLights -> "TurnOffLights"
+            // Tires & Suspension (PRO)
+            Command.CheckTireStatus -> "CheckTireStatus"
+            Command.CheckTireWear -> "CheckTireWear"
+            Command.CheckSuspensionHealth -> "CheckSuspensionHealth"
+            Command.CheckWheelAlignment -> "CheckWheelAlignment"
+            Command.CheckSteeringStatus -> "CheckSteeringStatus"
 
-            // Info
-            Command.GetRange -> "GetRange"
-            Command.GetOdometer -> "GetOdometer"
-            Command.GetSpeed -> "GetSpeed"
-            Command.GetOutsideTemp -> "GetOutsideTemp"
+            // Fluids & Filters (PRO)
+            Command.CheckTransmissionFluid -> "CheckTransmissionFluid"
+            Command.CheckBrakeFluid -> "CheckBrakeFluid"
+            Command.CheckCoolantLevel -> "CheckCoolantLevel"
+            Command.CheckAirFilter -> "CheckAirFilter"
+
+            // Driving Stats (PRO)
+            Command.CheckOdometer -> "CheckOdometer"
+            Command.CheckDrivingRange -> "CheckDrivingRange"
+
+            // Environmental (PRO)
+            Command.CheckOutsideTemperature -> "CheckOutsideTemperature"
+
+            // Find (PRO Extended)
+            Command.FindService -> "FindService"
+            Command.FindCarWash -> "FindCarWash"
 
             is Command.Unknown -> "Unknown"
         }
@@ -117,4 +165,3 @@ object CommandAccessControl {
         return commandVersionMap[commandName]
     }
 }
-

@@ -3,9 +3,9 @@ package com.khateev.hermi.ui
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
 
 @AndroidEntryPoint
-class HermiAssistantActivity : ComponentActivity() {
+class HermiAssistantActivity : AppCompatActivity() {
 
     private val REQUEST_RECORD_AUDIO_PERMISSION = 200
     private val viewModel: CommandListViewModel by viewModels()
@@ -65,11 +65,12 @@ class HermiAssistantActivity : ComponentActivity() {
                         }
                     )
                 }
-            }
 
-            LaunchedEffect(Unit) {
-                viewModel.commandExecutionEvent.collect { event ->
-                    handleCommandEvent(event)
+
+                LaunchedEffect(Unit) {
+                    viewModel.commandExecutionEvent.collect { event ->
+                        handleCommandEvent(event)
+                    }
                 }
             }
         }
@@ -134,7 +135,7 @@ class HermiAssistantActivity : ComponentActivity() {
                     "• Tire & Fuel Monitoring\n" +
                     "• Vehicle Control (Lock/Unlock)\n" +
                     "• And more...\n\n" +
-                    "Only \$4.99/month",
+                    "Only $6.99/month",
             positiveButtonText = "Upgrade Now",
             onPositiveClick = {
                 // TODO: Интегрировать Google Play Billing

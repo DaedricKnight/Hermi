@@ -136,24 +136,24 @@ class TFLiteAIProcessor(private val context: Context) : AIProcessor {
         }
 
         return when (index) {
-            0  -> Command.CheckBatteryLevel
-            1  -> Command.CheckEngine
+//            0  -> Command.CheckBatteryLevel
+//            1  -> Command.CheckEngine
             2  -> Command.CheckFuelLevel
-            3  -> Command.CheckTires
+//            3  -> Command.CheckTires
             4  -> Command.FindChargingStation
             5  -> Command.FindFood
             6  -> Command.FindGasStation
             7  -> Command.FindParking
-            8  -> Command.GetOdometer
-            9  -> Command.GetOutsideTemp
-            10 -> Command.GetRange
-            11 -> Command.GetSpeed
-            12 -> Command.LockDoors
-            15 -> Command.TurnOffLights
-            16 -> Command.TurnOnLights
+//            8  -> Command.GetOdometer
+//            9  -> Command.GetOutsideTemp
+//            10 -> Command.GetRange
+//            11 -> Command.GetSpeed
+//            12 -> Command.LockDoors
+//            15 -> Command.TurnOffLights
+//            16 -> Command.TurnOnLights
             17 -> Command.Unknown(rawText)
-            18 -> Command.UnlockDoors
-            19 -> Command.VehicleStatus
+//            18 -> Command.UnlockDoors
+//            19 -> Command.VehicleStatus
             else -> Command.Unknown(rawText)
         }
     }
