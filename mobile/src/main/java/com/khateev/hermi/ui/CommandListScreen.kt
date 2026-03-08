@@ -21,7 +21,7 @@ import com.khateev.hermi.shared.model.Command
 import com.khateev.hermi.shared.model.CommandAccessControl
 
 /**
- * Data class для отображения информации о команде
+ * Data class for displaying command information
  */
 data class CommandUIModel(
     val name: String,
@@ -32,7 +32,7 @@ data class CommandUIModel(
 )
 
 /**
- * Экран со списком доступных команд
+ * Screen with a list of available commands
  */
 @Composable
 fun CommandListScreen(
@@ -49,12 +49,12 @@ fun CommandListScreen(
             .background(Color(0xFFF5F5F5))
             .padding(16.dp)
     ) {
-        // Header с информацией о версии
+        // Header with version information
         VersionHeaderCard(isPro = isPro, onUpgradeClick = onUpgradeClick)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Список команд
+        // List of commands
         CommandsList(
             isPro = isPro,
             onCommandClick = onCommandClick
@@ -63,7 +63,7 @@ fun CommandListScreen(
 }
 
 /**
- * Карточка с информацией о версии приложения
+ * Card with application version information
  */
 @Composable
 private fun VersionHeaderCard(
@@ -130,7 +130,7 @@ private fun VersionHeaderCard(
 }
 
 /**
- * Список команд
+ * List of commands
  */
 @Composable
 private fun CommandsList(
@@ -144,7 +144,7 @@ private fun CommandsList(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // FREE ВЕРСИЯ
+        // FREE VERSION
         items(
             items = commands.filter { !it.isPro },
             key = { it.name }
@@ -156,7 +156,7 @@ private fun CommandsList(
             )
         }
 
-        // PRO ВЕРСИЯ (если есть доступ)
+        // PRO VERSION (if access is available)
         if (commands.any { it.isPro }) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -178,7 +178,7 @@ private fun CommandsList(
 }
 
 /**
- * Заголовок раздела Pro команд
+ * Header for the Pro commands section
  */
 @Composable
 private fun ProSectionHeader(modifier: Modifier = Modifier) {
@@ -211,7 +211,7 @@ private fun ProSectionHeader(modifier: Modifier = Modifier) {
 }
 
 /**
- * Карточка с командой
+ * Command card
  */
 @Composable
 private fun CommandCard(
@@ -289,13 +289,13 @@ private fun CommandCard(
 }
 
 /**
- * Получить список команд для отображения
+ * Get a list of commands for display
  */
 private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
     val availableCommands = CommandAccessControl.getAvailableCommands(isPro)
 
     return listOf(
-        // ===== FREE ВЕРСИЯ (5 команд) =====
+        // ===== FREE VERSION (5 commands) =====
         CommandUIModel(
             name = "Find Food",
             description = "Search for nearby restaurants and cafes",
@@ -332,7 +332,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "FindRestStop" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: ENGINE & POWERTRAIN (6 команд) =====
+        // ===== PRO VERSION: ENGINE & POWERTRAIN (6 commands) =====
         CommandUIModel(
             name = "Engine Status",
             description = "Check engine diagnostics and warnings",
@@ -376,7 +376,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "CheckRpm" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: FUEL & BATTERY (5 команд) =====
+        // ===== PRO VERSION: FUEL & BATTERY (5 commands) =====
         CommandUIModel(
             name = "Fuel Level",
             description = "Check fuel tank level and consumption",
@@ -413,7 +413,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "CheckEvStatus" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: TIRES & SUSPENSION (5 команд) =====
+        // ===== PRO VERSION: TIRES & SUSPENSION (5 commands) =====
         CommandUIModel(
             name = "Tire Status",
             description = "Monitor tire pressure and condition",
@@ -450,7 +450,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "CheckSteeringStatus" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: FLUIDS & FILTERS (4 команды) =====
+        // ===== PRO VERSION: FLUIDS & FILTERS (4 commands) =====
         CommandUIModel(
             name = "Transmission Fluid",
             description = "Monitor transmission fluid status",
@@ -480,7 +480,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "CheckAirFilter" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: DRIVING STATS (2 команды) =====
+        // ===== PRO VERSION: DRIVING STATS (2 commands) =====
         CommandUIModel(
             name = "Odometer",
             description = "View total vehicle mileage",
@@ -496,7 +496,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "CheckDrivingRange" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: ENVIRONMENTAL (1 команда) =====
+        // ===== PRO VERSION: ENVIRONMENTAL (1 command) =====
         CommandUIModel(
             name = "Outside Temperature",
             description = "Get current outside temperature",
@@ -505,7 +505,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isAvailable = "CheckOutsideTemperature" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ: SMART FINDING (2 команды) =====
+        // ===== PRO VERSION: SMART FINDING (2 commands) =====
         CommandUIModel(
             name = "Find Service",
             description = "Locate auto repair and service stations",
@@ -524,11 +524,11 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
 }
 
 /**
- * Preview для разработки
+ * Preview for development
  * TODO: Add proper preview implementation
  */
 // @androidx.compose.ui.tooling.preview.Preview
 // @Composable
 // private fun CommandListScreenPreview() {
-    // Здесь можно добавить preview для тестирования UI
+    // Here you can add a preview for testing the UI
 // }

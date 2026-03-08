@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel для экрана со списком команд
+ * ViewModel for the command list screen
  */
 @HiltViewModel
 class CommandListViewModel @Inject constructor(
@@ -24,12 +24,12 @@ class CommandListViewModel @Inject constructor(
 
     private val TAG = "CommandListVM"
 
-    // Event для выполнения команды
+    // Event for command execution
     private val _commandExecutionEvent = MutableSharedFlow<CommandExecutionEvent>()
     val commandExecutionEvent: SharedFlow<CommandExecutionEvent> = _commandExecutionEvent.asSharedFlow()
 
     /**
-     * Обработчик клика на команду
+     * Command click handler
      */
     fun onCommandClick(command: Command) {
         viewModelScope.launch {
@@ -63,7 +63,7 @@ class CommandListViewModel @Inject constructor(
     }
 
     /**
-     * Обработчик клика на кнопку обновления до Pro
+     * Upgrade to Pro button click handler
      */
     fun onUpgradeClick() {
         viewModelScope.launch {
@@ -74,7 +74,7 @@ class CommandListViewModel @Inject constructor(
 }
 
 /**
- * События, которые отправляет ViewModel на UI
+ * Events that the ViewModel sends to the UI
  */
 sealed class CommandExecutionEvent {
     data class Execute(val command: Command) : CommandExecutionEvent()

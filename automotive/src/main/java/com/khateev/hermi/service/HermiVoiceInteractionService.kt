@@ -20,8 +20,8 @@ class HermiVoiceInteractionService : VoiceInteractionService() {
     }
 
     /**
-     * Вызывается, когда пользователь зажимает кнопку микрофона на руле
-     * или говорит "Hey Hermi" (если настроен hotword)
+     * Called when the user holds the microphone button on the steering wheel
+     * or says "Hey Hermi" (if hotword is configured)
      */
     override fun onLaunchVoiceAssistFromKeyguard() {
         super.onLaunchVoiceAssistFromKeyguard()
@@ -29,7 +29,7 @@ class HermiVoiceInteractionService : VoiceInteractionService() {
     }
 
     /**
-     * Основной метод запуска сессии
+     * Main session launch method
      */
     private fun startAssistantSession() {
         val args = Bundle().apply {

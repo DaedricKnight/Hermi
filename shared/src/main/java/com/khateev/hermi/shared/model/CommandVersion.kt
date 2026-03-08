@@ -1,23 +1,23 @@
 package com.khateev.hermi.shared.model
 
 /**
- * Определяет в какой версии приложения доступна команда
+ * Defines in which version of the application the command is available
  */
 enum class CommandVersion {
-    FREE,    // Доступна в бесплатной версии
-    PRO      // Доступна только в платной версии (Pro)
+    FREE,    // Available in the free version
+    PRO      // Available only in the paid version (Pro)
 }
 
 /**
- * Класс для управления доступностью команд в зависимости от версии
+ * Class for managing command availability depending on the version
  */
 object CommandAccessControl {
 
     /**
-     * Карта команд и их версионности
+     * Map of commands and their versioning
      */
     private val commandVersionMap = mapOf(
-        // === FREE версия (5 команд) ===
+        // === FREE version (5 commands) ===
         // Navigation — local, no internet needed
         "FindFood" to CommandVersion.FREE,
         "FindGasStation" to CommandVersion.FREE,

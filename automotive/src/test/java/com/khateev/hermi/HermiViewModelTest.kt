@@ -55,7 +55,7 @@ class HermiViewModelTest {
         versionManager = Mockito.mock(VersionManager::class.java)
         
         `when`(vhalReader.carState).thenReturn(fakeCarState)
-        // По умолчанию пользователь Pro, чтобы тесты команд проходили
+        // Default to Pro user so command tests pass
         `when`(versionManager.isProNow()).thenReturn(true)
     }
 
@@ -73,7 +73,7 @@ class HermiViewModelTest {
         versionManager = versionManager
     )
 
-    // Хелпер для типичного сценария — инит + transcribe
+    // Helper for a typical scenario — init + transcribe
     private suspend fun TestScope.setupAndTranscribe(text: String, command: Command): HermiViewModel {
         val emptyFloatArray = FloatArray(0)
         `when`(voskManager.initialize()).thenReturn(true)

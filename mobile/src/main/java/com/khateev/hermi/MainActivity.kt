@@ -67,12 +67,12 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Обработчик событий команд
+     * Command event handler
      */
     private fun handleCommandEvent(event: Any) {
         when (event) {
             is com.khateev.hermi.ui.CommandExecutionEvent.Execute -> {
-                // TODO: Выполнить команду
+                // TODO: Execute command
                 showToast("Executing command: ${event.command}")
             }
             is com.khateev.hermi.ui.CommandExecutionEvent.ShowProRequiredDialog -> {
@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Показать диалог для покупки Pro версии
+     * Show dialog for purchasing Pro version
      */
     private fun showUpgradeDialog() {
         showDialog(
@@ -108,10 +108,10 @@ class MainActivity : ComponentActivity() {
                     "• Tire & Fuel Monitoring\n" +
                     "• Vehicle Control (Lock/Unlock)\n" +
                     "• And more...\n\n" +
-                    "Only \$4.99/month",
+                    "Only $4.99/month",
             positiveButtonText = "Upgrade Now",
             onPositiveClick = {
-                // TODO: Интегрировать Google Play Billing
+                // TODO: Integrate Google Play Billing
                 showToast("Opening Google Play Billing...")
             },
             negativeButtonText = "Maybe Later"
@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Показать диалог
+     * Show dialog
      */
     private fun showDialog(
         title: String,
@@ -138,9 +138,9 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Показать toast сообщение
+     * Show toast message
      */
     private fun showToast(message: String) {
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
     }
-}
+    }

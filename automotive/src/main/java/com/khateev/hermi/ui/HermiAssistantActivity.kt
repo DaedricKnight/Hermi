@@ -99,7 +99,7 @@ class HermiAssistantActivity : AppCompatActivity() {
     private fun handleCommandEvent(event: Any) {
         when (event) {
             is CommandExecutionEvent.Execute -> {
-                // TODO: Выполнить команду
+                // TODO: Execute command
                 showToast("Executing command: ${event.command}")
             }
             is CommandExecutionEvent.ShowProRequiredDialog -> {
@@ -124,7 +124,7 @@ class HermiAssistantActivity : AppCompatActivity() {
     }
 
     /**
-     * Показать диалог для покупки Pro версии
+     * Show dialog for purchasing Pro version
      */
     private fun showUpgradeDialog() {
         showDialog(
@@ -138,7 +138,7 @@ class HermiAssistantActivity : AppCompatActivity() {
                     "Only $6.99/month",
             positiveButtonText = "Upgrade Now",
             onPositiveClick = {
-                // TODO: Интегрировать Google Play Billing
+                // TODO: Integrate Google Play Billing
                 showToast("Opening Google Play Billing...")
             },
             negativeButtonText = "Maybe Later"
@@ -146,7 +146,7 @@ class HermiAssistantActivity : AppCompatActivity() {
     }
 
     /**
-     * Показать диалог
+     * Show dialog
      */
     private fun showDialog(
         title: String,
@@ -165,7 +165,7 @@ class HermiAssistantActivity : AppCompatActivity() {
     }
 
     /**
-     * Показать toast сообщение
+     * Show toast message
      */
     private fun showToast(message: String) {
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()

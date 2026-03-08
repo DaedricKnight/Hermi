@@ -1,15 +1,15 @@
 package com.khateev.hermi.shared.model
 
 /**
- * Утилита для работы с доступностью команд
+ * Utility for working with command availability
  */
 object CommandValidator {
 
     /**
-     * Проверяет доступность команды и выбрасывает исключение если недоступна
-     * @param command Команда для проверки
-     * @param isPro Является ли пользователь Pro
-     * @throws CommandNotAvailableException если команда недоступна
+     * Checks command availability and throws an exception if unavailable
+     * @param command Command to check
+     * @param isPro Whether the user is Pro
+     * @throws CommandNotAvailableException if the command is unavailable
      */
     @Throws(CommandNotAvailableException::class)
     fun validateCommandAccess(command: Command, isPro: Boolean) {
@@ -22,8 +22,8 @@ object CommandValidator {
     }
 
     /**
-     * Проверяет доступность команды безопасно (без исключений)
-     * @return Result с информацией о доступности
+     * Checks command availability safely (without exceptions)
+     * @return Result with availability information
      */
     fun checkCommandAccess(command: Command, isPro: Boolean): CommandAccessResult {
         return if (CommandAccessControl.isCommandAvailable(command, isPro)) {
@@ -38,7 +38,7 @@ object CommandValidator {
     }
 
     /**
-     * Получает информацию о доступности команды
+     * Gets command availability information
      */
     fun getCommandInfo(command: Command): CommandInfo {
         val version = CommandAccessControl.getCommandVersion(command)
@@ -51,7 +51,7 @@ object CommandValidator {
 }
 
 /**
- * Результат проверки доступности команды
+ * Result of command availability check
  */
 sealed class CommandAccessResult {
     object Available : CommandAccessResult()
@@ -60,7 +60,7 @@ sealed class CommandAccessResult {
 }
 
 /**
- * Информация о команде
+ * Command information
  */
 data class CommandInfo(
     val name: String,
@@ -69,21 +69,21 @@ data class CommandInfo(
 )
 
 /**
- * Extension функция для проверки доступности
+ * Extension function to check availability
  */
 fun Command.isAvailable(isPro: Boolean): Boolean {
     return CommandAccessControl.isCommandAvailable(this, isPro)
 }
 
 /**
- * Extension функция для получения информации о команде
+ * Extension function to get command information
  */
 fun Command.getInfo(): CommandInfo {
     return CommandValidator.getCommandInfo(this)
 }
 
 /**
- * Extension функция для проверки требования Pro версии
+ * Extension function to check if Pro version is required
  */
 fun Command.requiresPro(): Boolean {
     return CommandAccessControl.requiresPro(this)
