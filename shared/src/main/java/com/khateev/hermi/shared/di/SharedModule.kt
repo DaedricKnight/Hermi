@@ -2,7 +2,7 @@ package com.khateev.hermi.shared.di
 
 import android.content.Context
 import com.khateev.hermi.shared.AudioRecorderImpl
-import com.khateev.hermi.shared.ai.TFLiteAIProcessor
+import com.khateev.hermi.shared.ai.ONNXAIProcessor
 import com.khateev.hermi.shared.ai.VoskManager
 import com.khateev.hermi.shared.interfaces.AIProcessor
 import com.khateev.hermi.shared.interfaces.AudioRecorder
@@ -23,8 +23,8 @@ object SharedModule {
 
     @Provides
     @Singleton
-    fun provideHermiAIProcessor(@ApplicationContext context: Context): AIProcessor {
-        return TFLiteAIProcessor(context)
+    fun provideAIProcessor(@ApplicationContext context: Context): AIProcessor {
+        return ONNXAIProcessor(context)
     }
 
     @Provides
@@ -50,5 +50,4 @@ object SharedModule {
     fun provideVersionManager(@ApplicationContext context: Context): VersionManager {
         return VersionManagerImpl(context)
     }
-
 }

@@ -39,7 +39,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.vosk.android)
-    implementation(libs.tensorflow.lite)
+    implementation(libs.onnx.runtime)
     implementation (libs.tensorflow.lite.select.tf.ops)
     testImplementation(libs.junit)
     testImplementation (libs.json)
