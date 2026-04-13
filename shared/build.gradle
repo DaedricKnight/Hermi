@@ -43,4 +43,10 @@ dependencies {
     implementation (libs.tensorflow.lite.select.tf.ops)
     testImplementation(libs.junit)
     testImplementation (libs.json)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.junit.jupiter)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.monitor)
+    androidTestImplementation(libs.androidx.test.runner)
 }

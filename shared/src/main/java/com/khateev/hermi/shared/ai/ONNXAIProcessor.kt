@@ -19,7 +19,7 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
 
     companion object {
         private const val TAG = "ONNXAIProcessor"
-        private const val MODEL_FILE = "mobilebert_intent.onnx"
+        private const val MODEL_FILE = "mobilebert_intent_v9.onnx"
         private const val VOCAB_FILE = "vocab.txt"
         private const val LABELS_FILE = "labels.txt"
     }

@@ -33,6 +33,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 json = { module = "org.json:json", version.ref = "json" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-test-monitor = { group = "androidx.test", name = "monitor", version = "1.7.2" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version = "1.6.2" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
