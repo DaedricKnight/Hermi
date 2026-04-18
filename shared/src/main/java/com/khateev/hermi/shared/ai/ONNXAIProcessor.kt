@@ -32,23 +32,22 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
         return try {
             val modelFile = java.io.File(context.cacheDir, MODEL_FILE)
             
-            // Copy asset to cache if it doesn't exist (or always to be safe during dev)
+            // Copy asset to cache for memory-efficient session creation
             context.assets.open(MODEL_FILE).use { input ->
                 modelFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
             }
             
-            // Create session from the file path (memory-efficient)
             session = env.createSession(modelFile.absolutePath)
 
             loadVocab()
             loadLabels()
 
-            Log.d(TAG, "ONNX session (from file) and vocab initialized")
+            Log.d(TAG, "ONNX session and vocabulary initialized successfully")
             true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize ONNX", e)
+            Log.e(TAG, "Failed to initialize ONNX Processor: ${e.message}", e)
             false
         }
     }
@@ -116,7 +115,12 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
     }
 
     override fun parseCommand(input: String): Command {
-        if (input.isBlank() || session == null) return Command.Unknown(input)
+        if (input.isBlank() || session == null) {
+            Log.w(TAG, "Empty input or session not initialized")
+            return Command.Unknown(input)
+        }
+
+        Log.d(TAG, "Parsing input: \"$input\"")
 
         return try {
             val inputIds = tokenize(input)
@@ -138,12 +142,14 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
                 val confidence = probabilities.getOrElse(maxIndex) { 0f }
 
                 val label = labels.getOrElse(maxIndex) { "unknown" }
-                Log.d(TAG, "Inference results: label $label (conf: $confidence)")
+                Log.d(TAG, "Inference result: \"$label\" with confidence ${"%.2f".format(confidence)}")
 
-                CommandMapper.mapLabelToCommand(label, confidence, input)
+                val command = CommandMapper.mapLabelToCommand(label, confidence, input)
+                Log.d(TAG, "Mapped command: $command")
+                command
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Inference failure", e)
+            Log.e(TAG, "Inference execution failure: ${e.message}", e)
             Command.Unknown(input)
         }
     }

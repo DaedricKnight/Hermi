@@ -6,13 +6,18 @@ import android.media.MediaRecorder
 import android.util.Log
 import com.khateev.hermi.shared.interfaces.AudioRecorder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 
 class AudioRecorderImpl: AudioRecorder {
 
     private var audioRecord: AudioRecord? = null
-    private var isRecording = false
+    @Volatile private var isRecording = false
     private val recordedSamples = mutableListOf<Float>()
+
+    private val _audioFlow = MutableSharedFlow<FloatArray>(extraBufferCapacity = 50)
+    override val audioFlow = _audioFlow.asSharedFlow()
 
     companion object {
         private const val TAG = "AudioRecorder"
@@ -21,51 +26,87 @@ class AudioRecorderImpl: AudioRecorder {
         private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
     }
 
-    override suspend fun startRecording() = withContext(Dispatchers.IO) {
-        try {
-            val bufferSize = AudioRecord.getMinBufferSize(
-                SAMPLE_RATE,
-                CHANNEL_CONFIG,
-                AUDIO_FORMAT
-            ) * 2
+    override suspend fun startRecording() {
+        withContext(Dispatchers.IO) {
+            try {
+                val bufferSize = AudioRecord.getMinBufferSize(
+                    SAMPLE_RATE,
+                    CHANNEL_CONFIG,
+                    AUDIO_FORMAT
+                ).coerceAtLeast(1024) * 2
 
-            audioRecord = AudioRecord(
-                MediaRecorder.AudioSource.MIC,
-                SAMPLE_RATE,
-                CHANNEL_CONFIG,
-                AUDIO_FORMAT,
-                bufferSize
-            )
+                audioRecord = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    SAMPLE_RATE,
+                    CHANNEL_CONFIG,
+                    AUDIO_FORMAT,
+                    bufferSize
+                )
 
-            recordedSamples.clear()
-            isRecording = true
-            audioRecord?.startRecording()
+                if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
+                    Log.e(TAG, "AudioRecord initialization failed")
+                    return@withContext
+                }
 
-            Log.d(TAG, "Recording started")
+                recordedSamples.clear()
+                isRecording = true
+                audioRecord?.startRecording()
 
-            val buffer = ShortArray(bufferSize / 2)
-            while (isRecording) {
-                val read = audioRecord?.read(buffer, 0, buffer.size) ?: 0
-                if (read > 0) {
-                    for (i in 0 until read) {
-                        recordedSamples.add(buffer[i] / 32768.0f)
+                Log.d(TAG, "Recording started")
+
+                val buffer = ShortArray(512) 
+                while (isRecording) {
+                    val read = audioRecord?.read(buffer, 0, buffer.size) ?: 0
+                    if (read > 0) {
+                        var sum = 0.0
+                        val floatChunk = FloatArray(read)
+                        for (i in 0 until read) {
+                            val floatSample = buffer[i] / 32768.0f
+                            floatChunk[i] = floatSample
+                            recordedSamples.add(floatSample)
+                            sum += floatSample * floatSample
+                        }
+                        
+                        // Check volume level
+                        val rms = Math.sqrt(sum / read)
+                        if (rms > 0.01) {
+                             // Log significant audio levels for debugging
+                             // Log.d(TAG, "Audio Level (RMS): $rms")
+                        }
+                        
+                        // Emit float array to the shared flow
+                        _audioFlow.tryEmit(floatChunk)
                     }
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Recording error: ${e.message}", e)
+                isRecording = false
+            } finally {
+                stopInternal()
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Recording error", e)
-            isRecording = false
         }
     }
 
     override fun stopRecording(): FloatArray {
         isRecording = false
-        audioRecord?.stop()
-        audioRecord?.release()
-        audioRecord = null
+        stopInternal()
+        return synchronized(recordedSamples) {
+            recordedSamples.toFloatArray()
+        }
+    }
 
-        Log.d(TAG, "Recording stopped, ${recordedSamples.size} samples")
-        return recordedSamples.toFloatArray()
+    private fun stopInternal() {
+        try {
+            audioRecord?.let {
+                if (it.state == AudioRecord.STATE_INITIALIZED && it.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
+                    it.stop()
+                }
+                it.release()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping record: ${e.message}", e)
+        }
+        audioRecord = null
     }
 
     override fun isRecording(): Boolean = isRecording
