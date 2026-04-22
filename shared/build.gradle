@@ -33,17 +33,27 @@ android {
     }
 }
 dependencies {
+    testImplementation "com.microsoft.onnxruntime:onnxruntime:1.16.0"
+    testImplementation "androidx.test:core:1.5.0"
+    testImplementation "org.robolectric:robolectric:4.11.1"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3"
+    testImplementation "io.mockk:mockk:1.13.8"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3"
+    implementation "com.microsoft.onnxruntime:onnxruntime-android:1.16.0"
     implementation (libs.androidx.media)
     implementation(libs.androidx.core.ktx)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.vosk.android)
-    implementation(libs.tensorflow.lite)
+    implementation(libs.onnx.runtime)
     implementation (libs.tensorflow.lite.select.tf.ops)
     testImplementation(libs.junit)
     testImplementation (libs.json)
-//    implementation(libs.tensorflow.lite.support)
-//    implementation(libs.tensorflow.lite.metadata)
-//    implementation(libs.tensorflow.lite.task.text)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.junit.jupiter)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.monitor)
+    androidTestImplementation(libs.androidx.test.runner)
 }

@@ -10,10 +10,16 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <queries>
-        <package android:name="com.google.android.googlequicksearchbox" />
-    </queries>
+        <!-- For Google Maps package visibility -->
+        <package android:name="com.google.android.apps.maps" />
+        
+        <!-- For general navigation and geo intents visibility -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
 
-    <queries>
+        <package android:name="com.google.android.googlequicksearchbox" />
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
@@ -33,16 +39,23 @@
             android:name=".ui.HermiAssistantActivity"
             android:theme="@style/Theme.Hermi.Assistant"
             android:launchMode="singleInstance"
-            android:exported="false"
-            android:showForAllUsers="true" />
+            android:exported="true"
+            android:showForAllUsers="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.AUTOMOTIVE_LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".service.HermiCarAppService"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <action android:name="androidx.car.app.CarAppService" />-->
-<!--                <category android:name="androidx.car.app.category.IOT" />-->
-<!--            </intent-filter>-->
         </service>
 
         <service

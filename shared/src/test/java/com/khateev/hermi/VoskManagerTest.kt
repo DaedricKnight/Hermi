@@ -43,7 +43,7 @@ class VoskManagerTest {
     fun `parseResult handles Vosk partial result format`() {
         val json = """{"partial": "find"}"""
         val result = parseResult(json)
-        // partial не text — должен вернуть пустую строку
+        // partial is not text — should return empty string
         assertEquals("", result)
     }
 
@@ -74,10 +74,10 @@ class VoskManagerTest {
     @Test
     fun `parseResult handles unicode text`() {
         val json = JSONObject().apply {
-            put("text", "найди еду")
+            put("text", "find food")
         }.toString()
         val result = parseResult(json)
-        assertEquals("найди еду", result)
+        assertEquals("find food", result)
     }
 
     @Test
@@ -130,7 +130,7 @@ class VoskManagerTest {
 
     @Test
     fun `float to short conversion maps typical audio values correctly`() {
-        // Тихий сигнал ~0.1 должен дать ~3276
+        // Quiet signal ~0.1 should give ~3276
         val input = floatArrayOf(0.1f)
         val result = convertFloatToShort(input)
         val expected = (0.1f * 32767f).toInt().toShort()
@@ -139,14 +139,14 @@ class VoskManagerTest {
 
     @Test
     fun `recognizeAudio with null recognizer returns null`() {
-        // Без инициализации recognizer == null
+        // Before initialization recognizer == null
         val result = recognizeAudioSafe(null, floatArrayOf(0.1f, 0.2f))
         assertNull(result)
     }
 
     @Test
     fun `recognizeAudio with empty audio returns null or empty`() {
-        // Пустой массив не должен крашить
+        // Empty array should not crash
         val result = recognizeAudioSafe(null, floatArrayOf())
         assertNull(result)
     }
@@ -166,7 +166,7 @@ class VoskManagerTest {
         }
     }
 
-    // Симулируем поведение когда recognizer == null
+    // Simulate behavior when recognizer == null
     private fun recognizeAudioSafe(recognizer: Any?, audioData: FloatArray): String? {
         if (recognizer == null) return null
         return ""

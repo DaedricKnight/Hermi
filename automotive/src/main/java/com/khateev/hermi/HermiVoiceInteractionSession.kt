@@ -27,11 +27,11 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.khateev.hermi.di.HermiSessionEntryPoint
+import com.khateev.hermi.shared.manager.VersionManagerImpl
 import com.khateev.hermi.ui.HermiAssistantActivity
 import com.khateev.hermi.ui.HermiAssistantOverlay
 import com.khateev.hermi.viewmodel.HermiViewModel
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(context),
@@ -51,9 +51,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
     override fun onCreate() {
         savedStateRegistryController.performRestore(null)
         super.onCreate()
-
         window?.window?.setBackgroundDrawableResource(R.color.transparent)
-
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 
@@ -81,30 +79,29 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
                         HermiSessionEntryPoint::class.java
                     )
 
-                    Log.d("HermiSession", "Creating ViewModel...")
-
                     val viewModel: HermiViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
                             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                                Log.d("HermiSession", "Factory creating ViewModel with dependencies")
                                 return HermiViewModel(
                                     voskManager = entryPoint.getRecognitionManager(),
                                     audioRecorderImpl = entryPoint.getAudioRecorder(),
                                     vhalReader = entryPoint.getVhalReader(),
                                     aiProcessor = entryPoint.getAiProcessor(),
                                     voiceManager = entryPoint.getVoiceManager(),
+                                    versionManager = VersionManagerImpl(context),
+                                    vadManager = entryPoint.getVADManager()
                                 ) as T
                             }
                         }
                     )
-                    Log.d("HermiSession", "ViewModel created, setting hermiViewModel")
                     hermiViewModel = viewModel
                     HermiAssistantOverlay(audioPermission = audioPermission.value, viewModel = viewModel, onClose = { hide() })
 
                     viewModel.viewModelScope.launch {
                         viewModel.isRecording.collect { isListening ->
-                            if (!isListening) {
-                                hide()
+                            // Если запись остановилась (VAD сработал), скрываем сессию
+                            if (!isListening && viewModel.isProcessing.value == false) {
+                                // Добавляем небольшую задержку перед закрытием, если нужно показать текст
                             }
                         }
                     }
@@ -120,7 +117,6 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
         audioPermission.value = context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("HermiSession", "No RECORD_AUDIO permission, requesting...")
             val intent = Intent(context, HermiAssistantActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("REQUEST_PERMISSIONS", true)
@@ -128,19 +124,16 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
             startAssistantActivity(intent)
             hide()
         } else {
-            Log.d("HermiSession", "RECORD_AUDIO permission granted")
             getWindow()?.window?.let { win ->
                 win.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
                 win.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
 
-            Log.d("HermiSession", "Starting recording...")
             hermiViewModel?.let { viewModel ->
                 viewModel.viewModelScope.launch {
+                    // Теперь мы просто запускаем запись. 
+                    // ViewModel сама остановит её через VADManager.
                     viewModel.startRecording()
-                    delay(5000)
-                    viewModel.stopRecordingAndTranscribe()
-                    hide()
                 }
             }
         }

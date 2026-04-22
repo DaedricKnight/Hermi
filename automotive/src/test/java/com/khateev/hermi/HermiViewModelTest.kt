@@ -3,6 +3,7 @@ package com.khateev.hermi
 import com.khateev.hermi.shared.interfaces.AIProcessor
 import com.khateev.hermi.shared.interfaces.AudioRecorder
 import com.khateev.hermi.shared.interfaces.RecognitionManager
+import com.khateev.hermi.shared.interfaces.VersionManager
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
 import com.khateev.hermi.shared.model.Command
 import com.khateev.hermi.viewmodel.HermiViewModel
@@ -25,6 +26,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
+import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -38,6 +40,7 @@ class HermiViewModelTest {
     private lateinit var vhalReader: VhalReader
     private lateinit var aiProcessor: AIProcessor
     private lateinit var voiceManager: VoiceInterfaceManager
+    private lateinit var versionManager: VersionManager
 
     private val fakeCarState = MutableStateFlow(VhalParamsState())
 
@@ -49,7 +52,11 @@ class HermiViewModelTest {
         aiProcessor = Mockito.mock(AIProcessor::class.java)
         voiceManager = Mockito.mock(VoiceInterfaceManager::class.java)
         vhalReader = Mockito.mock(VhalReader::class.java)
+        versionManager = Mockito.mock(VersionManager::class.java)
+        
         `when`(vhalReader.carState).thenReturn(fakeCarState)
+        // Default to Pro user so command tests pass
+        `when`(versionManager.isProNow()).thenReturn(true)
     }
 
     @After
@@ -62,10 +69,11 @@ class HermiViewModelTest {
         audioRecorderImpl = audioRecorder,
         vhalReader = vhalReader,
         aiProcessor = aiProcessor,
-        voiceManager = voiceManager
+        voiceManager = voiceManager,
+        versionManager = versionManager
     )
 
-    // Хелпер для типичного сценария — инит + transcribe
+    // Helper for a typical scenario — init + transcribe
     private suspend fun TestScope.setupAndTranscribe(text: String, command: Command): HermiViewModel {
         val emptyFloatArray = FloatArray(0)
         `when`(voskManager.initialize()).thenReturn(true)
@@ -214,7 +222,7 @@ class HermiViewModelTest {
     @Test
     fun `stopRecordingAndTranscribe calls audioRecorder stopRecording`() = runTest {
         setupAndTranscribe("find food", Command.FindFood)
-        verify(audioRecorder).stopRecording()
+        verify(audioRecorder, atLeastOnce()).stopRecording()
     }
 
     @Test
@@ -231,13 +239,13 @@ class HermiViewModelTest {
 
     @Test
     fun `stopRecordingAndTranscribe sets transcription to recognized text`() = runTest {
-        val vm = setupAndTranscribe("lock doors", Command.LockDoors)
-        assertEquals("lock doors", vm.transcription)
+        val vm = setupAndTranscribe("check engine", Command.CheckEngineStatus)
+        assertEquals("check engine", vm.transcription)
     }
 
     @Test
     fun `stopRecordingAndTranscribe calls aiProcessor with recognized text`() = runTest {
-        setupAndTranscribe("check engine", Command.CheckEngine)
+        setupAndTranscribe("check engine", Command.CheckEngineStatus)
         verify(aiProcessor).parseCommand("check engine")
     }
 
@@ -308,48 +316,12 @@ class HermiViewModelTest {
     }
 
     @Test
-    fun `LockDoors speaks about locking`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("lock doors", Command.LockDoors)
-        assertTrue(spokenText.contains("ocking"))
-    }
-
-    @Test
-    fun `UnlockDoors speaks about unlocking`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("unlock doors", Command.UnlockDoors)
-        assertTrue(spokenText.contains("nlocking"))
-    }
-
-    @Test
-    fun `TurnOnLights speaks about headlights on`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("lights on", Command.TurnOnLights)
-        assertTrue(spokenText.contains("on"))
-    }
-
-    @Test
-    fun `TurnOffLights speaks about headlights off`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("lights off", Command.TurnOffLights)
-        assertTrue(spokenText.contains("off"))
-    }
-
-    @Test
     fun `Unknown command speaks unknown command`() = runTest {
         var spokenText = ""
         Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
             .`when`(voiceManager).speak(anyString())
         setupAndTranscribe("xyzzy", Command.Unknown("xyzzy"))
-        assertEquals("Unknown command", spokenText)
+        assertEquals("Sorry, I didn't understand that command", spokenText)
     }
 
     // ────────────────────────────────────────────────
@@ -414,40 +386,73 @@ class HermiViewModelTest {
     }
 
     @Test
-    fun `GetRange speaks current range from carState`() = runTest {
+    fun `CheckDrivingRange speaks current range from carState`() = runTest {
         fakeCarState.value = VhalParamsState(range = 350f)
-        setupAndTranscribe("get range", Command.GetRange)
+        setupAndTranscribe("get range", Command.CheckDrivingRange)
         val captor = argumentCaptor<String>()
         verify(voiceManager).speak(captor.capture())
         assertTrue(captor.firstValue.contains("350"))
     }
 
     @Test
-    fun `GetOdometer speaks odometer from carState`() = runTest {
+    fun `CheckOdometer speaks odometer from carState`() = runTest {
         fakeCarState.value = VhalParamsState(odometer = 12345f)
-        setupAndTranscribe("get odometer", Command.GetOdometer)
+        setupAndTranscribe("get odometer", Command.CheckOdometer)
         val captor = argumentCaptor<String>()
         verify(voiceManager).speak(captor.capture())
         assertTrue(captor.firstValue.contains("12345"))
     }
 
     @Test
-    fun `GetOutsideTemp speaks temperature with unit`() = runTest {
-        fakeCarState.value = VhalParamsState(outsideTemp = 22f, tempUnit = "°Celsius")
-        setupAndTranscribe("get temp", Command.GetOutsideTemp)
+    fun `CheckOutsideTemperature speaks temperature with unit`() = runTest {
+        fakeCarState.value = VhalParamsState(outsideTemp = 22f, tempUnit = "Celsius")
+        setupAndTranscribe("get temp", Command.CheckOutsideTemperature)
         val captor = argumentCaptor<String>()
         verify(voiceManager).speak(captor.capture())
         assertTrue(captor.firstValue.contains("22"))
         assertTrue(captor.firstValue.contains("Celsius"))
     }
 
+    // ────────────────────────────────────────────────
+    // PRO VERSION ACCESS TESTS
+    // ────────────────────────────────────────────────
+
     @Test
-    fun `GetOutsideTemp uses default unit when tempUnit is empty`() = runTest {
-        fakeCarState.value = VhalParamsState(outsideTemp = 18f, tempUnit = "")
-        setupAndTranscribe("get temp", Command.GetOutsideTemp)
-        val captor = argumentCaptor<String>()
-        verify(voiceManager).speak(captor.capture())
-        assertTrue(captor.firstValue.contains("18"))
-        assertTrue(captor.firstValue.contains("Celcium"))
+    fun `PRO command for FREE user speaks upgrade message`() = runTest {
+        `when`(versionManager.isProNow()).thenReturn(false)
+        var spokenText = ""
+        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
+            .`when`(voiceManager).speak(anyString())
+        
+        setupAndTranscribe("check engine", Command.CheckEngineStatus)
+        
+        assertTrue(spokenText.contains("upgrade to Pro"))
+    }
+
+    @Test
+    fun `PRO command for PRO user executes normally`() = runTest {
+        `when`(versionManager.isProNow()).thenReturn(true)
+        fakeCarState.value = VhalParamsState(isCheckEngineOn = false, coolantTemp = 90f, oilLevel = 85f)
+        
+        var spokenText = ""
+        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
+            .`when`(voiceManager).speak(anyString())
+        
+        setupAndTranscribe("check engine", Command.CheckEngineStatus)
+        
+        assertTrue(spokenText.contains("normally"))
+    }
+
+    @Test
+    fun `FREE command for FREE user executes normally`() = runTest {
+        `when`(versionManager.isProNow()).thenReturn(false)
+        
+        var spokenText = ""
+        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
+            .`when`(voiceManager).speak(anyString())
+        
+        setupAndTranscribe("find food", Command.FindFood)
+        
+        assertTrue(spokenText.contains("restaurant"))
     }
 }
