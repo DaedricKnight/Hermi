@@ -1,175 +1,61 @@
-# 🚗 Hermi — Android Automotive Voice Assistant
+# Hermi: High-Precision Edge AI Assistant for Automotive
 
-Hermi is an offline voice assistant built for Android Automotive OS. It understands natural speech commands for navigation, vehicle status monitoring, and car controls — all without an internet connection.
+Hermi is an innovative, privacy-focused voice assistant designed for Android Automotive OS (AAOS). It leverages advanced **Edge AI** technologies to provide high-precision voice control without requiring an internet connection.
 
----
+## 🚀 Key Innovation: Edge AI
 
-## Demo
+Unlike traditional voice assistants, Hermi processes everything locally on the device.
 
-https://github.com/user-attachments/assets/98630c60-e378-4727-8e57-437d5a4f5116
+*   **Privacy-First:** User data never leaves the vehicle; no audio is uploaded to the cloud.
+*   **Offline Reliability:** Works seamlessly in areas with poor or no cellular connectivity.
+*   **High Precision:** Achieves **99.2% recognition accuracy** for specific automotive commands.
+*   **Optimized Performance:** Small footprint (~115 MB model) optimized for on-device NPU/CPU execution using ONNX Runtime.
 
----
+## 🛠 Technical Architecture
 
-## Features
+The system is built on a modular architecture using modern Android standards and specialized AI components:
 
-### 🗺️ Navigation & Search
-Hermi can launch Google Maps or the system navigation app with a relevant search query:
+### 1. Voice Activity Detection (VAD) - `SileroVAD`
+Powered by **Silero VAD v5** via ONNX Runtime.
+*   **Efficiency:** Highly optimized to distinguish speech from car noise with minimal latency.
+*   **Adaptive State:** Maintains a rank-3 state [2, 1, 128] for temporal consistency.
+*   **Performance:** Operates on 16kHz mono audio chunks with a 1000ms silence threshold.
 
-| Command example | Action |
-|---|---|
-| *"Find food nearby"* | Search for restaurants |
-| *"Find a gas station"* | Search for gas stations |
-| *"Find a charging station"* | Search for EV charging |
-| *"Find parking"* | Search for parking |
+### 2. Intent Recognition - `ONNXAIProcessor`
+A custom NLU engine using **MobileBERT** quantized to ONNX.
+*   **Task:** Maps transcribed text to structured vehicle commands.
+*   **Vocabulary:** Uses a specialized automotive vocabulary for precise intent extraction.
+*   **Speed:** Inference happens in milliseconds on standard mobile processors.
 
-### 🚘 Vehicle Status
-Query live vehicle data read from the VHAL (Vehicle Hardware Abstraction Layer):
+### 3. Speech-to-Text (STT) - `VoskManager`
+Uses the **Vosk** offline engine for reliable transcription.
+*   **Streaming:** Audio is processed in real-time chunks for lower perceived latency.
+*   **Accuracy:** Calibrated specifically for command-based automotive interactions.
 
-| Command example | Action |
-|---|---|
-| *"What's the vehicle status?"* | General vehicle health summary |
-| *"Check engine"* | Engine warning status |
-| *"Check tires"* | Tire pressure status |
-| *"Check fuel level"* | Current fuel level |
-| *"Check battery level"* | High-voltage battery level |
+## 🏗 Project Structure
 
-### 🔧 Vehicle Controls
+*   `shared/`: Core AI logic, interfaces, and ONNX models.
+*   `automotive/`: AAOS-specific implementation, `VoiceInteractionService`, and Car App integration.
+*   `mobile/`: Mobile companion app (under development).
 
-| Command example | Action |
-|---|---|
-| *"Lock doors"* | Lock all doors |
-| *"Unlock doors"* | Unlock all doors |
-| *"Turn on lights"* | Turn on headlights |
-| *"Turn off lights"* | Turn off headlights |
+## 📊 Performance Metrics
 
-### 📊 Real-Time Info
+*   **Accuracy:** 99.2% (Intent classification)
+*   **Model Size:** ~115 MB
+*   **VAD Threshold:** 1000ms silence detection
+*   **Command Support:** 30+ automotive-specific intents (Fuel, Oil, Navigation, Engine status, etc.)
 
-| Command example | Action |
-|---|---|
-| *"What's my range?"* | Remaining driving range |
-| *"Show odometer"* | Total distance traveled |
-| *"What's my speed?"* | Current vehicle speed |
-| *"What's the outside temperature?"* | Exterior temperature with unit |
+## 🛠 Development & Build
 
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│              Android Automotive OS           │
-├─────────────────────────────────────────────┤
-│  HermiViewModel (MVVM)                      │
-│    ├── AudioRecorder  → captures microphone │
-│    ├── VoskManager    → offline STT         │
-│    ├── AIProcessor    → intent classifier   │
-│    ├── VoiceManager   → TTS responses       │
-│    └── VhalReader     → vehicle data        │
-└─────────────────────────────────────────────┘
-```
-
-- **Speech-to-Text**: [Vosk](https://alphacephei.com/vosk/) — fully offline, on-device recognition
-- **Intent Classification**: DistilBERT model converted to TFLite, 20 intent classes, ~99.455% accuracy
-- **Vehicle Data**: Read from VHAL via `VhalReader` (speed, range, odometer, temperature, etc.)
-- **TTS**: Android `TextToSpeech` for voice responses
-- **UI**: Jetpack Compose
-- **DI**: Dagger 2 / Hilt
-- **Architecture**: MVVM + StateFlow
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Language | Kotlin |
-| UI | Jetpack Compose |
-| Architecture | MVVM, Clean Architecture |
-| Speech Recognition | Vosk (offline) |
-| ML / NLU | DistilBERT → TFLite |
-| Vehicle Data | Android Automotive VHAL |
-| DI | Hilt |
-| Async | Kotlin Coroutines + Flow |
-| Testing | JUnit4, Mockito, kotlinx-coroutines-test |
-
----
-
-## How It Works
-
-1. User taps the microphone button
-2. `AudioRecorder` captures raw audio from the microphone
-3. `VoskManager` transcribes the audio to text **on-device** (no internet required)
-4. `AIProcessor` runs the TFLite DistilBERT model to classify the intent
-5. `HermiViewModel` handles the recognized `Command` and:
-   - reads live data from `VhalReader` if needed
-   - emits a navigation event or
-   - speaks a response via `VoiceInterfaceManager`
-
----
-
-## ML Model
-
-The intent classifier is based on **DistilBERT**, fine-tuned on automotive voice commands:
-
-- **20 intent classes** covering navigation, vehicle status, controls, and info queries
-- **~99.45% accuracy** on test set (183 samples)
-- Exported to **ONNX → TFLite** with Flex ops for on-device inference
-- Input: tokenized text (input_ids + attention_mask)
-- Output: softmax probabilities over 20 classes
-
----
-
-## Project Structure
-
-```
-Hermi/
-├── automotive/          # Android Automotive app module
-│   ├── src/main/
-│   │   ├── ui/          # Compose screens
-│   │   └── viewmodel/   # HermiViewModel
-│   └── src/test/        # Unit tests
-└── shared/              # Shared module
-    ├── ai/              # TFLiteAIProcessor, tokenizer
-    ├── audio/           # AudioRecorderImpl
-    ├── manager/         # VoiceInterfaceManager
-    ├── model/           # Command sealed class
-    └── interfaces/      # AIProcessor, AudioRecorder, RecognitionManager
-```
-
----
-
-## Getting Started
-
-### Requirements
-
-- Android Studio Hedgehog or later
-- Android Automotive OS emulator or physical device
-- Vosk model file (place in `assets/`)
-
-### Setup
+The project uses Hilt for Dependency Injection and Kotlin Coroutines/Flow for reactive data handling.
 
 ```bash
-git clone https://github.com/yourusername/hermi.git
-cd hermi
+# Clean and build the project
+./gradlew clean assembleDebug
+
+# Install on Automotive device/emulator
+./gradlew :automotive:installDebug
 ```
 
-1. Download a [Vosk model](https://alphacephei.com/vosk/models) (e.g. `vosk-model-small-en-us`) and place it in `shared/src/main/assets/model/`
-2. Open the project in Android Studio
-3. Run on an Android Automotive emulator or device
-
 ---
-
-## Running Tests
-
-```bash
-./gradlew :automotive:testDebugUnitTest
-./gradlew :shared:testDebugUnitTest
-```
-
-Tests cover: `HermiViewModel`, `TFLiteAIProcessor`, `VoskManager`, `VoiceInterfaceManager`, `AudioRecorderImpl`
-
----
-
-## License
-
-MIT License. See [LICENSE](LICENSE) for details.
+*Developed by Artem Khateev*
