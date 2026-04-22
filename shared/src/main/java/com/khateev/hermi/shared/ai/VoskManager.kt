@@ -40,6 +40,14 @@ class VoskManager(private val context: Context): RecognitionManager {
         }
     }
 
+    override fun acceptChunk(audioData: FloatArray): Boolean {
+        val rec = recognizer ?: return false
+        val shortData = ShortArray(audioData.size) {
+            (audioData[it] * 32767f).toInt().coerceIn(-32768, 32767).toShort()
+        }
+        return rec.acceptWaveForm(shortData, shortData.size)
+    }
+
     override fun recognizeAudio(audioData: FloatArray): String? {
         val rec = recognizer ?: return null
 
@@ -49,11 +57,9 @@ class VoskManager(private val context: Context): RecognitionManager {
             }
 
             if (rec.acceptWaveForm(shortData, shortData.size)) {
-                val result = rec.result
-                parseResult(result)
+                parseResult(rec.result)
             } else {
-                val final = rec.result
-                parseResult(final)
+                parseResult(rec.finalResult)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Recognition error", e)

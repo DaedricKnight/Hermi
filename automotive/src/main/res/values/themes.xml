@@ -1,7 +1,7 @@
 <resources>
 
     <style name="Theme.Hermi" parent="android:Theme.Material.Light.DarkActionBar" />
-    <style name="Theme.Hermi.Assistant" parent="android:Theme.DeviceDefault.NoActionBar">
+    <style name="Theme.Hermi.Assistant" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>

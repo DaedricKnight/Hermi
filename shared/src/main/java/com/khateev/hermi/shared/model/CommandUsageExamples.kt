@@ -9,7 +9,7 @@ object CommandUsageExamples {
      * Пример 1: Проверка доступности команды перед выполнением
      */
     fun example1_CheckCommandAvailability() {
-        val command = Command.GetSpeed
+        val command = Command.CheckFuelConsumption
         val isPro = false  // Бесплатный пользователь
 
         if (CommandAccessControl.isCommandAvailable(command, isPro)) {
@@ -25,7 +25,7 @@ object CommandUsageExamples {
      * Пример 2: Использование Validator с обработкой исключений
      */
     fun example2_ValidateWithException() {
-        val command = Command.CheckEngine
+        val command = Command.CheckEngineStatus
         val isPro = false
 
         try {
@@ -84,7 +84,7 @@ object CommandUsageExamples {
      * Пример 5: Безопасная проверка без исключений
      */
     fun example5_SafeCheck() {
-        val command = Command.LockDoors
+        val command = Command.CheckEngineStatus
         val isPro = false
 
         val result = CommandValidator.checkCommandAccess(command, isPro)
@@ -108,7 +108,7 @@ object CommandUsageExamples {
      * Пример 6: Использование с VersionManager
      */
     suspend fun example6_WithVersionManager(versionManager: com.khateev.hermi.shared.interfaces.VersionManager) {
-        val command = Command.GetOdometer
+        val command = Command.CheckTireWear
         val isPro = versionManager.isProNow()
 
         if (CommandAccessControl.isCommandAvailable(command, isPro)) {

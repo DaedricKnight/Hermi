@@ -15,6 +15,7 @@ import com.khateev.hermi.shared.manager.VoiceInterfaceManager
 import com.khateev.hermi.shared.model.Command
 import com.khateev.hermi.shared.model.CommandValidator
 import com.khateev.hermi.shared.model.CommandAccessResult
+import com.khateev.hermi.shared.ai.VADManager
 import com.qubit.core_vhal.VhalParamsState
 import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.delay
@@ -25,6 +26,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 
 class HermiViewModel(
     private val voskManager: RecognitionManager,
@@ -33,12 +37,12 @@ class HermiViewModel(
     private val aiProcessor: AIProcessor,
     private val voiceManager: VoiceInterfaceManager,
     private val versionManager: VersionManager,
+    private val vadManager: VADManager,
 ) : ViewModel() {
 
     val uiState: StateFlow<VhalParamsState> = vhalReader.carState
 
-    var _isRecording = MutableStateFlow(false)
-
+    private var _isRecording = MutableStateFlow(false)
     val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
 
     var transcription by mutableStateOf("")
@@ -47,12 +51,10 @@ class HermiViewModel(
     var isInitialized by mutableStateOf(false)
         private set
 
-    var _isProcessing = MutableStateFlow(false)
-
+    private var _isProcessing = MutableStateFlow(false)
     val isProcessing = _isProcessing.asStateFlow()
 
-    var _hasError = MutableStateFlow<Exception?>(null)
-
+    private var _hasError = MutableStateFlow<Exception?>(null)
     val hasError = _hasError.asStateFlow()
 
     private val _currentSpokenText = MutableStateFlow("")
@@ -64,27 +66,27 @@ class HermiViewModel(
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
 
+    private var vadJob: Job? = null
+    private var fallbackJob: Job? = null
     private val TAG = "HermiVM"
 
     init {
         viewModelScope.launch {
             try {
                 transcription = "Loading Vosk model..."
-                log("Calling voskManager.initialize()...")
-
+                Log.d(TAG, "Initializing VoskManager...")
                 delay(100)
-
                 isInitialized = voskManager.initialize()
 
                 if (isInitialized) {
-                    log("VoskManager initialized successfully!")
-                    transcription = "🎤 Ready to record"
+                    Log.d(TAG, "VoskManager initialized successfully")
+                    transcription = "Ready to record"
                 } else {
                     Log.e(TAG, "VoskManager initialization FAILED")
                     transcription = "Initialization failed"
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Exception during initialization", e)
+                Log.e(TAG, "Exception during initialization: ${e.message}", e)
                 transcription = "Error: ${e.message}"
             }
         }
@@ -92,51 +94,81 @@ class HermiViewModel(
 
     fun startRecording() {
         if (!isInitialized) {
-            Log.e("HermiVM", "Cannot record: Vosk not initialized")
+            Log.e(TAG, "Cannot start recording: Vosk is not initialized")
             transcription = "Not initialized yet"
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _isRecording.value = true
-            transcription = "Recording..."
+            transcription = "Listening..."
+            Log.d(TAG, "Manual recording start requested")
+            
+            // Fallback: stop after 7s if VAD fails to trigger
+            fallbackJob?.cancel()
+            fallbackJob = launch { 
+                delay(7000) 
+                if (_isRecording.value) {
+                    Log.d(TAG, "Fallback timeout reached (7s). Stopping recording.")
+                    stopRecordingAndTranscribe()
+                }
+            }
+            
+            startVadMonitoring()
             audioRecorderImpl.startRecording()
         }
     }
 
-    fun stopRecordingAndTranscribe() {
-
-        if (!isInitialized) {
-            Log.e("HermiVM", "Cannot transcribe: Vosk not initialized")
-            return
+    private fun startVadMonitoring() {
+        vadJob?.cancel()
+        vadJob = viewModelScope.launch(Dispatchers.Default) {
+            try {
+                Log.d(TAG, "Starting VAD speech monitoring")
+                vadManager.monitorSpeech(audioRecorderImpl.audioFlow) {
+                    Log.d(TAG, "VAD: Speech end detected. Processing.")
+                    stopRecordingAndTranscribe()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "VAD monitoring error: ${e.message}", e)
+            }
         }
+    }
 
+    fun stopRecordingAndTranscribe() {
+        if (!isInitialized || !_isRecording.value) return 
+
+        Log.d(TAG, "stopRecordingAndTranscribe() called")
         _isRecording.value = false
+        vadJob?.cancel()
+        fallbackJob?.cancel()
+        
         val samples = audioRecorderImpl.stopRecording()
-
-        log("Got ${samples.size} samples, starting transcription...")
+        Log.d(TAG, "Recording stopped. Samples captured: ${samples.size}")
 
         viewModelScope.launch {
             try {
                 _isProcessing.value = true
-                transcription = "Transcribing..."
+                transcription = "Processing..."
 
+                // Use the full samples array for stable recognition
                 val result = voskManager.recognizeAudio(samples)
 
-                if (result != null) {
-                    log("Transcription: $result")
+                if (!result.isNullOrBlank()) {
+                    Log.d(TAG, "Transcription result: \"$result\"")
                     transcription = result
+                    _recognizedText.emit(result)
+                    
                     val command = aiProcessor.parseCommand(result)
                     executeCommand(command)
-                    delay(5000)
-                    _recognizedText.emit("")
                 } else {
-                    log("Transcription returned null")
-                    transcription = "Failed to transcribe"
+                    Log.d(TAG, "Transcription returned empty result")
+                    transcription = "I didn't catch that"
+                    delay(1500)
+                    _navigationEvent.emit(NavigationEvent.CloseAssistant)
                 }
             } catch (e: Exception) {
-                Log.e("HermiVM", "Transcription error", e)
-                transcription = "Error: ${e.message}"
+                Log.e(TAG, "Processing error: ${e.message}", e)
+                _navigationEvent.emit(NavigationEvent.CloseAssistant)
             } finally {
                 _isProcessing.value = false
             }
@@ -144,233 +176,120 @@ class HermiViewModel(
     }
 
     private fun executeCommand(command: Command) {
-        log("executeCommand: $command")
-
+        Log.d(TAG, "Executing command: $command")
         viewModelScope.launch {
-            // Check if command is available for current version
             val isPro = versionManager.isProNow()
             val accessResult = CommandValidator.checkCommandAccess(command, isPro)
 
-            // Handle version access restrictions
             if (accessResult == CommandAccessResult.RequiresPro) {
-                voiceManager.speak(
-                    "This command is not included in the free package. " +
-                    "You can upgrade to Pro subscription to access this feature"
-                )
-                log("Pro command attempted by free user: $command")
+                voiceManager.speak("This command requires a Pro subscription.")
+                delay(2000)
+                _navigationEvent.emit(NavigationEvent.CloseAssistant)
                 return@launch
             }
 
             if (accessResult == CommandAccessResult.Unavailable) {
-                voiceManager.speak("This command is not available at the moment")
-                log("Unavailable command attempted: $command")
+                voiceManager.speak("This command is currently unavailable.")
+                delay(2000)
+                _navigationEvent.emit(NavigationEvent.CloseAssistant)
                 return@launch
             }
 
             when (command) {
-                // Navigation commands
                 is Command.FindFood -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("restaurants"))
-                    voiceManager.speak("Searching for nearby restaurants and cafes")
+                    voiceManager.speak("Searching for nearby restaurants.")
                 }
-
                 is Command.FindGasStation -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("gas stations"))
-                    voiceManager.speak("Finding gas stations near you")
+                    voiceManager.speak("Locating the nearest gas stations.")
                 }
-
                 is Command.FindChargingStation -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("EV charging stations"))
-                    voiceManager.speak("Locating charging stations nearby")
+                    voiceManager.speak("Finding EV charging stations nearby.")
                 }
-
                 is Command.FindParking -> {
                     _navigationEvent.emit(NavigationEvent.OpenNavigation("parking"))
-                    voiceManager.speak("Searching for parking areas")
+                    voiceManager.speak("Searching for available parking areas.")
                 }
-
-                // Vehicle status commands
-                is Command.VehicleStatus -> {
-                    val status = buildVehicleStatusReport()
-                    voiceManager.speak(status)
+                is Command.FindRestStop -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("rest stops"))
+                    voiceManager.speak("Finding rest stops on your route.")
                 }
-
-                is Command.CheckEngine -> {
-                    val engineStatus = buildEngineStatusReport()
-                    voiceManager.speak(engineStatus)
+                is Command.CheckEngineStatus -> voiceManager.speak(buildEngineStatusReport())
+                is Command.CheckOilLevel -> {
+                    val state = uiState.value
+                    voiceManager.speak("Oil level is ${state.oilLevel.toInt()} percent.")
                 }
-
-                is Command.CheckTires -> {
-                    val tireStatus = buildTireStatusReport()
-                    voiceManager.speak(tireStatus)
+                is Command.CheckTransmissionStatus -> {
+                    val state = uiState.value
+                    voiceManager.speak("Transmission gear: ${state.gear}. Engine RPM: ${state.rpm}.")
                 }
-
-                is Command.CheckFuelLevel -> {
-                    val fuelStatus = buildFuelStatusReport()
-                    voiceManager.speak(fuelStatus)
+                is Command.CheckRpm -> voiceManager.speak("Engine RPM: ${uiState.value.rpm}.")
+                is Command.CheckFuelLevel -> voiceManager.speak(buildFuelStatusReport())
+                is Command.CheckBatteryVoltage -> {
+                    val state = uiState.value
+                    voiceManager.speak("Battery level is ${state.evBatteryLevel.toInt()} percent.")
                 }
-
-                is Command.CheckBatteryLevel -> {
-                    val batteryStatus = buildBatteryStatusReport()
-                    voiceManager.speak(batteryStatus)
+                is Command.CheckEvStatus -> {
+                    val state = uiState.value
+                    voiceManager.speak("EV battery at ${state.evBatteryLevel.toInt()} percent.")
                 }
-
-                // Control commands
-                is Command.LockDoors -> {
-                    sendVehicleCommand(VehicleCommand.LOCK_DOORS)
-                    voiceManager.speak("Locking all doors")
+                is Command.CheckTireStatus -> voiceManager.speak(buildTireStatusReport())
+                is Command.CheckOdometer -> voiceManager.speak("Total distance: ${uiState.value.odometer.toInt()} km.")
+                is Command.CheckDrivingRange -> voiceManager.speak("Range: ${uiState.value.range.toInt()} km.")
+                is Command.CheckOutsideTemperature -> {
+                    val temp = uiState.value.outsideTemp.toInt()
+                    voiceManager.speak("Temperature is $temp degrees.")
                 }
-
-                is Command.UnlockDoors -> {
-                    sendVehicleCommand(VehicleCommand.UNLOCK_DOORS)
-                    voiceManager.speak("Unlocking all doors")
+                is Command.FindService -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("auto repair"))
+                    voiceManager.speak("Searching for auto repair services.")
                 }
-
-                is Command.TurnOnLights -> {
-                    sendVehicleCommand(VehicleCommand.LIGHTS_ON)
-                    voiceManager.speak("Turning on headlights")
+                is Command.FindCarWash -> {
+                    _navigationEvent.emit(NavigationEvent.OpenNavigation("car wash"))
+                    voiceManager.speak("Searching for car wash stations.")
                 }
-
-                is Command.TurnOffLights -> {
-                    sendVehicleCommand(VehicleCommand.LIGHTS_OFF)
-                    voiceManager.speak("Turning off headlights")
-                }
-
-                // Information commands
-                is Command.GetRange -> {
-                    val range = uiState.value.range
-                    voiceManager.speak("Your current range is ${range.toInt()} kilometers")
-                }
-
-                is Command.GetOdometer -> {
-                    val odometer = uiState.value.odometer
-                    voiceManager.speak("Total mileage is ${odometer.toInt()} kilometers")
-                }
-
-                is Command.GetSpeed -> {
-                    val speed = uiState.value.speed
-                    voiceManager.speak("Current speed is ${speed.toInt()} kilometers per hour")
-                }
-
-                is Command.GetOutsideTemp -> {
-                    val temp = uiState.value.outsideTemp
-                    val unit = uiState.value.tempUnit.ifEmpty { "Celsius" }
-                    voiceManager.speak("Outside temperature is ${temp.toInt()} degrees $unit")
-                }
-
                 is Command.Unknown -> {
-                    voiceManager.speak("Unknown command")
+                    voiceManager.speak("I'm sorry, I don't know how to do that.")
                 }
+                else -> {}
             }
-        }
-    }
-
-    // Helper functions to build status reports
-    private fun buildVehicleStatusReport(): String {
-        val state = uiState.value
-        return buildString {
-            if (state.isCheckEngineOn) {
-                append("Warning! Check engine light is on. ")
-            }
-            if (state.isCriticallyLowTirePressure) {
-                append("Critical tire pressure detected. ")
-            }
-            if (state.isFuelLow) {
-                append("Fuel level is low. ")
-            }
-            if (isEmpty()) {
-                append("All vehicle systems are operating normally. ")
-            }
-            append("Fuel level is ${state.fuelLevel.toInt()} percent. ")
-            append("Range is ${state.range.toInt()} kilometers.")
+            
+            // Close immediately after starting speech/action
+            _navigationEvent.emit(NavigationEvent.CloseAssistant)
         }
     }
 
     private fun buildEngineStatusReport(): String {
         val state = uiState.value
         return if (state.isCheckEngineOn) {
-            val dtcInfo = if (state.activeDTCs.isNotEmpty()) {
-                "Active diagnostic codes: ${state.activeDTCs.joinToString(", ")}"
-            } else {
-                "Please perform a diagnostic scan"
-            }
-            "Check engine light is on. $dtcInfo"
+            "The check engine light is active. Please visit a service station."
         } else {
-            "Engine is running normally. " +
-                    "Coolant temperature is ${state.coolantTemp.toInt()} degrees. " +
-                    "Oil level is ${state.oilLevel.toInt()} percent."
+            "The engine system is functioning normally."
         }
     }
 
     private fun buildTireStatusReport(): String {
         val state = uiState.value
         return if (state.isCriticallyLowTirePressure) {
-            val lowTires = state.tirePressures.filter { it.value < 2.0f }
-            "Warning! Low tire pressure detected in ${lowTires.size} tire(s). Please check immediately."
-        } else if (state.tirePressures.isNotEmpty()) {
-            "All tire pressures are within normal range"
+            "Warning: Low tire pressure detected. Check your tires immediately."
         } else {
-            "Tire pressure data is not available"
+            "Tire pressure is within the normal range."
         }
     }
 
     private fun buildFuelStatusReport(): String {
         val state = uiState.value
-        return buildString {
-            append("Fuel level is ${state.fuelLevel.toInt()} percent. ")
-            if (state.isFuelLow) {
-                append("Warning: fuel is low. ")
-            }
-            append("Range is ${state.range.toInt()} kilometers.")
-        }
-    }
-
-    private fun buildBatteryStatusReport(): String {
-        val state = uiState.value
-        return if (state.evBatteryLevel > 0) {
-            buildString {
-                append("Battery charge is ${state.evBatteryLevel.toInt()} percent. ")
-                if (state.isEvChargePortConnected) {
-                    append("Charging port is connected. ")
-                    if (state.evChargeTime > 0) {
-                        append("Estimated time to full charge: ${state.evChargeTime} minutes.")
-                    }
-                } else if (state.evBatteryLevel < 20) {
-                    append("Warning: battery is low. Please charge soon.")
-                }
-            }
-        } else {
-            "This vehicle does not have an electric battery"
-        }
-    }
-
-    enum class VehicleCommand {
-        LOCK_DOORS,
-        UNLOCK_DOORS,
-        LIGHTS_ON,
-        LIGHTS_OFF
-    }
-
-    // Function to send commands to vehicle HAL
-    private fun sendVehicleCommand(command: VehicleCommand) {
-        viewModelScope.launch {
-            try {
-                // TODO: Implement actual vehicle HAL command sending
-                // vhalManager.sendCommand(command)
-                log("Sending vehicle command: $command")
-            } catch (e: Exception) {
-                Log.e("HermiVM", "Failed to send vehicle command: ${e.message}")
-                _hasError.value = Exception("Failed to send vehicle command: ${e.message}")
-                voiceManager.speak("Failed to execute command")
-            }
-        }
+        return "Fuel level is ${state.fuelLevel.toInt()} percent. Estimated range is ${state.range.toInt()} kilometers."
     }
 
     override fun onCleared() {
         super.onCleared()
+        vadJob?.cancel()
+        fallbackJob?.cancel()
         voiceManager.shutdown()
         voskManager.release()
+        vadManager.close()
     }
 }
-
-private fun log(message: String) = Log.d("HermiViewModel", message)

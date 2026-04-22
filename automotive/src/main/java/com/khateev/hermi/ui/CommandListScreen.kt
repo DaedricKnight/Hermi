@@ -2,18 +2,35 @@ package com.khateev.hermi.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.khateev.hermi.shared.interfaces.VersionManager
@@ -49,12 +66,10 @@ fun CommandListScreen(
             .background(Color(0xFFF5F5F5))
             .padding(16.dp)
     ) {
-        // Header с информацией о версии
         VersionHeaderCard(isPro = isPro, onUpgradeClick = onUpgradeClick)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Список команд
         CommandsList(
             isPro = isPro,
             onCommandClick = onCommandClick
@@ -295,7 +310,7 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
     val availableCommands = CommandAccessControl.getAvailableCommands(isPro)
 
     return listOf(
-        // ===== FREE ВЕРСИЯ (Навигация) =====
+        // ===== FREE ВЕРСИЯ (5 команд - Навигация) =====
         CommandUIModel(
             name = "Find Food",
             description = "Search for nearby restaurants and cafes",
@@ -324,112 +339,227 @@ private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> {
             isPro = false,
             isAvailable = "FindParking" in availableCommands
         ),
+        CommandUIModel(
+            name = "Find Rest Stop",
+            description = "Find roadside rest areas and travel stops",
+            command = Command.FindRestStop,
+            isPro = false,
+            isAvailable = "FindRestStop" in availableCommands
+        ),
 
-        // ===== PRO ВЕРСИЯ (Статус машины) =====
+        // ===== PRO ВЕРСИЯ: ENGINE & POWERTRAIN (6 команд) =====
         CommandUIModel(
-            name = "Vehicle Status",
-            description = "Get complete vehicle diagnostics",
-            command = Command.VehicleStatus,
+            name = "Engine Status",
+            description = "Check engine diagnostics and warnings",
+            command = Command.CheckEngineStatus,
             isPro = true,
-            isAvailable = "VehicleStatus" in availableCommands
+            isAvailable = "CheckEngineStatus" in availableCommands
         ),
         CommandUIModel(
-            name = "Check Engine",
-            description = "Check engine status and diagnostic codes",
-            command = Command.CheckEngine,
+            name = "Oil Level",
+            description = "Monitor engine oil level and quality",
+            command = Command.CheckOilLevel,
             isPro = true,
-            isAvailable = "CheckEngine" in availableCommands
+            isAvailable = "CheckOilLevel" in availableCommands
         ),
         CommandUIModel(
-            name = "Check Tires",
-            description = "Monitor tire pressure and conditions",
-            command = Command.CheckTires,
+            name = "Transmission Status",
+            description = "Monitor transmission health and performance",
+            command = Command.CheckTransmissionStatus,
             isPro = true,
-            isAvailable = "CheckTires" in availableCommands
+            isAvailable = "CheckTransmissionStatus" in availableCommands
         ),
         CommandUIModel(
-            name = "Check Fuel Level",
-            description = "View fuel level and fuel status",
+            name = "Brake Pad Wear",
+            description = "Check brake pad wear levels",
+            command = Command.CheckBrakePadWear,
+            isPro = true,
+            isAvailable = "CheckBrakePadWear" in availableCommands
+        ),
+        CommandUIModel(
+            name = "Spark Plugs",
+            description = "Monitor spark plug condition",
+            command = Command.CheckSparkPlugCondition,
+            isPro = true,
+            isAvailable = "CheckSparkPlugCondition" in availableCommands
+        ),
+        CommandUIModel(
+            name = "RPM Monitor",
+            description = "Monitor engine RPM in real-time",
+            command = Command.CheckRpm,
+            isPro = true,
+            isAvailable = "CheckRpm" in availableCommands
+        ),
+
+        // ===== PRO ВЕРСИЯ: FUEL & BATTERY (5 команд) =====
+        CommandUIModel(
+            name = "Fuel Level",
+            description = "Check fuel tank level and consumption",
             command = Command.CheckFuelLevel,
             isPro = true,
             isAvailable = "CheckFuelLevel" in availableCommands
         ),
         CommandUIModel(
-            name = "Check Battery",
-            description = "Monitor battery charge status",
-            command = Command.CheckBatteryLevel,
+            name = "Fuel Consumption",
+            description = "Monitor fuel consumption and economy",
+            command = Command.CheckFuelConsumption,
             isPro = true,
-            isAvailable = "CheckBatteryLevel" in availableCommands
+            isAvailable = "CheckFuelConsumption" in availableCommands
+        ),
+        CommandUIModel(
+            name = "Battery Voltage",
+            description = "Monitor battery voltage levels",
+            command = Command.CheckBatteryVoltage,
+            isPro = true,
+            isAvailable = "CheckBatteryVoltage" in availableCommands
+        ),
+        CommandUIModel(
+            name = "Battery Health",
+            description = "Check battery health and temperature",
+            command = Command.CheckBatteryHealth,
+            isPro = true,
+            isAvailable = "CheckBatteryHealth" in availableCommands
+        ),
+        CommandUIModel(
+            name = "EV Status",
+            description = "Check EV battery charge, port connection, and range",
+            command = Command.CheckEvStatus,
+            isPro = true,
+            isAvailable = "CheckEvStatus" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ (Управление) =====
+        // ===== PRO ВЕРСИЯ: TIRES & SUSPENSION (5 команд) =====
         CommandUIModel(
-            name = "Lock Doors",
-            description = "Lock all vehicle doors",
-            command = Command.LockDoors,
+            name = "Tire Status",
+            description = "Monitor tire pressure and condition",
+            command = Command.CheckTireStatus,
             isPro = true,
-            isAvailable = "LockDoors" in availableCommands
+            isAvailable = "CheckTireStatus" in availableCommands
         ),
         CommandUIModel(
-            name = "Unlock Doors",
-            description = "Unlock all vehicle doors",
-            command = Command.UnlockDoors,
+            name = "Tire Wear",
+            description = "Check tire tread wear levels",
+            command = Command.CheckTireWear,
             isPro = true,
-            isAvailable = "UnlockDoors" in availableCommands
+            isAvailable = "CheckTireWear" in availableCommands
         ),
         CommandUIModel(
-            name = "Turn On Lights",
-            description = "Turn on vehicle headlights",
-            command = Command.TurnOnLights,
+            name = "Suspension Health",
+            description = "Monitor suspension system status",
+            command = Command.CheckSuspensionHealth,
             isPro = true,
-            isAvailable = "TurnOnLights" in availableCommands
+            isAvailable = "CheckSuspensionHealth" in availableCommands
         ),
         CommandUIModel(
-            name = "Turn Off Lights",
-            description = "Turn off vehicle headlights",
-            command = Command.TurnOffLights,
+            name = "Wheel Alignment",
+            description = "Check wheel alignment status",
+            command = Command.CheckWheelAlignment,
             isPro = true,
-            isAvailable = "TurnOffLights" in availableCommands
+            isAvailable = "CheckWheelAlignment" in availableCommands
+        ),
+        CommandUIModel(
+            name = "Steering Status",
+            description = "Monitor steering system condition",
+            command = Command.CheckSteeringStatus,
+            isPro = true,
+            isAvailable = "CheckSteeringStatus" in availableCommands
         ),
 
-        // ===== PRO ВЕРСИЯ (Информация) =====
+        // ===== PRO ВЕРСИЯ: FLUIDS & FILTERS (4 команды) =====
         CommandUIModel(
-            name = "Get Range",
-            description = "Check remaining driving range",
-            command = Command.GetRange,
+            name = "Transmission Fluid",
+            description = "Monitor transmission fluid status",
+            command = Command.CheckTransmissionFluid,
             isPro = true,
-            isAvailable = "GetRange" in availableCommands
+            isAvailable = "CheckTransmissionFluid" in availableCommands
         ),
         CommandUIModel(
-            name = "Get Odometer",
+            name = "Brake Fluid",
+            description = "Check brake fluid level and condition",
+            command = Command.CheckBrakeFluid,
+            isPro = true,
+            isAvailable = "CheckBrakeFluid" in availableCommands
+        ),
+        CommandUIModel(
+            name = "Coolant Level",
+            description = "Monitor engine coolant level",
+            command = Command.CheckCoolantLevel,
+            isPro = true,
+            isAvailable = "CheckCoolantLevel" in availableCommands
+        ),
+        CommandUIModel(
+            name = "Air Filters",
+            description = "Check engine and cabin air filters",
+            command = Command.CheckAirFilter,
+            isPro = true,
+            isAvailable = "CheckAirFilter" in availableCommands
+        ),
+
+        // ===== PRO ВЕРСИЯ: DRIVING STATS (2 команды) =====
+        CommandUIModel(
+            name = "Odometer",
             description = "View total vehicle mileage",
-            command = Command.GetOdometer,
+            command = Command.CheckOdometer,
             isPro = true,
-            isAvailable = "GetOdometer" in availableCommands
+            isAvailable = "CheckOdometer" in availableCommands
         ),
         CommandUIModel(
-            name = "Get Speed",
-            description = "Check current driving speed",
-            command = Command.GetSpeed,
+            name = "Driving Range",
+            description = "Check remaining fuel/battery range",
+            command = Command.CheckDrivingRange,
             isPro = true,
-            isAvailable = "GetSpeed" in availableCommands
+            isAvailable = "CheckDrivingRange" in availableCommands
+        ),
+
+        // ===== PRO ВЕРСИЯ: ENVIRONMENTAL (1 команда) =====
+        CommandUIModel(
+            name = "Outside Temperature",
+            description = "Get current outside temperature",
+            command = Command.CheckOutsideTemperature,
+            isPro = true,
+            isAvailable = "CheckOutsideTemperature" in availableCommands
+        ),
+
+        // ===== PRO ВЕРСИЯ: SMART FINDING (2 команды) =====
+        CommandUIModel(
+            name = "Find Service",
+            description = "Locate auto repair and service stations",
+            command = Command.FindService,
+            isPro = true,
+            isAvailable = "FindService" in availableCommands
         ),
         CommandUIModel(
-            name = "Get Temperature",
-            description = "Get outside temperature reading",
-            command = Command.GetOutsideTemp,
+            name = "Find Car Wash",
+            description = "Search for nearby car wash facilities",
+            command = Command.FindCarWash,
             isPro = true,
-            isAvailable = "GetOutsideTemp" in availableCommands
+            isAvailable = "FindCarWash" in availableCommands
         )
     )
 }
 
 /**
- * Preview для разработки
- * TODO: Add proper preview implementation
+ * Mock VersionManager for Preview
  */
-// @androidx.compose.ui.tooling.preview.Preview
-// @Composable
-// private fun CommandListScreenPreview() {
-    // Здесь можно добавить preview для тестирования UI
-// }
+class MockVersionManager : VersionManager {
+    override val isProVersion: kotlinx.coroutines.flow.Flow<Boolean>
+        get() = kotlinx.coroutines.flow.flowOf(false) // Mock as FREE version
+
+    override fun isProNow(): Boolean = false
+
+    override suspend fun setProVersion(isPro: Boolean) {
+        // Mock implementation
+    }
+
+    override suspend fun isSubscriptionActive(): Boolean = false
+}
+
+@Preview
+@Composable
+fun CommandListScreenPreview() {
+    CommandListScreen(
+        versionManager = MockVersionManager(),
+        onCommandClick = { _ -> },
+        onUpgradeClick = {}
+    )
+}

@@ -70,6 +70,10 @@ fun HermiAssistantOverlay(
                     is NavigationEvent.OpenNavigation -> {
                         openNavigationFor(context, event.searchQuery)
                     }
+                    is NavigationEvent.CloseAssistant -> {
+                        Log.d("Overlay", "CloseAssistant event received")
+                        onClose()
+                    }
                 }
             }
         }
@@ -93,7 +97,7 @@ fun HermiAssistantOverlay(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = if (spokenText.isEmpty() && isListening) "Listening..." else spokenText,
+                    text = if (spokenText.isEmpty() && isListening) "Listening..." else "Recognizing...",
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White,
                     textAlign = TextAlign.Center,
@@ -164,8 +168,9 @@ fun PulseAnimation(isListening: Boolean, isProcessing: Boolean, hasError: Boolea
 
 private fun openNavigationFor(context: Context, searchQuery: String) {
     try {
-        val uri =
-            "https://www.google.com/maps/search/?api=1&query=$searchQuery&open_now=true".toUri()
+        // Use geo: intent for best compatibility with Google Maps on Android Automotive
+        // geo:0,0?q=query searches for the query near the current location
+        val uri = "geo:0,0?q=$searchQuery".toUri()
 
         val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
             setPackage("com.google.android.apps.maps")
@@ -179,39 +184,35 @@ private fun openNavigationFor(context: Context, searchQuery: String) {
 
         Log.d(
             "Navigation",
-            "Available apps for geo intent: ${availableApps.map { it.activityInfo.packageName }}"
+            "Opening navigation for: $searchQuery. Available apps: ${availableApps.size}"
         )
 
         if (availableApps.isNotEmpty()) {
             context.startActivity(mapIntent)
-            Log.d("Navigation", "Opened navigation successfully")
+            Log.d("Navigation", "Successfully opened Google Maps with query: $searchQuery")
         } else {
-            Log.w("Navigation", "No navigation app available, trying alternatives")
+            Log.w("Navigation", "Google Maps package not found, trying alternative navigation schemes")
             tryAlternativeNavigation(context, searchQuery)
         }
 
     } catch (e: Exception) {
-        Log.e("Navigation", "Failed to open navigation: ${e.message}")
+        Log.e("Navigation", "Error opening navigation: ${e.message}")
         tryAlternativeNavigation(context, searchQuery)
     }
 }
 
 private fun tryAlternativeNavigation(context: Context, searchQuery: String) {
-    // Try different intent types
     val alternatives = listOf(
-        // Try Google Maps with different URI schemes
-        Intent(
-            Intent.ACTION_VIEW,
-            "https://www.google.com/maps/search/?api=1&query=$searchQuery".toUri()
-        ),
+        // 1. Google navigation mode
+        Intent(Intent.ACTION_VIEW, "google.navigation:q=$searchQuery".toUri()),
 
-        // Try generic search intent
+        // 2. Google Maps web search link
+        Intent(Intent.ACTION_VIEW, "https://www.google.com/maps/search/?api=1&query=$searchQuery".toUri()),
+
+        // 3. Generic web search
         Intent(Intent.ACTION_WEB_SEARCH).apply {
             putExtra(SearchManager.QUERY, "$searchQuery near me")
-        },
-
-        // Try browser with Google Maps URL
-        Intent(Intent.ACTION_VIEW, "https://www.google.com/maps/search/$searchQuery".toUri())
+        }
     )
 
     for ((index, intent) in alternatives.withIndex()) {
