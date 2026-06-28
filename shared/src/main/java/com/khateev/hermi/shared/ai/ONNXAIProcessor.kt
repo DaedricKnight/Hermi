@@ -19,7 +19,7 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
 
     companion object {
         private const val TAG = "ONNXAIProcessor"
-        private const val MODEL_FILE = "mobilebert_intent_v9.onnx"
+        private const val MODEL_FILE = "automotive_intent_quant.onnx"
         private const val VOCAB_FILE = "vocab.txt"
         private const val LABELS_FILE = "labels.txt"
     }
@@ -69,18 +69,34 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
         val resultIds = mutableListOf<Long>()
         resultIds.add(vocab["[CLS]"]?.toLong() ?: 101L)
 
-        val words = text.lowercase().trim().split(Regex("\\s+"))
+        // Split by whitespace first, then handle each "word" for punctuation
+        val initialWords = text.lowercase().trim().split(Regex("\\s+"))
+        val tokens = mutableListOf<String>()
+        
+        for (word in initialWords) {
+            var current = ""
+            for (char in word) {
+                if (char.isLetterOrDigit()) {
+                    current += char
+                } else {
+                    if (current.isNotEmpty()) tokens.add(current)
+                    tokens.add(char.toString())
+                    current = ""
+                }
+            }
+            if (current.isNotEmpty()) tokens.add(current)
+        }
 
-        for (word in words) {
+        for (token in tokens) {
             if (resultIds.size >= MAX_SEQ_LEN - 1) break
 
-            var remaining = word
+            var remaining = token
             while (remaining.isNotEmpty()) {
                 var subword = ""
                 var end = remaining.length
 
                 while (end > 0) {
-                    val candidate = if (remaining == word) {
+                    val candidate = if (remaining == token) {
                         remaining.substring(0, end)
                     } else {
                         "##" + remaining.substring(0, end)
@@ -114,7 +130,7 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
         return finalIds
     }
 
-    override fun parseCommand(input: String): Command {
+    override suspend fun parseCommand(input: String): Command {
         if (input.isBlank() || session == null) {
             Log.w(TAG, "Empty input or session not initialized")
             return Command.Unknown(input)

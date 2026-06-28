@@ -2,6 +2,7 @@ package com.khateev.hermi.shared.ai
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.khateev.hermi.shared.model.Command
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -16,7 +17,7 @@ class ONNXAIProcessorIntegrationTest {
     }
 
     @Test
-    fun testModelAccuracyOnAllPhrases() {
+    fun testModelAccuracyOnAllPhrases() = runTest {
         val testData = TestPhrases.data
         var totalTests = 0
         var correctMatches = 0

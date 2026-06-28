@@ -33,6 +33,6 @@
     "find_service",
     "unknown"
   ],
-  "model_type": "mobilebert",
-  "best_accuracy": 0.9947
+  "model_type": "bert",
+  "best_accuracy": 0.9989
 }
