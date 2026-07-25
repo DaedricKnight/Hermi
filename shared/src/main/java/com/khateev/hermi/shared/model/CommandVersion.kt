@@ -9,162 +9,38 @@ enum class CommandVersion {
 }
 
 /**
- * Class for managing command availability depending on the version
+ * Command availability by app version.
+ *
+ * The tier of every command lives in [CommandCatalog] alongside the model label
+ * it comes from, so adding an intent to the model is the only place tiers are
+ * declared. [Command.Unknown] is always available — it is how the assistant says
+ * "I didn't get that".
  */
 object CommandAccessControl {
 
-    /**
-     * Map of commands and their versioning
-     */
-    private val commandVersionMap = mapOf(
-        // === FREE version (5 commands) ===
-        // Navigation — local, no internet needed
-        "FindFood" to CommandVersion.FREE,
-        "FindGasStation" to CommandVersion.FREE,
-        "FindChargingStation" to CommandVersion.FREE,
-        "FindParking" to CommandVersion.FREE,
-        "FindRestStop" to CommandVersion.FREE,
-
-        // === PRO версия (24 команды) ===
-        // Engine & Powertrain (5)
-        "CheckEngineStatus" to CommandVersion.PRO,
-        "CheckOilLevel" to CommandVersion.PRO,
-        "CheckTransmissionStatus" to CommandVersion.PRO,
-        "CheckBrakePadWear" to CommandVersion.PRO,
-        "CheckSparkPlugCondition" to CommandVersion.PRO,
-        "CheckRpm" to CommandVersion.PRO,
-
-        // Fuel & Battery (5)
-        "CheckFuelLevel" to CommandVersion.PRO,
-        "CheckFuelConsumption" to CommandVersion.PRO,
-        "CheckBatteryVoltage" to CommandVersion.PRO,
-        "CheckBatteryHealth" to CommandVersion.PRO,
-        "CheckEvStatus" to CommandVersion.PRO,
-
-        // Tires & Suspension (5)
-        "CheckTireStatus" to CommandVersion.PRO,
-        "CheckTireWear" to CommandVersion.PRO,
-        "CheckSuspensionHealth" to CommandVersion.PRO,
-        "CheckWheelAlignment" to CommandVersion.PRO,
-        "CheckSteeringStatus" to CommandVersion.PRO,
-
-        // Fluids & Filters (4)
-        "CheckTransmissionFluid" to CommandVersion.PRO,
-        "CheckBrakeFluid" to CommandVersion.PRO,
-        "CheckCoolantLevel" to CommandVersion.PRO,
-        "CheckAirFilter" to CommandVersion.PRO,
-
-        // Driving Stats (2)
-        "CheckOdometer" to CommandVersion.PRO,
-        "CheckDrivingRange" to CommandVersion.PRO,
-
-        // Environmental (1)
-        "CheckOutsideTemperature" to CommandVersion.PRO,
-
-        // Find (PRO Extended) (2)
-        "FindService" to CommandVersion.PRO,
-        "FindCarWash" to CommandVersion.PRO,
-
-        // Fallback
-        "Unknown" to CommandVersion.FREE
-    )
-
-    /**
-     * Проверяет, доступна ли команда для текущей версии приложения
-     * @param command Команда для проверки
-     * @param isPro Является ли пользователь Pro (платным) пользователем
-     * @return true если команда доступна, false если нет
-     */
     fun isCommandAvailable(command: Command, isPro: Boolean): Boolean {
-        val commandName = getCommandName(command)
-        val requiredVersion = commandVersionMap[commandName] ?: return false
-
-        return when {
-            requiredVersion == CommandVersion.FREE -> true  // FREE команды всегда доступны
-            requiredVersion == CommandVersion.PRO && isPro -> true  // PRO команды только для Pro
-            else -> false
+        if (command is Command.Unknown) return true
+        return when (CommandCatalog.specFor(command)?.version) {
+            CommandVersion.FREE -> true
+            CommandVersion.PRO -> isPro
+            null -> false
         }
     }
 
-    /**
-     * Проверяет, требуется ли Pro версия для команды
-     * @param command Команда для проверки
-     * @return true если команда требует Pro версию
-     */
-    fun requiresPro(command: Command): Boolean {
-        val commandName = getCommandName(command)
-        return commandVersionMap[commandName] == CommandVersion.PRO
-    }
+    fun requiresPro(command: Command): Boolean =
+        CommandCatalog.specFor(command)?.version == CommandVersion.PRO
 
-    /**
-     * Получает название команды из sealed class
-     */
-    fun getCommandName(command: Command): String {
-        return when (command) {
-            // Navigation and search (FREE)
-            Command.FindFood -> "FindFood"
-            Command.FindGasStation -> "FindGasStation"
-            Command.FindChargingStation -> "FindChargingStation"
-            Command.FindParking -> "FindParking"
-            Command.FindRestStop -> "FindRestStop"
+    /** Human-readable name, e.g. "Lock doors" — shown in dialogs and the list. */
+    fun getCommandName(command: Command): String =
+        CommandCatalog.specFor(command)?.title ?: "Unknown"
 
-            // Engine & Powertrain (PRO)
-            Command.CheckEngineStatus -> "CheckEngineStatus"
-            Command.CheckOilLevel -> "CheckOilLevel"
-            Command.CheckTransmissionStatus -> "CheckTransmissionStatus"
-            Command.CheckBrakePadWear -> "CheckBrakePadWear"
-            Command.CheckSparkPlugCondition -> "CheckSparkPlugCondition"
-            Command.CheckRpm -> "CheckRpm"
+    /** Titles of the commands the given tier may run. */
+    fun getAvailableCommands(isPro: Boolean): List<String> =
+        CommandCatalog.specs
+            .filter { it.version == CommandVersion.FREE || isPro }
+            .map { it.title }
 
-            // Fuel & Battery (PRO)
-            Command.CheckFuelLevel -> "CheckFuelLevel"
-            Command.CheckFuelConsumption -> "CheckFuelConsumption"
-            Command.CheckBatteryVoltage -> "CheckBatteryVoltage"
-            Command.CheckBatteryHealth -> "CheckBatteryHealth"
-            Command.CheckEvStatus -> "CheckEvStatus"
-
-            // Tires & Suspension (PRO)
-            Command.CheckTireStatus -> "CheckTireStatus"
-            Command.CheckTireWear -> "CheckTireWear"
-            Command.CheckSuspensionHealth -> "CheckSuspensionHealth"
-            Command.CheckWheelAlignment -> "CheckWheelAlignment"
-            Command.CheckSteeringStatus -> "CheckSteeringStatus"
-
-            // Fluids & Filters (PRO)
-            Command.CheckTransmissionFluid -> "CheckTransmissionFluid"
-            Command.CheckBrakeFluid -> "CheckBrakeFluid"
-            Command.CheckCoolantLevel -> "CheckCoolantLevel"
-            Command.CheckAirFilter -> "CheckAirFilter"
-
-            // Driving Stats (PRO)
-            Command.CheckOdometer -> "CheckOdometer"
-            Command.CheckDrivingRange -> "CheckDrivingRange"
-
-            // Environmental (PRO)
-            Command.CheckOutsideTemperature -> "CheckOutsideTemperature"
-
-            // Find (PRO Extended)
-            Command.FindService -> "FindService"
-            Command.FindCarWash -> "FindCarWash"
-
-            is Command.Unknown -> "Unknown"
-        }
-    }
-
-    /**
-     * Возвращает список всех команд для конкретной версии
-     */
-    fun getAvailableCommands(isPro: Boolean): List<String> {
-        return commandVersionMap.filter { (_, version) ->
-            version == CommandVersion.FREE || (version == CommandVersion.PRO && isPro)
-        }.keys.toList()
-    }
-
-    /**
-     * Возвращает тип версии для команды
-     */
-    fun getCommandVersion(command: Command): CommandVersion? {
-        val commandName = getCommandName(command)
-        return commandVersionMap[commandName]
-    }
+    fun getCommandVersion(command: Command): CommandVersion? =
+        if (command is Command.Unknown) CommandVersion.FREE
+        else CommandCatalog.specFor(command)?.version
 }

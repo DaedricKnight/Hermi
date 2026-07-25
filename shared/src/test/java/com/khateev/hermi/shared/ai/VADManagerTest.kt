@@ -3,6 +3,7 @@ package com.khateev.hermi.shared.ai
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -23,18 +24,19 @@ class VADManagerTest {
                 speechEndedCalled = true
             }
         }
+        advanceUntilIdle()
 
         // Active speech
         every { mockSileroVAD.predict(any()) } returns 0.9f
         audioFlow.emit(FloatArray(512)) 
-        yield()
+        advanceUntilIdle()
         assertTrue(!speechEndedCalled)
 
         // Silence (128ms total)
         every { mockSileroVAD.predict(any()) } returns 0.1f
         repeat(4) {
             audioFlow.emit(FloatArray(512))
-            yield()
+            advanceUntilIdle()
         }
 
         assertTrue("Speech end should be called", speechEndedCalled)
@@ -54,28 +56,29 @@ class VADManagerTest {
                 speechEndedCalled = true
             }
         }
+        advanceUntilIdle()
 
         // 2 chunks of silence (64ms)
         every { mockSileroVAD.predict(any()) } returns 0.1f
         repeat(2) { audioFlow.emit(FloatArray(512)) }
-        yield()
+        advanceUntilIdle()
         assertTrue(!speechEndedCalled)
         
         // 1 chunk of speech (32ms) -> reset
         every { mockSileroVAD.predict(any()) } returns 0.9f
         audioFlow.emit(FloatArray(512))
-        yield()
+        advanceUntilIdle()
         assertTrue(!speechEndedCalled)
 
         // 2 chunks of silence (64ms) -> total 64ms, < 100ms
         every { mockSileroVAD.predict(any()) } returns 0.1f
         repeat(2) { audioFlow.emit(FloatArray(512)) }
-        yield()
+        advanceUntilIdle()
         assertTrue(!speechEndedCalled)
         
         // 2 more chunks (total 128ms) -> finish
         repeat(2) { audioFlow.emit(FloatArray(512)) }
-        yield()
+        advanceUntilIdle()
         
         assertTrue("Speech end should be called now", speechEndedCalled)
         job.cancel()

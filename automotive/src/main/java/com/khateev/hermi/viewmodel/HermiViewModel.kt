@@ -13,6 +13,7 @@ import com.khateev.hermi.shared.interfaces.RecognitionManager
 import com.khateev.hermi.shared.interfaces.VersionManager
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
 import com.khateev.hermi.shared.model.Command
+import com.khateev.hermi.shared.model.CommandCatalog
 import com.khateev.hermi.shared.model.CommandValidator
 import com.khateev.hermi.shared.model.CommandAccessResult
 import com.khateev.hermi.shared.ai.VADManager
@@ -195,93 +196,44 @@ class HermiViewModel(
                 return@launch
             }
 
-            when (command) {
-                is Command.FindFood -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("restaurants"))
-                    voiceManager.speak("Searching for nearby restaurants.")
-                }
-                is Command.FindGasStation -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("gas stations"))
-                    voiceManager.speak("Locating the nearest gas stations.")
-                }
-                is Command.FindChargingStation -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("EV charging stations"))
-                    voiceManager.speak("Finding EV charging stations nearby.")
-                }
-                is Command.FindParking -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("parking"))
-                    voiceManager.speak("Searching for available parking areas.")
-                }
-                is Command.FindRestStop -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("rest stops"))
-                    voiceManager.speak("Finding rest stops on your route.")
-                }
-                is Command.CheckEngineStatus -> voiceManager.speak(buildEngineStatusReport())
-                is Command.CheckOilLevel -> {
-                    val state = uiState.value
-                    voiceManager.speak("Oil level is ${state.oilLevel.toInt()} percent.")
-                }
-                is Command.CheckTransmissionStatus -> {
-                    val state = uiState.value
-                    voiceManager.speak("Transmission gear: ${state.gear}. Engine RPM: ${state.rpm}.")
-                }
-                is Command.CheckRpm -> voiceManager.speak("Engine RPM: ${uiState.value.rpm}.")
-                is Command.CheckFuelLevel -> voiceManager.speak(buildFuelStatusReport())
-                is Command.CheckBatteryVoltage -> {
-                    val state = uiState.value
-                    voiceManager.speak("Battery level is ${state.evBatteryLevel.toInt()} percent.")
-                }
-                is Command.CheckEvStatus -> {
-                    val state = uiState.value
-                    voiceManager.speak("EV battery at ${state.evBatteryLevel.toInt()} percent.")
-                }
-                is Command.CheckTireStatus -> voiceManager.speak(buildTireStatusReport())
-                is Command.CheckOdometer -> voiceManager.speak("Total distance: ${uiState.value.odometer.toInt()} km.")
-                is Command.CheckDrivingRange -> voiceManager.speak("Range: ${uiState.value.range.toInt()} km.")
-                is Command.CheckOutsideTemperature -> {
-                    val temp = uiState.value.outsideTemp.toInt()
-                    voiceManager.speak("Temperature is $temp degrees.")
-                }
-                is Command.FindService -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("auto repair"))
-                    voiceManager.speak("Searching for auto repair services.")
-                }
-                is Command.FindCarWash -> {
-                    _navigationEvent.emit(NavigationEvent.OpenNavigation("car wash"))
-                    voiceManager.speak("Searching for car wash stations.")
-                }
-                is Command.Unknown -> {
-                    voiceManager.speak("I'm sorry, I don't know how to do that.")
-                }
-                else -> {}
+            if (command is Command.Unknown) {
+                voiceManager.speak("I'm sorry, I don't know how to do that.")
+                _navigationEvent.emit(NavigationEvent.CloseAssistant)
+                return@launch
             }
-            
+
+            val spec = CommandCatalog.specFor(command)
+            if (spec == null) {
+                Log.w(TAG, "No catalog entry for $command")
+                voiceManager.speak("I'm sorry, I don't know how to do that.")
+                _navigationEvent.emit(NavigationEvent.CloseAssistant)
+                return@launch
+            }
+
+            POI_QUERIES[spec.label]?.let { query ->
+                _navigationEvent.emit(NavigationEvent.OpenNavigation(query))
+            }
+            voiceManager.speak(spec.acknowledgement)
+
             // Close immediately after starting speech/action
             _navigationEvent.emit(NavigationEvent.CloseAssistant)
         }
     }
 
-    private fun buildEngineStatusReport(): String {
-        val state = uiState.value
-        return if (state.isCheckEngineOn) {
-            "The check engine light is active. Please visit a service station."
-        } else {
-            "The engine system is functioning normally."
-        }
-    }
-
-    private fun buildTireStatusReport(): String {
-        val state = uiState.value
-        return if (state.isCriticallyLowTirePressure) {
-            "Warning: Low tire pressure detected. Check your tires immediately."
-        } else {
-            "Tire pressure is within the normal range."
-        }
-    }
-
-    private fun buildFuelStatusReport(): String {
-        val state = uiState.value
-        return "Fuel level is ${state.fuelLevel.toInt()} percent. Estimated range is ${state.range.toInt()} kilometers."
+    private companion object {
+        /**
+         * Intents that hand off to the navigation app instead of acting on the
+         * car itself. Every other command in the catalog is acknowledged and
+         * awaits a VHAL writer — core_vhal is read-only today, so nothing in the
+         * cabin actually moves yet.
+         */
+        val POI_QUERIES = mapOf(
+            "navi_find_restaurant" to "restaurants",
+            "navi_find_gas_station" to "gas stations",
+            "navi_find_parking" to "parking",
+            "navi_go_home" to "home",
+            "navi_go_work" to "work",
+        )
     }
 
     override fun onCleared() {

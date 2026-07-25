@@ -5,12 +5,17 @@ import com.khateev.hermi.shared.interfaces.AudioRecorder
 import com.khateev.hermi.shared.interfaces.RecognitionManager
 import com.khateev.hermi.shared.interfaces.VersionManager
 import com.khateev.hermi.shared.manager.VoiceInterfaceManager
+import com.khateev.hermi.shared.ai.VADManager
 import com.khateev.hermi.shared.model.Command
+import com.khateev.hermi.shared.model.CommandCatalog
 import com.khateev.hermi.viewmodel.HermiViewModel
 import com.qubit.core_vhal.VhalParamsState
 import com.qubit.core_vhal.repository.VhalReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -28,6 +33,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.never
+import org.mockito.Mockito.timeout
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.argumentCaptor
@@ -41,6 +47,7 @@ class HermiViewModelTest {
     private lateinit var aiProcessor: AIProcessor
     private lateinit var voiceManager: VoiceInterfaceManager
     private lateinit var versionManager: VersionManager
+    private lateinit var vadManager: VADManager
 
     private val fakeCarState = MutableStateFlow(VhalParamsState())
 
@@ -53,6 +60,7 @@ class HermiViewModelTest {
         voiceManager = Mockito.mock(VoiceInterfaceManager::class.java)
         vhalReader = Mockito.mock(VhalReader::class.java)
         versionManager = Mockito.mock(VersionManager::class.java)
+        vadManager = Mockito.mock(VADManager::class.java)
         
         `when`(vhalReader.carState).thenReturn(fakeCarState)
         // Default to Pro user so command tests pass
@@ -70,10 +78,23 @@ class HermiViewModelTest {
         vhalReader = vhalReader,
         aiProcessor = aiProcessor,
         voiceManager = voiceManager,
-        versionManager = versionManager
+        versionManager = versionManager,
+        vadManager = vadManager
     )
 
-    // Helper for a typical scenario — init + transcribe
+    /**
+     * startRecording() runs on Dispatchers.IO, so the test scheduler cannot drive
+     * it — wait on the real clock until the ViewModel reports it is recording.
+     * stopRecordingAndTranscribe() is a no-op otherwise.
+     */
+    private suspend fun beginRecording(vm: HermiViewModel) {
+        vm.startRecording()
+        withContext(Dispatchers.Default) {
+            withTimeout(2_000) { vm.isRecording.first { it } }
+        }
+    }
+
+    // Helper for a typical scenario — init + record + transcribe
     private suspend fun TestScope.setupAndTranscribe(text: String, command: Command): HermiViewModel {
         val emptyFloatArray = FloatArray(0)
         `when`(voskManager.initialize()).thenReturn(true)
@@ -82,6 +103,7 @@ class HermiViewModelTest {
         `when`(aiProcessor.parseCommand(anyString())).thenReturn(command)
         val vm = createViewModel()
         advanceUntilIdle()
+        beginRecording(vm)
         vm.stopRecordingAndTranscribe()
         advanceUntilIdle()
         return vm
@@ -103,7 +125,7 @@ class HermiViewModelTest {
         `when`(voskManager.initialize()).thenReturn(true)
         val vm = createViewModel()
         advanceUntilIdle()
-        assertEquals("\uD83C\uDFA4 Ready to record", vm.transcription)
+        assertEquals("Ready to record", vm.transcription)
     }
 
     @Test
@@ -174,8 +196,7 @@ class HermiViewModelTest {
         `when`(voskManager.initialize()).thenReturn(true)
         val vm = createViewModel()
         advanceUntilIdle()
-        vm.startRecording()
-        advanceUntilIdle()
+        beginRecording(vm)
         assertTrue(vm.isRecording.value)
     }
 
@@ -184,9 +205,8 @@ class HermiViewModelTest {
         `when`(voskManager.initialize()).thenReturn(true)
         val vm = createViewModel()
         advanceUntilIdle()
-        vm.startRecording()
-        advanceUntilIdle()
-        assertEquals("Recording...", vm.transcription)
+        beginRecording(vm)
+        assertEquals("Listening...", vm.transcription)
     }
 
     @Test
@@ -194,9 +214,8 @@ class HermiViewModelTest {
         `when`(voskManager.initialize()).thenReturn(true)
         val vm = createViewModel()
         advanceUntilIdle()
-        vm.startRecording()
-        advanceUntilIdle()
-        verify(audioRecorder).startRecording()
+        beginRecording(vm)
+        verify(audioRecorder, timeout(2_000)).startRecording()
     }
 
     // ────────────────────────────────────────────────
@@ -215,13 +234,13 @@ class HermiViewModelTest {
 
     @Test
     fun `stopRecordingAndTranscribe sets isRecording to false`() = runTest {
-        val vm = setupAndTranscribe("find food", Command.FindFood)
+        val vm = setupAndTranscribe("play music", Command.MediaPlay)
         assertFalse(vm.isRecording.value)
     }
 
     @Test
     fun `stopRecordingAndTranscribe calls audioRecorder stopRecording`() = runTest {
-        setupAndTranscribe("find food", Command.FindFood)
+        setupAndTranscribe("play music", Command.MediaPlay)
         verify(audioRecorder, atLeastOnce()).stopRecording()
     }
 
@@ -232,26 +251,27 @@ class HermiViewModelTest {
         `when`(voskManager.recognizeAudio(FloatArray(0))).thenReturn(null)
         val vm = createViewModel()
         advanceUntilIdle()
+        beginRecording(vm)
         vm.stopRecordingAndTranscribe()
         advanceUntilIdle()
-        assertEquals("Failed to transcribe", vm.transcription)
+        assertEquals("I didn't catch that", vm.transcription)
     }
 
     @Test
     fun `stopRecordingAndTranscribe sets transcription to recognized text`() = runTest {
-        val vm = setupAndTranscribe("check engine", Command.CheckEngineStatus)
-        assertEquals("check engine", vm.transcription)
+        val vm = setupAndTranscribe("turn on the ac", Command.ClimateAcOn)
+        assertEquals("turn on the ac", vm.transcription)
     }
 
     @Test
     fun `stopRecordingAndTranscribe calls aiProcessor with recognized text`() = runTest {
-        setupAndTranscribe("check engine", Command.CheckEngineStatus)
-        verify(aiProcessor).parseCommand("check engine")
+        setupAndTranscribe("turn on the ac", Command.ClimateAcOn)
+        verify(aiProcessor).parseCommand("turn on the ac")
     }
 
     @Test
     fun `stopRecordingAndTranscribe sets isProcessing false after completion`() = runTest {
-        val vm = setupAndTranscribe("find food", Command.FindFood)
+        val vm = setupAndTranscribe("play music", Command.MediaPlay)
         assertFalse(vm.isProcessing.value)
     }
 
@@ -262,9 +282,16 @@ class HermiViewModelTest {
         `when`(voskManager.recognizeAudio(FloatArray(0))).thenThrow(RuntimeException("Audio error"))
         val vm = createViewModel()
         advanceUntilIdle()
+        beginRecording(vm)
+
+        val events = mutableListOf<NavigationEvent>()
+        val job = launch { vm.navigationEvent.collect { events.add(it) } }
         vm.stopRecordingAndTranscribe()
         advanceUntilIdle()
-        assertEquals("Error: Audio error", vm.transcription)
+        job.cancel()
+
+        assertTrue("recognition failure must close the assistant",
+            events.any { it is NavigationEvent.CloseAssistant })
     }
 
     @Test
@@ -274,143 +301,104 @@ class HermiViewModelTest {
         `when`(voskManager.recognizeAudio(FloatArray(0))).thenThrow(RuntimeException("fail"))
         val vm = createViewModel()
         advanceUntilIdle()
+        beginRecording(vm)
         vm.stopRecordingAndTranscribe()
         advanceUntilIdle()
         assertFalse(vm.isProcessing.value)
     }
 
-    @Test
-    fun `FindFood speaks about restaurants`() = runTest {
+    // ────────────────────────────────────────────────
+    // COMMAND EXECUTION TESTS (catalog-driven)
+    // ────────────────────────────────────────────────
+
+    /** Whatever the catalog says a command announces is what the user must hear. */
+    private suspend fun TestScope.assertSpeaksAcknowledgement(command: Command) {
         var spokenText = ""
         Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
             .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("find food", Command.FindFood)
-        assertTrue(spokenText.contains("restaurant"))
+        setupAndTranscribe("some phrase", command)
+        assertEquals(CommandCatalog.specFor(command)?.acknowledgement, spokenText)
     }
 
     @Test
-    fun `FindGasStation speaks about gas stations`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("find gas", Command.FindGasStation)
-        assertTrue(spokenText.contains("gas"))
+    fun `door lock speaks its acknowledgement`() = runTest {
+        assertSpeaksAcknowledgement(Command.BodyDoorLock)
     }
 
     @Test
-    fun `FindChargingStation speaks about charging`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("find charging", Command.FindChargingStation)
-        assertTrue(spokenText.contains("charging"))
+    fun `climate command speaks its acknowledgement`() = runTest {
+        assertSpeaksAcknowledgement(Command.ClimateAcOn)
     }
 
     @Test
-    fun `FindParking speaks about parking`() = runTest {
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        setupAndTranscribe("find parking", Command.FindParking)
-        assertTrue(spokenText.contains("parking"))
+    fun `media command speaks its acknowledgement`() = runTest {
+        assertSpeaksAcknowledgement(Command.MediaPlay)
     }
 
     @Test
-    fun `Unknown command speaks unknown command`() = runTest {
+    fun `every catalog command is announced with a non-empty phrase`() = runTest {
+        val silent = CommandCatalog.specs.filter { it.acknowledgement.isBlank() }
+        assertTrue("commands with no acknowledgement: ${silent.map { it.label }}", silent.isEmpty())
+    }
+
+    @Test
+    fun `Unknown command speaks an apology`() = runTest {
         var spokenText = ""
         Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
             .`when`(voiceManager).speak(anyString())
         setupAndTranscribe("xyzzy", Command.Unknown("xyzzy"))
-        assertEquals("Sorry, I didn't understand that command", spokenText)
+        assertTrue(spokenText.contains("don't know how to do that"))
     }
 
     // ────────────────────────────────────────────────
     // navigationEvent TESTS
     // ────────────────────────────────────────────────
 
-    @Test
-    fun `FindFood emits OpenNavigation with restaurants`() = runTest {
+    private suspend fun TestScope.navigationEventsFor(command: Command): List<NavigationEvent> {
         `when`(voskManager.initialize()).thenReturn(true)
         `when`(audioRecorder.stopRecording()).thenReturn(FloatArray(0))
-        `when`(voskManager.recognizeAudio(FloatArray(0))).thenReturn("find food")
-        `when`(aiProcessor.parseCommand("find food")).thenReturn(Command.FindFood)
+        `when`(voskManager.recognizeAudio(FloatArray(0))).thenReturn("some phrase")
+        `when`(aiProcessor.parseCommand(anyString())).thenReturn(command)
         val vm = createViewModel()
         advanceUntilIdle()
 
         val events = mutableListOf<NavigationEvent>()
         val job = launch { vm.navigationEvent.collect { events.add(it) } }
-
+        beginRecording(vm)
         vm.stopRecordingAndTranscribe()
         advanceUntilIdle()
+        job.cancel()
+        return events
+    }
 
+    @Test
+    fun `find restaurant emits OpenNavigation with restaurants`() = runTest {
+        val events = navigationEventsFor(Command.NavigationFindRestaurant)
         assertTrue(events.any { it is NavigationEvent.OpenNavigation && it.searchQuery == "restaurants" })
-        job.cancel()
     }
 
     @Test
-    fun `FindGasStation emits OpenNavigation with gas stations`() = runTest {
-        `when`(voskManager.initialize()).thenReturn(true)
-        `when`(audioRecorder.stopRecording()).thenReturn(FloatArray(0))
-        `when`(voskManager.recognizeAudio(FloatArray(0))).thenReturn("find gas")
-        `when`(aiProcessor.parseCommand("find gas")).thenReturn(Command.FindGasStation)
-        val vm = createViewModel()
-        advanceUntilIdle()
-
-        val events = mutableListOf<NavigationEvent>()
-        val job = launch { vm.navigationEvent.collect { events.add(it) } }
-
-        vm.stopRecordingAndTranscribe()
-        advanceUntilIdle()
-
+    fun `find gas station emits OpenNavigation with gas stations`() = runTest {
+        val events = navigationEventsFor(Command.NavigationFindGasStation)
         assertTrue(events.any { it is NavigationEvent.OpenNavigation && it.searchQuery == "gas stations" })
-        job.cancel()
     }
 
     @Test
-    fun `FindParking emits OpenNavigation with parking`() = runTest {
-        `when`(voskManager.initialize()).thenReturn(true)
-        `when`(audioRecorder.stopRecording()).thenReturn(FloatArray(0))
-        `when`(voskManager.recognizeAudio(FloatArray(0))).thenReturn("find parking")
-        `when`(aiProcessor.parseCommand("find parking")).thenReturn(Command.FindParking)
-        val vm = createViewModel()
-        advanceUntilIdle()
-
-        val events = mutableListOf<NavigationEvent>()
-        val job = launch { vm.navigationEvent.collect { events.add(it) } }
-
-        vm.stopRecordingAndTranscribe()
-        advanceUntilIdle()
-
+    fun `find parking emits OpenNavigation with parking`() = runTest {
+        val events = navigationEventsFor(Command.NavigationFindParking)
         assertTrue(events.any { it is NavigationEvent.OpenNavigation && it.searchQuery == "parking" })
-        job.cancel()
     }
 
     @Test
-    fun `CheckDrivingRange speaks current range from carState`() = runTest {
-        fakeCarState.value = VhalParamsState(range = 350f)
-        setupAndTranscribe("get range", Command.CheckDrivingRange)
-        val captor = argumentCaptor<String>()
-        verify(voiceManager).speak(captor.capture())
-        assertTrue(captor.firstValue.contains("350"))
+    fun `cabin command does not open navigation`() = runTest {
+        val events = navigationEventsFor(Command.BodyDoorLock)
+        assertTrue(events.none { it is NavigationEvent.OpenNavigation })
     }
 
     @Test
-    fun `CheckOdometer speaks odometer from carState`() = runTest {
-        fakeCarState.value = VhalParamsState(odometer = 12345f)
-        setupAndTranscribe("get odometer", Command.CheckOdometer)
-        val captor = argumentCaptor<String>()
-        verify(voiceManager).speak(captor.capture())
-        assertTrue(captor.firstValue.contains("12345"))
-    }
-
-    @Test
-    fun `CheckOutsideTemperature speaks temperature with unit`() = runTest {
-        fakeCarState.value = VhalParamsState(outsideTemp = 22f, tempUnit = "Celsius")
-        setupAndTranscribe("get temp", Command.CheckOutsideTemperature)
-        val captor = argumentCaptor<String>()
-        verify(voiceManager).speak(captor.capture())
-        assertTrue(captor.firstValue.contains("22"))
-        assertTrue(captor.firstValue.contains("Celsius"))
+    fun `assistant closes after every command`() = runTest {
+        val events = navigationEventsFor(Command.MediaPause)
+        assertTrue(events.any { it is NavigationEvent.CloseAssistant })
     }
 
     // ────────────────────────────────────────────────
@@ -423,36 +411,21 @@ class HermiViewModelTest {
         var spokenText = ""
         Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
             .`when`(voiceManager).speak(anyString())
-        
-        setupAndTranscribe("check engine", Command.CheckEngineStatus)
-        
-        assertTrue(spokenText.contains("upgrade to Pro"))
+
+        setupAndTranscribe("open the sunroof", Command.BodySunroofOpen)
+
+        assertTrue(spokenText.contains("Pro"))
     }
 
     @Test
     fun `PRO command for PRO user executes normally`() = runTest {
         `when`(versionManager.isProNow()).thenReturn(true)
-        fakeCarState.value = VhalParamsState(isCheckEngineOn = false, coolantTemp = 90f, oilLevel = 85f)
-        
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        
-        setupAndTranscribe("check engine", Command.CheckEngineStatus)
-        
-        assertTrue(spokenText.contains("normally"))
+        assertSpeaksAcknowledgement(Command.BodySunroofOpen)
     }
 
     @Test
     fun `FREE command for FREE user executes normally`() = runTest {
         `when`(versionManager.isProNow()).thenReturn(false)
-        
-        var spokenText = ""
-        Mockito.doAnswer { spokenText = it.arguments[0] as String; null }
-            .`when`(voiceManager).speak(anyString())
-        
-        setupAndTranscribe("find food", Command.FindFood)
-        
-        assertTrue(spokenText.contains("restaurant"))
+        assertSpeaksAcknowledgement(Command.MediaPlay)
     }
 }
