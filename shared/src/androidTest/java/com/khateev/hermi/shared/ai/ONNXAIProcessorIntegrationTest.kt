@@ -1,10 +1,24 @@
 package com.khateev.hermi.shared.ai
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.khateev.hermi.shared.model.Command
+import com.khateev.hermi.shared.model.CommandCatalog
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+/**
+ * The shipped 110-label model on device, over the phrase bank it was trained on.
+ *
+ * This is a wiring and regression check — tokenizer, label order, catalog mapping
+ * and confidence gate — not a generalization measurement. Accent and ASR
+ * robustness live in [VoicePipelineTest] and tools/accent_stress_test.py.
+ */
+@RunWith(AndroidJUnit4::class)
 class ONNXAIProcessorIntegrationTest {
 
     private lateinit var aiProcessor: ONNXAIProcessor
@@ -16,74 +30,103 @@ class ONNXAIProcessorIntegrationTest {
     }
 
     @Test
-    fun testModelAccuracyOnAllPhrases() {
-        val testData = TestPhrases.data
-        var totalTests = 0
-        var correctMatches = 0
+    fun modelAccuracyOverThePhraseBank() = runTest {
+        var total = 0
+        var correct = 0
         val failures = mutableListOf<String>()
+        val perLabel = mutableMapOf<String, IntArray>()
 
-        testData.forEach { (expectedLabel, phrases) ->
-            phrases.forEach { phrase ->
-                totalTests++
+        for ((label, phrases) in TestPhrases.data) {
+            val expected = CommandCatalog.commandForLabel(label)
+                ?: error("no command for label $label")
+            val counts = perLabel.getOrPut(label) { intArrayOf(0, 0) }
+            for (phrase in phrases) {
+                total++
+                counts[1]++
                 val result = aiProcessor.parseCommand(phrase)
-
-                // Проверяем, что результат соответствует ожидаемому типу команды
-                val isCorrect = when (expectedLabel) {
-                    "find_food" -> result is Command.FindFood
-                    "find_gas_station" -> result is Command.FindGasStation
-                    "find_charging_station" -> result is Command.FindChargingStation
-                    "find_parking" -> result is Command.FindParking
-                    "find_rest_stop" -> result is Command.FindRestStop
-                    "check_engine" -> result is Command.CheckEngineStatus
-                    "check_oil_level" -> result is Command.CheckOilLevel
-                    "check_transmission_status" -> result is Command.CheckTransmissionStatus
-                    "check_brake_pad_wear" -> result is Command.CheckBrakePadWear
-                    "check_spark_plug_condition" -> result is Command.CheckSparkPlugCondition
-                    "check_rpm" -> result is Command.CheckRpm
-                    "check_fuel_level" -> result is Command.CheckFuelLevel
-                    "check_fuel_consumption" -> result is Command.CheckFuelConsumption
-                    "check_battery_voltage" -> result is Command.CheckBatteryVoltage
-                    "check_battery_health" -> result is Command.CheckBatteryHealth
-                    "check_ev_status" -> result is Command.CheckEvStatus
-                    "check_tires" -> result is Command.CheckTireStatus
-                    "check_tire_wear" -> result is Command.CheckTireWear
-                    "check_suspension_health" -> result is Command.CheckSuspensionHealth
-                    "check_wheel_alignment" -> result is Command.CheckWheelAlignment
-                    "check_steering_status" -> result is Command.CheckSteeringStatus
-                    "check_transmission_fluid" -> result is Command.CheckTransmissionFluid
-                    "check_brake_fluid" -> result is Command.CheckBrakeFluid
-                    "check_coolant_level" -> result is Command.CheckCoolantLevel
-                    "check_air_filter" -> result is Command.CheckAirFilter
-                    "check_odometer" -> result is Command.CheckOdometer
-                    "check_driving_range" -> result is Command.CheckDrivingRange
-                    "check_outside_temperature" -> result is Command.CheckOutsideTemperature
-                    "find_service" -> result is Command.FindService
-                    "find_car_wash" -> result is Command.FindCarWash
-                    else -> false
-                }
-
-                if (isCorrect) {
-                    correctMatches++
+                if (result == expected) {
+                    correct++
+                    counts[0]++
                 } else {
-                    failures.add("FAIL: '$phrase' expected $expectedLabel but got ${result.javaClass.simpleName}")
+                    failures.add("'$phrase' expected $label but got ${result.javaClass.simpleName}")
                 }
             }
         }
 
-        val accuracy = (correctMatches.toFloat() / totalTests.toFloat()) * 100
-        println("Integration Test Results:")
-        println("Total Phrases: $totalTests")
-        println("Correct: $correctMatches")
-        println("Accuracy: %.2f%%".format(accuracy))
-
-        if (failures.isNotEmpty()) {
-            println("\nTop Failures (first 20):")
-            failures.take(20).forEach { println(it) }
+        val accuracy = correct * 100.0 / total
+        println("Phrase bank: $correct/$total (%.2f%%)".format(accuracy))
+        perLabel.filterValues { it[0] < it[1] }.forEach { (label, c) ->
+            println("  weak: $label ${c[0]}/${c[1]}")
         }
+        failures.take(20).forEach { println("  FAIL $it") }
 
-        // Мы не ставим жесткое ограничение на 100% точность,
-        // так как модель может ошибаться на живых данных,
-        // но мы проверяем, что процессор работает.
-        assert( accuracy > 1f, { "Accuracy should be at least 1%" })
+        assertTrue(
+            "accuracy %.2f%% is below the 90%% floor:\n%s"
+                .format(accuracy, failures.take(20).joinToString("\n")),
+            accuracy >= 90.0
+        )
+    }
+
+    @Test
+    fun everyCommandIsReachableFromAtLeastOnePhrase() = runTest {
+        val reached = mutableSetOf<Command>()
+        for ((_, phrases) in TestPhrases.data) {
+            for (phrase in phrases) {
+                val result = aiProcessor.parseCommand(phrase)
+                if (result !is Command.Unknown) reached.add(result)
+            }
+        }
+        val unreachable = CommandCatalog.specs.map { it.command }.filterNot { it in reached }
+        assertTrue(
+            "commands no phrase can trigger: " +
+                    unreachable.map { CommandCatalog.specFor(it)?.label }.toString(),
+            unreachable.isEmpty()
+        )
+    }
+
+    /**
+     * Known limitation, measured rather than wished away: the 110-label model has
+     * no `unknown` class, so ordinary non-car speech has nowhere to go and the
+     * confidence gate is the only defence. About two thirds of off-topic phrases
+     * are rejected; the rest fire a real command. Fix is on the model side —
+     * train a `none` class. This test fails if the rate gets worse.
+     */
+    @Test
+    fun outOfDomainSpeechIsMostlyRejected() = runTest {
+        val offTopic = listOf(
+            "what time is the meeting tomorrow", "remind me to buy milk",
+            "how tall is the eiffel tower", "tell me a joke about penguins",
+            "what is the capital of portugal", "send an email to my boss",
+            "how do i cook rice", "what is the weather in tokyo",
+            "add eggs to my shopping list", "who won the game last night",
+            "translate hello into spanish", "set an alarm for seven",
+            "what is my bank balance", "book a table for two",
+            "how many calories in an apple", "read my messages",
+            "what is the meaning of life", "play chess with me",
+            "schedule a dentist appointment", "convert ten dollars to euros",
+            "tell me the news headlines", "where did i leave my keys",
+            "what is your name", "sing me a song", "order a pizza"
+        )
+
+        val fired = offTopic.filter { aiProcessor.parseCommand(it) !is Command.Unknown }
+        val rejected = offTopic.size - fired.size
+        println("Out-of-domain: $rejected/${offTopic.size} rejected " +
+                "(${rejected * 100 / offTopic.size}%)")
+        fired.forEach { println("  FIRES \"$it\" -> ${aiProcessor.parseCommand(it)}") }
+
+        assertTrue(
+            "off-topic rejection dropped to $rejected/${offTopic.size}; firing: $fired",
+            rejected * 100 >= offTopic.size * 60
+        )
+    }
+
+    @Test
+    fun synonymLabelsCannotSplitACommand() = runTest {
+        // "Pause the music" and "Pause playback" sit under different labels in the
+        // model; both must reach the same command.
+        assertEquals(Command.MediaPause, aiProcessor.parseCommand("pause the music"))
+        assertEquals(Command.MediaPause, aiProcessor.parseCommand("pause playback"))
+        assertEquals(Command.MediaPlay, aiProcessor.parseCommand("play music"))
+        assertEquals(Command.MediaPlay, aiProcessor.parseCommand("resume playback"))
     }
 }

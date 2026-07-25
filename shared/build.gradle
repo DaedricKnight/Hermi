@@ -31,6 +31,12 @@ android {
     kotlinOptions {
         jvmTarget = '11'
     }
+
+    testOptions {
+        // VADManager/VoskManager call android.util.Log; without this the stubbed
+        // android.jar throws and VADManager's catch-all swallows the collection.
+        unitTests.returnDefaultValues = true
+    }
 }
 dependencies {
     testImplementation "com.microsoft.onnxruntime:onnxruntime:1.16.0"

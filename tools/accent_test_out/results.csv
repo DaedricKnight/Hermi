@@ -1,0 +1,617 @@
+accent,voice,condition,phrase,expected,transcript,predicted,confidence,verdict,baseline_label,baseline_confidence
+US,Samantha,140wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+US,Samantha,140wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+US,Samantha,140wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+US,Samantha,140wpm,fold the mirrors,body_mirrors_fold,for the mirrors,body_mirrors_unfold,0.998,WRONG_INTENT,body_mirrors_fold,1.0
+US,Samantha,140wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+US,Samantha,140wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+US,Samantha,140wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+US,Samantha,140wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+US,Samantha,140wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+US,Samantha,140wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+US,Samantha,140wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+US,Samantha,140wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+US,Samantha,140wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+US,Samantha,140wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+US,Samantha,140wpm,cancel the route,navi_cancel_route,cancel the rude,navi_cancel_route,0.997,PASS,navi_cancel_route,1.0
+US,Samantha,140wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+US,Samantha,140wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+US,Samantha,140wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+US,Samantha,140wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+US,Samantha,140wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+US,Samantha,140wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+US,Samantha,140wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+US,Samantha,180wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+US,Samantha,180wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+US,Samantha,180wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+US,Samantha,180wpm,fold the mirrors,body_mirrors_fold,for the mirrors,body_mirrors_unfold,0.998,WRONG_INTENT,body_mirrors_fold,1.0
+US,Samantha,180wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+US,Samantha,180wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+US,Samantha,180wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+US,Samantha,180wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+US,Samantha,180wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+US,Samantha,180wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+US,Samantha,180wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+US,Samantha,180wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+US,Samantha,180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+US,Samantha,180wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+US,Samantha,180wpm,cancel the route,navi_cancel_route,cancel the rude,navi_cancel_route,0.997,PASS,navi_cancel_route,1.0
+US,Samantha,180wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+US,Samantha,180wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+US,Samantha,180wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+US,Samantha,180wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+US,Samantha,180wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+US,Samantha,180wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+US,Samantha,180wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+US,Samantha,220wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+US,Samantha,220wpm,open the sunroof,body_sunroof_open,when the sun sunroof,body_sunroof_open,0.999,PASS,body_sunroof_open,1.0
+US,Samantha,220wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+US,Samantha,220wpm,fold the mirrors,body_mirrors_fold,though the mirrors,body_mirrors_unfold,0.994,WRONG_INTENT,body_mirrors_fold,1.0
+US,Samantha,220wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+US,Samantha,220wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+US,Samantha,220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+US,Samantha,220wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+US,Samantha,220wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+US,Samantha,220wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+US,Samantha,220wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+US,Samantha,220wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+US,Samantha,220wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+US,Samantha,220wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+US,Samantha,220wpm,cancel the route,navi_cancel_route,cancel the rude,navi_cancel_route,0.997,PASS,navi_cancel_route,1.0
+US,Samantha,220wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+US,Samantha,220wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+US,Samantha,220wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+US,Samantha,220wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+US,Samantha,220wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+US,Samantha,220wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+US,Samantha,220wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+US,Samantha,180wpm+noise,lock the doors,body_door_lock,the doj,body_door_unlock,0.54,REJECTED,body_door_lock,1.0
+US,Samantha,180wpm+noise,open the sunroof,body_sunroof_open,in the summer,climate_ac_on,0.264,REJECTED,body_sunroof_open,1.0
+US,Samantha,180wpm+noise,open the trunk,body_trunk_open,open the term,phone_end_call,0.997,WRONG_INTENT,body_trunk_open,1.0
+US,Samantha,180wpm+noise,fold the mirrors,body_mirrors_fold,though the mirror,body_mirrors_fold,0.682,REJECTED,body_mirrors_fold,1.0
+US,Samantha,180wpm+noise,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+US,Samantha,180wpm+noise,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+US,Samantha,180wpm+noise,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+US,Samantha,180wpm+noise,turn on the seat heating,heating_seats_driver_on,turn on the cp them,phone_unmute_mic,0.509,REJECTED,heating_seats_driver_on,0.927
+US,Samantha,180wpm+noise,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+US,Samantha,180wpm+noise,play music,media_play,they music,radio_next_station,0.987,WRONG_INTENT,media_play,0.999
+US,Samantha,180wpm+noise,next track,media_next_track,that's track,media_play,0.614,REJECTED,media_next_track,1.0
+US,Samantha,180wpm+noise,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+US,Samantha,180wpm+noise,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+US,Samantha,180wpm+noise,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+US,Samantha,180wpm+noise,cancel the route,navi_cancel_route,cancel the roof,navi_zoom_out,0.885,REJECTED,navi_cancel_route,1.0
+US,Samantha,180wpm+noise,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+US,Samantha,180wpm+noise,turn on the wipers,wipers_on,turn on the library,navi_zoom_in,0.7,REJECTED,wipers_on,0.999
+US,Samantha,180wpm+noise,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+US,Samantha,180wpm+noise,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+US,Samantha,180wpm+noise,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+US,Samantha,180wpm+noise,tell me a joke about penguins,none,tell me a joke about when,navi_unmute_guidance,0.994,WRONG_INTENT,navi_unmute_guidance,0.969
+US,Samantha,180wpm+noise,remind me to buy milk,none,remind me to guy now,phone_unmute_mic,0.731,PASS,climate_ac_on,0.506
+GB,Daniel,140wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+GB,Daniel,140wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+GB,Daniel,140wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+GB,Daniel,140wpm,fold the mirrors,body_mirrors_fold,build the mirrors,body_mirrors_unfold,0.997,WRONG_INTENT,body_mirrors_fold,1.0
+GB,Daniel,140wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB,Daniel,140wpm,turn on the air conditioning,climate_ac_on,then on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+GB,Daniel,140wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB,Daniel,140wpm,turn on the seat heating,heating_seats_driver_on,the on the seat heating,heating_seats_driver_on,0.766,REJECTED,heating_seats_driver_on,0.927
+GB,Daniel,140wpm,turn on the headlights,light_headlights_on,then on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+GB,Daniel,140wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB,Daniel,140wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+GB,Daniel,140wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+GB,Daniel,140wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+GB,Daniel,140wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+GB,Daniel,140wpm,cancel the route,navi_cancel_route,cancel the road,navi_cancel_route,0.999,PASS,navi_cancel_route,1.0
+GB,Daniel,140wpm,answer the call,phone_accept_call,so the goal,media_play,0.367,REJECTED,phone_accept_call,1.0
+GB,Daniel,140wpm,turn on the wipers,wipers_on,the on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+GB,Daniel,140wpm,turn on the radio,radio_turn_on,the on the radio,radio_turn_on,0.98,PASS,radio_turn_on,0.998
+GB,Daniel,140wpm,turn on the parking sensors,parking_sensors_on,the on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+GB,Daniel,140wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB,Daniel,140wpm,tell me a joke about penguins,none,tell me a joke about pangolins,navi_unmute_guidance,0.768,PASS,navi_unmute_guidance,0.969
+GB,Daniel,140wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+GB,Daniel,180wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+GB,Daniel,180wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+GB,Daniel,180wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+GB,Daniel,180wpm,fold the mirrors,body_mirrors_fold,build the mirrors,body_mirrors_unfold,0.997,WRONG_INTENT,body_mirrors_fold,1.0
+GB,Daniel,180wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB,Daniel,180wpm,turn on the air conditioning,climate_ac_on,the on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+GB,Daniel,180wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB,Daniel,180wpm,turn on the seat heating,heating_seats_driver_on,the on the seat heating,heating_seats_driver_on,0.766,REJECTED,heating_seats_driver_on,0.927
+GB,Daniel,180wpm,turn on the headlights,light_headlights_on,the on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+GB,Daniel,180wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB,Daniel,180wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+GB,Daniel,180wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+GB,Daniel,180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+GB,Daniel,180wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+GB,Daniel,180wpm,cancel the route,navi_cancel_route,cancel the road,navi_cancel_route,0.999,PASS,navi_cancel_route,1.0
+GB,Daniel,180wpm,answer the call,phone_accept_call,so the goal,media_play,0.367,REJECTED,phone_accept_call,1.0
+GB,Daniel,180wpm,turn on the wipers,wipers_on,the on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+GB,Daniel,180wpm,turn on the radio,radio_turn_on,the on the radio,radio_turn_on,0.98,PASS,radio_turn_on,0.998
+GB,Daniel,180wpm,turn on the parking sensors,parking_sensors_on,the on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+GB,Daniel,180wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB,Daniel,180wpm,tell me a joke about penguins,none,tell me a joke about pangolins,navi_unmute_guidance,0.768,PASS,navi_unmute_guidance,0.969
+GB,Daniel,180wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+GB,Daniel,220wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+GB,Daniel,220wpm,open the sunroof,body_sunroof_open,logan the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+GB,Daniel,220wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+GB,Daniel,220wpm,fold the mirrors,body_mirrors_fold,though the mirrors,body_mirrors_unfold,0.994,WRONG_INTENT,body_mirrors_fold,1.0
+GB,Daniel,220wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB,Daniel,220wpm,turn on the air conditioning,climate_ac_on,then on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+GB,Daniel,220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB,Daniel,220wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+GB,Daniel,220wpm,turn on the headlights,light_headlights_on,then on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+GB,Daniel,220wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB,Daniel,220wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+GB,Daniel,220wpm,turn up the volume,media_volume_up,the another the volume,media_prev_track,0.811,REJECTED,media_volume_up,1.0
+GB,Daniel,220wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+GB,Daniel,220wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+GB,Daniel,220wpm,cancel the route,navi_cancel_route,cancel the road,navi_cancel_route,0.999,PASS,navi_cancel_route,1.0
+GB,Daniel,220wpm,answer the call,phone_accept_call,i'm so the goal,system_volume_up,0.225,REJECTED,phone_accept_call,1.0
+GB,Daniel,220wpm,turn on the wipers,wipers_on,then on the wipers,wipers_on,0.998,PASS,wipers_on,0.999
+GB,Daniel,220wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+GB,Daniel,220wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+GB,Daniel,220wpm,what time is the meeting tomorrow,none,what time is a meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB,Daniel,220wpm,tell me a joke about penguins,none,they'll be a joke about penguins,parking_sensors_on,0.566,PASS,navi_unmute_guidance,0.969
+GB,Daniel,220wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+GB,Daniel,180wpm+noise,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+GB,Daniel,180wpm+noise,open the sunroof,body_sunroof_open,open the summer,body_door_unlock,0.521,REJECTED,body_sunroof_open,1.0
+GB,Daniel,180wpm+noise,open the trunk,body_trunk_open,open the from,body_door_unlock,0.996,WRONG_INTENT,body_trunk_open,1.0
+GB,Daniel,180wpm+noise,fold the mirrors,body_mirrors_fold,though the mirror,body_mirrors_fold,0.682,REJECTED,body_mirrors_fold,1.0
+GB,Daniel,180wpm+noise,show the rear camera,camera_show_rear,though the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB,Daniel,180wpm+noise,turn on the air conditioning,climate_ac_on,the on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+GB,Daniel,180wpm+noise,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB,Daniel,180wpm+noise,turn on the seat heating,heating_seats_driver_on,the on the seat heating,heating_seats_driver_on,0.766,REJECTED,heating_seats_driver_on,0.927
+GB,Daniel,180wpm+noise,turn on the headlights,light_headlights_on,the on the headline,media_play,0.63,REJECTED,light_headlights_on,1.0
+GB,Daniel,180wpm+noise,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB,Daniel,180wpm+noise,next track,media_next_track,this thread,wipers_off,0.784,REJECTED,media_next_track,1.0
+GB,Daniel,180wpm+noise,turn up the volume,media_volume_up,the another value,phone_redial,1.0,WRONG_INTENT,media_volume_up,1.0
+GB,Daniel,180wpm+noise,navigate home,navi_go_home,navigate her,heating_seats_passenger_on,0.344,REJECTED,navi_go_home,1.0
+GB,Daniel,180wpm+noise,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+GB,Daniel,180wpm+noise,cancel the route,navi_cancel_route,cancel the road,navi_cancel_route,0.999,PASS,navi_cancel_route,1.0
+GB,Daniel,180wpm+noise,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+GB,Daniel,180wpm+noise,turn on the wipers,wipers_on,the on the library,navi_zoom_in,0.837,REJECTED,wipers_on,0.999
+GB,Daniel,180wpm+noise,turn on the radio,radio_turn_on,then on the radio,radio_turn_on,0.995,PASS,radio_turn_on,0.998
+GB,Daniel,180wpm+noise,turn on the parking sensors,parking_sensors_on,then on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+GB,Daniel,180wpm+noise,what time is the meeting tomorrow,none,what time is a meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB,Daniel,180wpm+noise,tell me a joke about penguins,none,tell me a joke about and with,navi_unmute_guidance,0.831,PASS,navi_unmute_guidance,0.969
+GB,Daniel,180wpm+noise,remind me to buy milk,none,remind me of i know,seat_massage_off,0.86,PASS,climate_ac_on,0.506
+AU,Karen,140wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+AU,Karen,140wpm,open the sunroof,body_sunroof_open,urban the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+AU,Karen,140wpm,open the trunk,body_trunk_open,open the trying,body_door_unlock,0.781,REJECTED,body_trunk_open,1.0
+AU,Karen,140wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+AU,Karen,140wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+AU,Karen,140wpm,turn on the air conditioning,climate_ac_on,the on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+AU,Karen,140wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+AU,Karen,140wpm,turn on the seat heating,heating_seats_driver_on,the on the seed paging,camera_show_front,0.989,WRONG_INTENT,heating_seats_driver_on,0.927
+AU,Karen,140wpm,turn on the headlights,light_headlights_on,the on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+AU,Karen,140wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+AU,Karen,140wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+AU,Karen,140wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+AU,Karen,140wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+AU,Karen,140wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+AU,Karen,140wpm,cancel the route,navi_cancel_route,cancel the road,navi_cancel_route,0.999,PASS,navi_cancel_route,1.0
+AU,Karen,140wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+AU,Karen,140wpm,turn on the wipers,wipers_on,the on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+AU,Karen,140wpm,turn on the radio,radio_turn_on,the on the radio,radio_turn_on,0.98,PASS,radio_turn_on,0.998
+AU,Karen,140wpm,turn on the parking sensors,parking_sensors_on,the on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+AU,Karen,140wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+AU,Karen,140wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+AU,Karen,140wpm,remind me to buy milk,none,remind me to by mail,navi_mute_guidance,0.432,PASS,climate_ac_on,0.506
+AU,Karen,180wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+AU,Karen,180wpm,open the sunroof,body_sunroof_open,urban the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+AU,Karen,180wpm,open the trunk,body_trunk_open,open the trying,body_door_unlock,0.781,REJECTED,body_trunk_open,1.0
+AU,Karen,180wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+AU,Karen,180wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+AU,Karen,180wpm,turn on the air conditioning,climate_ac_on,the on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+AU,Karen,180wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+AU,Karen,180wpm,turn on the seat heating,heating_seats_driver_on,the on the seat aging,seat_lumbar_support_up,0.971,WRONG_INTENT,heating_seats_driver_on,0.927
+AU,Karen,180wpm,turn on the headlights,light_headlights_on,the on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+AU,Karen,180wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+AU,Karen,180wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+AU,Karen,180wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+AU,Karen,180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+AU,Karen,180wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+AU,Karen,180wpm,cancel the route,navi_cancel_route,cancel the rude,navi_cancel_route,0.997,PASS,navi_cancel_route,1.0
+AU,Karen,180wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+AU,Karen,180wpm,turn on the wipers,wipers_on,the on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+AU,Karen,180wpm,turn on the radio,radio_turn_on,the on the radio,radio_turn_on,0.98,PASS,radio_turn_on,0.998
+AU,Karen,180wpm,turn on the parking sensors,parking_sensors_on,the on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+AU,Karen,180wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+AU,Karen,180wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+AU,Karen,180wpm,remind me to buy milk,none,remind me to by mail,navi_mute_guidance,0.432,PASS,climate_ac_on,0.506
+AU,Karen,220wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+AU,Karen,220wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+AU,Karen,220wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+AU,Karen,220wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+AU,Karen,220wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+AU,Karen,220wpm,turn on the air conditioning,climate_ac_on,then on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+AU,Karen,220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+AU,Karen,220wpm,turn on the seat heating,heating_seats_driver_on,then on the seat heating,heating_seats_rear_on,0.74,REJECTED,heating_seats_driver_on,0.927
+AU,Karen,220wpm,turn on the headlights,light_headlights_on,then on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+AU,Karen,220wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+AU,Karen,220wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+AU,Karen,220wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+AU,Karen,220wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+AU,Karen,220wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+AU,Karen,220wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+AU,Karen,220wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+AU,Karen,220wpm,turn on the wipers,wipers_on,then on the wipers,wipers_on,0.998,PASS,wipers_on,0.999
+AU,Karen,220wpm,turn on the radio,radio_turn_on,then on the radio,radio_turn_on,0.995,PASS,radio_turn_on,0.998
+AU,Karen,220wpm,turn on the parking sensors,parking_sensors_on,then on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+AU,Karen,220wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+AU,Karen,220wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+AU,Karen,220wpm,remind me to buy milk,none,remind me to buy mail,wipers_off,0.426,PASS,climate_ac_on,0.506
+AU,Karen,180wpm+noise,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+AU,Karen,180wpm+noise,open the sunroof,body_sunroof_open,in the sunday,media_play,0.505,REJECTED,body_sunroof_open,1.0
+AU,Karen,180wpm+noise,open the trunk,body_trunk_open,in the chan,body_sunroof_open,0.199,REJECTED,body_trunk_open,1.0
+AU,Karen,180wpm+noise,fold the mirrors,body_mirrors_fold,how the noise,media_play,0.997,WRONG_INTENT,body_mirrors_fold,1.0
+AU,Karen,180wpm+noise,show the rear camera,camera_show_rear,show them the camera,camera_show_front,0.86,REJECTED,camera_show_rear,1.0
+AU,Karen,180wpm+noise,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+AU,Karen,180wpm+noise,increase the temperature,climate_increase_temperature,the increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+AU,Karen,180wpm+noise,turn on the seat heating,heating_seats_driver_on,on the see beating,body_sunroof_close,1.0,WRONG_INTENT,heating_seats_driver_on,0.927
+AU,Karen,180wpm+noise,turn on the headlights,light_headlights_on,on the headline,media_play,0.305,REJECTED,light_headlights_on,1.0
+AU,Karen,180wpm+noise,play music,media_play,they music,radio_next_station,0.987,WRONG_INTENT,media_play,0.999
+AU,Karen,180wpm+noise,next track,media_next_track,the track,media_play,0.679,REJECTED,media_next_track,1.0
+AU,Karen,180wpm+noise,turn up the volume,media_volume_up,up the volume,media_volume_up,0.998,PASS,media_volume_up,1.0
+AU,Karen,180wpm+noise,navigate home,navi_go_home,navigate time,navigation_start_route,0.999,WRONG_INTENT,navi_go_home,1.0
+AU,Karen,180wpm+noise,find parking,navi_find_parking,hi parking,navi_find_parking,0.999,PASS,navi_find_parking,1.0
+AU,Karen,180wpm+noise,cancel the route,navi_cancel_route,then the rules,media_prev_track,0.542,REJECTED,navi_cancel_route,1.0
+AU,Karen,180wpm+noise,answer the call,phone_accept_call,the to the pool,wipers_on,0.985,WRONG_INTENT,phone_accept_call,1.0
+AU,Karen,180wpm+noise,turn on the wipers,wipers_on,on the wiping,wipers_speed_down,0.905,REJECTED,wipers_on,0.999
+AU,Karen,180wpm+noise,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+AU,Karen,180wpm+noise,turn on the parking sensors,parking_sensors_on,on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+AU,Karen,180wpm+noise,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+AU,Karen,180wpm+noise,tell me a joke about penguins,none,tell me a joke about penguin,navi_unmute_guidance,0.993,WRONG_INTENT,navi_unmute_guidance,0.969
+AU,Karen,180wpm+noise,remind me to buy milk,none,the nine me to buy new,phone_end_call,0.355,PASS,climate_ac_on,0.506
+IE,Moira,140wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IE,Moira,140wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+IE,Moira,140wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IE,Moira,140wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+IE,Moira,140wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+IE,Moira,140wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+IE,Moira,140wpm,increase the temperature,climate_increase_temperature,the increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IE,Moira,140wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+IE,Moira,140wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+IE,Moira,140wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+IE,Moira,140wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+IE,Moira,140wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+IE,Moira,140wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IE,Moira,140wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+IE,Moira,140wpm,cancel the route,navi_cancel_route,cancel the roots,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+IE,Moira,140wpm,answer the call,phone_accept_call,answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IE,Moira,140wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IE,Moira,140wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+IE,Moira,140wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IE,Moira,140wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IE,Moira,140wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+IE,Moira,140wpm,remind me to buy milk,none,remind me to buy mailed,seat_lumbar_support_up,0.275,PASS,climate_ac_on,0.506
+IE,Moira,180wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IE,Moira,180wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+IE,Moira,180wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IE,Moira,180wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+IE,Moira,180wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+IE,Moira,180wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+IE,Moira,180wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IE,Moira,180wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+IE,Moira,180wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+IE,Moira,180wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+IE,Moira,180wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+IE,Moira,180wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+IE,Moira,180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IE,Moira,180wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+IE,Moira,180wpm,cancel the route,navi_cancel_route,cancel the roots,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+IE,Moira,180wpm,answer the call,phone_accept_call,answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IE,Moira,180wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IE,Moira,180wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+IE,Moira,180wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IE,Moira,180wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IE,Moira,180wpm,tell me a joke about penguins,none,the me a joke about penguins,parking_sensors_on,0.974,WRONG_INTENT,navi_unmute_guidance,0.969
+IE,Moira,180wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+IE,Moira,220wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IE,Moira,220wpm,open the sunroof,body_sunroof_open,open the sun roof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+IE,Moira,220wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IE,Moira,220wpm,fold the mirrors,body_mirrors_fold,folder mirrors,body_mirrors_fold,0.692,REJECTED,body_mirrors_fold,1.0
+IE,Moira,220wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+IE,Moira,220wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+IE,Moira,220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IE,Moira,220wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+IE,Moira,220wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+IE,Moira,220wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+IE,Moira,220wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+IE,Moira,220wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+IE,Moira,220wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IE,Moira,220wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+IE,Moira,220wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+IE,Moira,220wpm,answer the call,phone_accept_call,answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IE,Moira,220wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IE,Moira,220wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+IE,Moira,220wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IE,Moira,220wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IE,Moira,220wpm,tell me a joke about penguins,none,that me a joke about penguins,parking_sensors_on,0.827,PASS,navi_unmute_guidance,0.969
+IE,Moira,220wpm,remind me to buy milk,none,remind me to buy mailed,seat_lumbar_support_up,0.275,PASS,climate_ac_on,0.506
+IE,Moira,180wpm+noise,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IE,Moira,180wpm+noise,open the sunroof,body_sunroof_open,open the summary,navi_show_route,0.839,REJECTED,body_sunroof_open,1.0
+IE,Moira,180wpm+noise,open the trunk,body_trunk_open,open the phone,media_source_bluetooth,0.997,WRONG_INTENT,body_trunk_open,1.0
+IE,Moira,180wpm+noise,fold the mirrors,body_mirrors_fold,though the mirrors,body_mirrors_unfold,0.994,WRONG_INTENT,body_mirrors_fold,1.0
+IE,Moira,180wpm+noise,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+IE,Moira,180wpm+noise,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+IE,Moira,180wpm+noise,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IE,Moira,180wpm+noise,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+IE,Moira,180wpm+noise,turn on the headlights,light_headlights_on,turn on the life,climate_increase_temperature,0.98,WRONG_INTENT,light_headlights_on,1.0
+IE,Moira,180wpm+noise,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+IE,Moira,180wpm+noise,next track,media_next_track,the extra,light_fog_off,0.568,REJECTED,media_next_track,1.0
+IE,Moira,180wpm+noise,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+IE,Moira,180wpm+noise,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IE,Moira,180wpm+noise,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+IE,Moira,180wpm+noise,cancel the route,navi_cancel_route,so the roof,body_sunroof_open,0.986,WRONG_INTENT,navi_cancel_route,1.0
+IE,Moira,180wpm+noise,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IE,Moira,180wpm+noise,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IE,Moira,180wpm+noise,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+IE,Moira,180wpm+noise,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IE,Moira,180wpm+noise,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IE,Moira,180wpm+noise,tell me a joke about penguins,none,the me a joke about penguins,parking_sensors_on,0.974,WRONG_INTENT,navi_unmute_guidance,0.969
+IE,Moira,180wpm+noise,remind me to buy milk,none,remind me to buy mail,wipers_off,0.426,PASS,climate_ac_on,0.506
+IN,Rishi,140wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IN,Rishi,140wpm,open the sunroof,body_sunroof_open,open the sun roof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+IN,Rishi,140wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IN,Rishi,140wpm,fold the mirrors,body_mirrors_fold,fold the minutes,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+IN,Rishi,140wpm,show the rear camera,camera_show_rear,sure the rear camera,camera_show_rear,0.826,REJECTED,camera_show_rear,1.0
+IN,Rishi,140wpm,turn on the air conditioning,climate_ac_on,turn on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+IN,Rishi,140wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IN,Rishi,140wpm,turn on the seat heating,heating_seats_driver_on,turn on the seat heating,heating_seats_driver_on,0.927,REJECTED,heating_seats_driver_on,0.927
+IN,Rishi,140wpm,turn on the headlights,light_headlights_on,turn on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+IN,Rishi,140wpm,play music,media_play,the music,media_play,0.938,REJECTED,media_play,0.999
+IN,Rishi,140wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+IN,Rishi,140wpm,turn up the volume,media_volume_up,turn up the volume,media_volume_up,1.0,PASS,media_volume_up,1.0
+IN,Rishi,140wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IN,Rishi,140wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+IN,Rishi,140wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+IN,Rishi,140wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IN,Rishi,140wpm,turn on the wipers,wipers_on,turn on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IN,Rishi,140wpm,turn on the radio,radio_turn_on,turn on the radio,radio_turn_on,0.998,PASS,radio_turn_on,0.998
+IN,Rishi,140wpm,turn on the parking sensors,parking_sensors_on,turn on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IN,Rishi,140wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IN,Rishi,140wpm,tell me a joke about penguins,none,the me a joke about penguins,parking_sensors_on,0.974,WRONG_INTENT,navi_unmute_guidance,0.969
+IN,Rishi,140wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+IN,Rishi,180wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IN,Rishi,180wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+IN,Rishi,180wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IN,Rishi,180wpm,fold the mirrors,body_mirrors_fold,fold the meters,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+IN,Rishi,180wpm,show the rear camera,camera_show_rear,sure the rear camera,camera_show_rear,0.826,REJECTED,camera_show_rear,1.0
+IN,Rishi,180wpm,turn on the air conditioning,climate_ac_on,the on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+IN,Rishi,180wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IN,Rishi,180wpm,turn on the seat heating,heating_seats_driver_on,the on the seat heating,heating_seats_driver_on,0.766,REJECTED,heating_seats_driver_on,0.927
+IN,Rishi,180wpm,turn on the headlights,light_headlights_on,the on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+IN,Rishi,180wpm,play music,media_play,the music,media_play,0.938,REJECTED,media_play,0.999
+IN,Rishi,180wpm,next track,media_next_track,the next track,media_next_track,1.0,PASS,media_next_track,1.0
+IN,Rishi,180wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+IN,Rishi,180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IN,Rishi,180wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+IN,Rishi,180wpm,cancel the route,navi_cancel_route,and so the route,navigation_start_route,0.744,REJECTED,navi_cancel_route,1.0
+IN,Rishi,180wpm,answer the call,phone_accept_call,the sort of the call,phone_end_call,0.859,REJECTED,phone_accept_call,1.0
+IN,Rishi,180wpm,turn on the wipers,wipers_on,the on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IN,Rishi,180wpm,turn on the radio,radio_turn_on,the on the radio,radio_turn_on,0.98,PASS,radio_turn_on,0.998
+IN,Rishi,180wpm,turn on the parking sensors,parking_sensors_on,the on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IN,Rishi,180wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IN,Rishi,180wpm,tell me a joke about penguins,none,that me a joke about penguins,parking_sensors_on,0.827,PASS,navi_unmute_guidance,0.969
+IN,Rishi,180wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+IN,Rishi,220wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IN,Rishi,220wpm,open the sunroof,body_sunroof_open,when the sun roof,body_sunroof_open,0.965,PASS,body_sunroof_open,1.0
+IN,Rishi,220wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IN,Rishi,220wpm,fold the mirrors,body_mirrors_fold,fold the minutes,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+IN,Rishi,220wpm,show the rear camera,camera_show_rear,sure the rear camera,camera_show_rear,0.826,REJECTED,camera_show_rear,1.0
+IN,Rishi,220wpm,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+IN,Rishi,220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IN,Rishi,220wpm,turn on the seat heating,heating_seats_driver_on,on the seat heating,heating_seats_driver_on,0.9,REJECTED,heating_seats_driver_on,0.927
+IN,Rishi,220wpm,turn on the headlights,light_headlights_on,on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+IN,Rishi,220wpm,play music,media_play,the music,media_play,0.938,REJECTED,media_play,0.999
+IN,Rishi,220wpm,next track,media_next_track,the next track,media_next_track,1.0,PASS,media_next_track,1.0
+IN,Rishi,220wpm,turn up the volume,media_volume_up,up the volume,media_volume_up,0.998,PASS,media_volume_up,1.0
+IN,Rishi,220wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+IN,Rishi,220wpm,find parking,navi_find_parking,find barking,radio_next_station,0.244,REJECTED,navi_find_parking,1.0
+IN,Rishi,220wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+IN,Rishi,220wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IN,Rishi,220wpm,turn on the wipers,wipers_on,on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+IN,Rishi,220wpm,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+IN,Rishi,220wpm,turn on the parking sensors,parking_sensors_on,on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+IN,Rishi,220wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IN,Rishi,220wpm,tell me a joke about penguins,none,the me a joke about penguins,parking_sensors_on,0.974,WRONG_INTENT,navi_unmute_guidance,0.969
+IN,Rishi,220wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+IN,Rishi,180wpm+noise,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+IN,Rishi,180wpm+noise,open the sunroof,body_sunroof_open,the from the sun roof,body_sunroof_open,0.745,REJECTED,body_sunroof_open,1.0
+IN,Rishi,180wpm+noise,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+IN,Rishi,180wpm+noise,fold the mirrors,body_mirrors_fold,for the middle,phone_reject_call,0.996,WRONG_INTENT,body_mirrors_fold,1.0
+IN,Rishi,180wpm+noise,show the rear camera,camera_show_rear,so the real canada,wipers_wash_windshield,0.931,REJECTED,camera_show_rear,1.0
+IN,Rishi,180wpm+noise,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+IN,Rishi,180wpm+noise,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+IN,Rishi,180wpm+noise,turn on the seat heating,heating_seats_driver_on,on the seat heating,heating_seats_driver_on,0.9,REJECTED,heating_seats_driver_on,0.927
+IN,Rishi,180wpm+noise,turn on the headlights,light_headlights_on,on the life,climate_heat_on,0.759,REJECTED,light_headlights_on,1.0
+IN,Rishi,180wpm+noise,play music,media_play,the music,media_play,0.938,REJECTED,media_play,0.999
+IN,Rishi,180wpm+noise,next track,media_next_track,the next try,phone_redial,1.0,WRONG_INTENT,media_next_track,1.0
+IN,Rishi,180wpm+noise,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+IN,Rishi,180wpm+noise,navigate home,navi_go_home,navigate phone,navi_go_home,0.503,REJECTED,navi_go_home,1.0
+IN,Rishi,180wpm+noise,find parking,navi_find_parking,fine fighting,wipers_off,0.999,WRONG_INTENT,navi_find_parking,1.0
+IN,Rishi,180wpm+noise,cancel the route,navi_cancel_route,than so the roof,body_sunroof_close,0.716,REJECTED,navi_cancel_route,1.0
+IN,Rishi,180wpm+noise,answer the call,phone_accept_call,answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+IN,Rishi,180wpm+noise,turn on the wipers,wipers_on,on the wife and,phone_call_contact,1.0,WRONG_INTENT,wipers_on,0.999
+IN,Rishi,180wpm+noise,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+IN,Rishi,180wpm+noise,turn on the parking sensors,parking_sensors_on,on the viking censoring,climate_defrost_on,0.759,REJECTED,parking_sensors_on,1.0
+IN,Rishi,180wpm+noise,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+IN,Rishi,180wpm+noise,tell me a joke about penguins,none,the me a joke about fingering,seat_massage_on,0.717,PASS,navi_unmute_guidance,0.969
+IN,Rishi,180wpm+noise,remind me to buy milk,none,remind me to buy mail,wipers_off,0.426,PASS,climate_ac_on,0.506
+ZA,Tessa,140wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+ZA,Tessa,140wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+ZA,Tessa,140wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+ZA,Tessa,140wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+ZA,Tessa,140wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+ZA,Tessa,140wpm,turn on the air conditioning,climate_ac_on,then on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+ZA,Tessa,140wpm,increase the temperature,climate_increase_temperature,the increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+ZA,Tessa,140wpm,turn on the seat heating,heating_seats_driver_on,on the seat heating,heating_seats_driver_on,0.9,REJECTED,heating_seats_driver_on,0.927
+ZA,Tessa,140wpm,turn on the headlights,light_headlights_on,then on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+ZA,Tessa,140wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+ZA,Tessa,140wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+ZA,Tessa,140wpm,turn up the volume,media_volume_up,then up the volume,media_volume_up,0.992,PASS,media_volume_up,1.0
+ZA,Tessa,140wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+ZA,Tessa,140wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+ZA,Tessa,140wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+ZA,Tessa,140wpm,answer the call,phone_accept_call,the answer the call,phone_accept_call,1.0,PASS,phone_accept_call,1.0
+ZA,Tessa,140wpm,turn on the wipers,wipers_on,then on the wipers,wipers_on,0.998,PASS,wipers_on,0.999
+ZA,Tessa,140wpm,turn on the radio,radio_turn_on,then on the radio,radio_turn_on,0.995,PASS,radio_turn_on,0.998
+ZA,Tessa,140wpm,turn on the parking sensors,parking_sensors_on,then on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+ZA,Tessa,140wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+ZA,Tessa,140wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+ZA,Tessa,140wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+ZA,Tessa,180wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+ZA,Tessa,180wpm,open the sunroof,body_sunroof_open,open the sunroof,body_sunroof_open,1.0,PASS,body_sunroof_open,1.0
+ZA,Tessa,180wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+ZA,Tessa,180wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+ZA,Tessa,180wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+ZA,Tessa,180wpm,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+ZA,Tessa,180wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+ZA,Tessa,180wpm,turn on the seat heating,heating_seats_driver_on,on the seat heating,heating_seats_driver_on,0.9,REJECTED,heating_seats_driver_on,0.927
+ZA,Tessa,180wpm,turn on the headlights,light_headlights_on,on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+ZA,Tessa,180wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+ZA,Tessa,180wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+ZA,Tessa,180wpm,turn up the volume,media_volume_up,the and up the volume,media_volume_up,0.795,REJECTED,media_volume_up,1.0
+ZA,Tessa,180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+ZA,Tessa,180wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+ZA,Tessa,180wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+ZA,Tessa,180wpm,answer the call,phone_accept_call,so the cool,climate_decrease_temperature,0.943,REJECTED,phone_accept_call,1.0
+ZA,Tessa,180wpm,turn on the wipers,wipers_on,on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+ZA,Tessa,180wpm,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+ZA,Tessa,180wpm,turn on the parking sensors,parking_sensors_on,on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+ZA,Tessa,180wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+ZA,Tessa,180wpm,tell me a joke about penguins,none,tell me a joke about penguins,navi_unmute_guidance,0.969,WRONG_INTENT,navi_unmute_guidance,0.969
+ZA,Tessa,180wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+ZA,Tessa,220wpm,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+ZA,Tessa,220wpm,open the sunroof,body_sunroof_open,in the sun roof,body_sunroof_open,0.998,PASS,body_sunroof_open,1.0
+ZA,Tessa,220wpm,open the trunk,body_trunk_open,open the trunk,body_trunk_open,1.0,PASS,body_trunk_open,1.0
+ZA,Tessa,220wpm,fold the mirrors,body_mirrors_fold,fold the mirrors,body_mirrors_fold,1.0,PASS,body_mirrors_fold,1.0
+ZA,Tessa,220wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+ZA,Tessa,220wpm,turn on the air conditioning,climate_ac_on,the on the air conditioning,climate_ac_on,1.0,PASS,climate_ac_on,1.0
+ZA,Tessa,220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+ZA,Tessa,220wpm,turn on the seat heating,heating_seats_driver_on,the on the seat teaching,seat_incline,0.615,REJECTED,heating_seats_driver_on,0.927
+ZA,Tessa,220wpm,turn on the headlights,light_headlights_on,the on the headlights,light_headlights_on,1.0,PASS,light_headlights_on,1.0
+ZA,Tessa,220wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+ZA,Tessa,220wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+ZA,Tessa,220wpm,turn up the volume,media_volume_up,the up the volume,media_volume_up,0.999,PASS,media_volume_up,1.0
+ZA,Tessa,220wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+ZA,Tessa,220wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+ZA,Tessa,220wpm,cancel the route,navi_cancel_route,cancel the route,navi_cancel_route,1.0,PASS,navi_cancel_route,1.0
+ZA,Tessa,220wpm,answer the call,phone_accept_call,so the call,phone_redial,0.881,REJECTED,phone_accept_call,1.0
+ZA,Tessa,220wpm,turn on the wipers,wipers_on,the on the wipers,wipers_on,0.999,PASS,wipers_on,0.999
+ZA,Tessa,220wpm,turn on the radio,radio_turn_on,the on the radio,radio_turn_on,0.98,PASS,radio_turn_on,0.998
+ZA,Tessa,220wpm,turn on the parking sensors,parking_sensors_on,the on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+ZA,Tessa,220wpm,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+ZA,Tessa,220wpm,tell me a joke about penguins,none,the me a joke about penguins,parking_sensors_on,0.974,WRONG_INTENT,navi_unmute_guidance,0.969
+ZA,Tessa,220wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+ZA,Tessa,180wpm+noise,lock the doors,body_door_lock,lock the doors,body_door_lock,1.0,PASS,body_door_lock,1.0
+ZA,Tessa,180wpm+noise,open the sunroof,body_sunroof_open,in the sunday,media_play,0.505,REJECTED,body_sunroof_open,1.0
+ZA,Tessa,180wpm+noise,open the trunk,body_trunk_open,in the phone,media_source_bluetooth,1.0,WRONG_INTENT,body_trunk_open,1.0
+ZA,Tessa,180wpm+noise,fold the mirrors,body_mirrors_fold,how the news,radio_turn_on,0.998,WRONG_INTENT,body_mirrors_fold,1.0
+ZA,Tessa,180wpm+noise,show the rear camera,camera_show_rear,the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+ZA,Tessa,180wpm+noise,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+ZA,Tessa,180wpm+noise,increase the temperature,climate_increase_temperature,the increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+ZA,Tessa,180wpm+noise,turn on the seat heating,heating_seats_driver_on,on the seat teaching,navi_unmute_guidance,0.93,REJECTED,heating_seats_driver_on,0.927
+ZA,Tessa,180wpm+noise,turn on the headlights,light_headlights_on,on the headlines,wipers_off,0.371,REJECTED,light_headlights_on,1.0
+ZA,Tessa,180wpm+noise,play music,media_play,they use it,wipers_wash_windshield,0.659,REJECTED,media_play,0.999
+ZA,Tessa,180wpm+noise,next track,media_next_track,the trip,navi_show_route,0.386,REJECTED,media_next_track,1.0
+ZA,Tessa,180wpm+noise,turn up the volume,media_volume_up,on you,media_play,0.43,REJECTED,media_volume_up,1.0
+ZA,Tessa,180wpm+noise,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+ZA,Tessa,180wpm+noise,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+ZA,Tessa,180wpm+noise,cancel the route,navi_cancel_route,pennsylvania,climate_ac_off,0.458,REJECTED,navi_cancel_route,1.0
+ZA,Tessa,180wpm+noise,answer the call,phone_accept_call,so the cool,climate_decrease_temperature,0.943,REJECTED,phone_accept_call,1.0
+ZA,Tessa,180wpm+noise,turn on the wipers,wipers_on,on the why things,media_play,0.998,WRONG_INTENT,wipers_on,0.999
+ZA,Tessa,180wpm+noise,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+ZA,Tessa,180wpm+noise,turn on the parking sensors,parking_sensors_on,on the parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+ZA,Tessa,180wpm+noise,what time is the meeting tomorrow,none,what time is the meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+ZA,Tessa,180wpm+noise,tell me a joke about penguins,none,tell me jokes about penguins,navi_unmute_guidance,0.97,WRONG_INTENT,navi_unmute_guidance,0.969
+ZA,Tessa,180wpm+noise,remind me to buy milk,none,remind me to buy new,navi_find_restaurant,0.732,PASS,climate_ac_on,0.506
+GB-aged,Grandma (English (UK)),140wpm,lock the doors,body_door_lock,the,navi_show_route,0.317,REJECTED,body_door_lock,1.0
+GB-aged,Grandma (English (UK)),140wpm,open the sunroof,body_sunroof_open,under the sun roof,body_sunroof_open,0.766,REJECTED,body_sunroof_open,1.0
+GB-aged,Grandma (English (UK)),140wpm,open the trunk,body_trunk_open,i'm trying,media_mute,0.958,WRONG_INTENT,body_trunk_open,1.0
+GB-aged,Grandma (English (UK)),140wpm,fold the mirrors,body_mirrors_fold,all mirrors,body_mirrors_fold,0.985,PASS,body_mirrors_fold,1.0
+GB-aged,Grandma (English (UK)),140wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB-aged,Grandma (English (UK)),140wpm,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+GB-aged,Grandma (English (UK)),140wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB-aged,Grandma (English (UK)),140wpm,turn on the seat heating,heating_seats_driver_on,not gonna sit here and,seat_incline,0.994,WRONG_INTENT,heating_seats_driver_on,0.927
+GB-aged,Grandma (English (UK)),140wpm,turn on the headlights,light_headlights_on,on the head nights,climate_increase_temperature,0.368,REJECTED,light_headlights_on,1.0
+GB-aged,Grandma (English (UK)),140wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB-aged,Grandma (English (UK)),140wpm,next track,media_next_track,next tried,media_next_track,1.0,PASS,media_next_track,1.0
+GB-aged,Grandma (English (UK)),140wpm,turn up the volume,media_volume_up,not a volume,media_prev_track,0.461,REJECTED,media_volume_up,1.0
+GB-aged,Grandma (English (UK)),140wpm,navigate home,navi_go_home,navigate,navigation_start_route,0.999,WRONG_INTENT,navi_go_home,1.0
+GB-aged,Grandma (English (UK)),140wpm,find parking,navi_find_parking,fine,wipers_off,0.999,WRONG_INTENT,navi_find_parking,1.0
+GB-aged,Grandma (English (UK)),140wpm,cancel the route,navi_cancel_route,your roots,navi_find_gas_station,0.947,REJECTED,navi_cancel_route,1.0
+GB-aged,Grandma (English (UK)),140wpm,answer the call,phone_accept_call,set call,phone_end_call,0.757,REJECTED,phone_accept_call,1.0
+GB-aged,Grandma (English (UK)),140wpm,turn on the wipers,wipers_on,not gonna lie plus,media_next_track,0.485,REJECTED,wipers_on,0.999
+GB-aged,Grandma (English (UK)),140wpm,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+GB-aged,Grandma (English (UK)),140wpm,turn on the parking sensors,parking_sensors_on,on no parking sensors,parking_sensors_on,1.0,PASS,parking_sensors_on,1.0
+GB-aged,Grandma (English (UK)),140wpm,what time is the meeting tomorrow,none,what time is no meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB-aged,Grandma (English (UK)),140wpm,tell me a joke about penguins,none,hell me a joke about ten wins,navi_find_parking,0.502,PASS,navi_unmute_guidance,0.969
+GB-aged,Grandma (English (UK)),140wpm,remind me to buy milk,none,remind me of buy milk,wipers_off,0.95,PASS,climate_ac_on,0.506
+GB-aged,Grandma (English (UK)),180wpm,lock the doors,body_door_lock,like that know,media_prev_track,0.683,REJECTED,body_door_lock,1.0
+GB-aged,Grandma (English (UK)),180wpm,open the sunroof,body_sunroof_open,on the sun roof,body_sunroof_open,0.992,PASS,body_sunroof_open,1.0
+GB-aged,Grandma (English (UK)),180wpm,open the trunk,body_trunk_open,on the trunk,body_trunk_open,0.993,PASS,body_trunk_open,1.0
+GB-aged,Grandma (English (UK)),180wpm,fold the mirrors,body_mirrors_fold,hall of mirrors,body_mirrors_unfold,0.997,WRONG_INTENT,body_mirrors_fold,1.0
+GB-aged,Grandma (English (UK)),180wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB-aged,Grandma (English (UK)),180wpm,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+GB-aged,Grandma (English (UK)),180wpm,increase the temperature,climate_increase_temperature,the increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB-aged,Grandma (English (UK)),180wpm,turn on the seat heating,heating_seats_driver_on,not as he he,parking_sensors_off,0.477,REJECTED,heating_seats_driver_on,0.927
+GB-aged,Grandma (English (UK)),180wpm,turn on the headlights,light_headlights_on,on the nice,light_high_beams_on,0.958,WRONG_INTENT,light_headlights_on,1.0
+GB-aged,Grandma (English (UK)),180wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB-aged,Grandma (English (UK)),180wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+GB-aged,Grandma (English (UK)),180wpm,turn up the volume,media_volume_up,not a volume,media_prev_track,0.461,REJECTED,media_volume_up,1.0
+GB-aged,Grandma (English (UK)),180wpm,navigate home,navi_go_home,navigate home,navi_go_home,1.0,PASS,navi_go_home,1.0
+GB-aged,Grandma (English (UK)),180wpm,find parking,navi_find_parking,mine again,media_prev_track,0.41,REJECTED,navi_find_parking,1.0
+GB-aged,Grandma (English (UK)),180wpm,cancel the route,navi_cancel_route,all the rules,system_open_settings,0.991,WRONG_INTENT,navi_cancel_route,1.0
+GB-aged,Grandma (English (UK)),180wpm,answer the call,phone_accept_call,said at all,media_pause,0.94,REJECTED,phone_accept_call,1.0
+GB-aged,Grandma (English (UK)),180wpm,turn on the wipers,wipers_on,not gonna lie plus,media_next_track,0.485,REJECTED,wipers_on,0.999
+GB-aged,Grandma (English (UK)),180wpm,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+GB-aged,Grandma (English (UK)),180wpm,turn on the parking sensors,parking_sensors_on,nah no parking sensors,parking_sensors_on,0.909,REJECTED,parking_sensors_on,1.0
+GB-aged,Grandma (English (UK)),180wpm,what time is the meeting tomorrow,none,what time is no meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB-aged,Grandma (English (UK)),180wpm,tell me a joke about penguins,none,they'll me a joke about penguins,parking_sensors_on,0.95,WRONG_INTENT,navi_unmute_guidance,0.969
+GB-aged,Grandma (English (UK)),180wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+GB-aged,Grandma (English (UK)),220wpm,lock the doors,body_door_lock,that,media_prev_track,0.999,WRONG_INTENT,body_door_lock,1.0
+GB-aged,Grandma (English (UK)),220wpm,open the sunroof,body_sunroof_open,on is unreal,wipers_wash_windshield,0.326,REJECTED,body_sunroof_open,1.0
+GB-aged,Grandma (English (UK)),220wpm,open the trunk,body_trunk_open,the trunk,body_trunk_close,0.997,WRONG_INTENT,body_trunk_open,1.0
+GB-aged,Grandma (English (UK)),220wpm,fold the mirrors,body_mirrors_fold,hall of mirrors,body_mirrors_unfold,0.997,WRONG_INTENT,body_mirrors_fold,1.0
+GB-aged,Grandma (English (UK)),220wpm,show the rear camera,camera_show_rear,show the rear camera,camera_show_rear,1.0,PASS,camera_show_rear,1.0
+GB-aged,Grandma (English (UK)),220wpm,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+GB-aged,Grandma (English (UK)),220wpm,increase the temperature,climate_increase_temperature,increase the temperature,climate_increase_temperature,0.999,PASS,climate_increase_temperature,0.999
+GB-aged,Grandma (English (UK)),220wpm,turn on the seat heating,heating_seats_driver_on,then on he he,light_headlights_on,0.979,WRONG_INTENT,heating_seats_driver_on,0.927
+GB-aged,Grandma (English (UK)),220wpm,turn on the headlights,light_headlights_on,on the nice,light_high_beams_on,0.958,WRONG_INTENT,light_headlights_on,1.0
+GB-aged,Grandma (English (UK)),220wpm,play music,media_play,play music,media_play,0.999,PASS,media_play,0.999
+GB-aged,Grandma (English (UK)),220wpm,next track,media_next_track,next track,media_next_track,1.0,PASS,media_next_track,1.0
+GB-aged,Grandma (English (UK)),220wpm,turn up the volume,media_volume_up,and up the volume,media_volume_up,0.954,PASS,media_volume_up,1.0
+GB-aged,Grandma (English (UK)),220wpm,navigate home,navi_go_home,navigate,navigation_start_route,0.999,WRONG_INTENT,navi_go_home,1.0
+GB-aged,Grandma (English (UK)),220wpm,find parking,navi_find_parking,find parking,navi_find_parking,1.0,PASS,navi_find_parking,1.0
+GB-aged,Grandma (English (UK)),220wpm,cancel the route,navi_cancel_route,that's all the route,navigation_start_route,0.542,REJECTED,navi_cancel_route,1.0
+GB-aged,Grandma (English (UK)),220wpm,answer the call,phone_accept_call,that at all,system_mute,0.999,WRONG_INTENT,phone_accept_call,1.0
+GB-aged,Grandma (English (UK)),220wpm,turn on the wipers,wipers_on,on your life was,media_prev_track,0.935,REJECTED,wipers_on,0.999
+GB-aged,Grandma (English (UK)),220wpm,turn on the radio,radio_turn_on,on the radio,radio_turn_on,0.996,PASS,radio_turn_on,0.998
+GB-aged,Grandma (English (UK)),220wpm,turn on the parking sensors,parking_sensors_on,on your parking sensors,parking_sensors_on,0.999,PASS,parking_sensors_on,1.0
+GB-aged,Grandma (English (UK)),220wpm,what time is the meeting tomorrow,none,what time is no meeting tomorrow,navi_go_work,1.0,WRONG_INTENT,navi_go_work,1.0
+GB-aged,Grandma (English (UK)),220wpm,tell me a joke about penguins,none,they'll me a joke about pangolins,navi_go_work,0.261,PASS,navi_unmute_guidance,0.969
+GB-aged,Grandma (English (UK)),220wpm,remind me to buy milk,none,remind me to buy milk,climate_ac_on,0.506,PASS,climate_ac_on,0.506
+GB-aged,Grandma (English (UK)),180wpm+noise,lock the doors,body_door_lock,not all,navi_find_parking,0.832,REJECTED,body_door_lock,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,open the sunroof,body_sunroof_open,some you,climate_decrease_temperature,0.985,WRONG_INTENT,body_sunroof_open,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,open the trunk,body_trunk_open,none,media_prev_track,0.988,WRONG_INTENT,body_trunk_open,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,fold the mirrors,body_mirrors_fold,home for me,navi_go_home,1.0,WRONG_INTENT,body_mirrors_fold,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,show the rear camera,camera_show_rear,then for me,seat_move_backward,0.437,REJECTED,camera_show_rear,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,turn on the air conditioning,climate_ac_on,on the air conditioning,climate_ac_on,0.93,REJECTED,climate_ac_on,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,increase the temperature,climate_increase_temperature,meet the him,phone_call_contact,0.986,WRONG_INTENT,climate_increase_temperature,0.999
+GB-aged,Grandma (English (UK)),180wpm+noise,turn on the seat heating,heating_seats_driver_on,on the v,climate_defrost_windshield,0.221,REJECTED,heating_seats_driver_on,0.927
+GB-aged,Grandma (English (UK)),180wpm+noise,turn on the headlights,light_headlights_on,the night,light_high_beams_off,0.954,WRONG_INTENT,light_headlights_on,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,play music,media_play,they movie,radio_next_station,0.663,REJECTED,media_play,0.999
+GB-aged,Grandma (English (UK)),180wpm+noise,next track,media_next_track,that that,media_prev_track,0.999,WRONG_INTENT,media_next_track,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,turn up the volume,media_volume_up,they're not run,phone_redial,0.939,REJECTED,media_volume_up,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,navigate home,navi_go_home,that he came from,phone_dial_number,0.842,REJECTED,navi_go_home,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,find parking,navi_find_parking,find him,phone_call_contact,0.789,REJECTED,navi_find_parking,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,cancel the route,navi_cancel_route,for them,phone_reject_call,0.539,REJECTED,navi_cancel_route,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,answer the call,phone_accept_call,the senate for,seat_massage_off,0.292,REJECTED,phone_accept_call,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,turn on the wipers,wipers_on,of the life phone,navi_mute_guidance,0.853,REJECTED,wipers_on,0.999
+GB-aged,Grandma (English (UK)),180wpm+noise,turn on the radio,radio_turn_on,on the,parking_sensors_on,0.543,REJECTED,radio_turn_on,0.998
+GB-aged,Grandma (English (UK)),180wpm+noise,turn on the parking sensors,parking_sensors_on,i'm no incentive,media_volume_up,0.97,WRONG_INTENT,parking_sensors_on,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,what time is the meeting tomorrow,none,the time for me meeting for mother,navi_go_work,0.999,WRONG_INTENT,navi_go_work,1.0
+GB-aged,Grandma (English (UK)),180wpm+noise,tell me a joke about penguins,none,an attempt,seat_massage_off,0.808,PASS,navi_unmute_guidance,0.969
+GB-aged,Grandma (English (UK)),180wpm+noise,remind me to buy milk,none,remind me of i knew,phone_unmute_mic,0.559,PASS,climate_ac_on,0.506
