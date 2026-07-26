@@ -99,6 +99,13 @@ out-of-domain safety drops from 100% to 39%. Pass
 `VoskManager(context, useGrammar = false)` for the open-vocabulary baseline;
 `VoicePipelineTest.grammarDecoding_beatsOpenVocabulary` runs both on the same clips.
 
+The 40 MB `vosk-model-small-en-us-0.15` stays on purpose: the 204 MB
+`vosk-model-en-us-0.22-lgraph` was measured on the same grid and lost on every
+axis — commands 93% against 97%, aged voice 75% against 86%, white noise 77%
+against 89%. A bigger language model prefers the *fluent* hypothesis, and for
+two-word car commands that is the wrong prior ("turn up the volume" → "turn off
+the volume"). See the report.
+
 **Phrasings are measured, not guessed.** `CommandCatalog` leads with the phrasing
 `tools/candidate_phrases_test.py` found most robust — "increase the volume", not
 "turn up the volume", which comes back as "turn off the volume" under noise and

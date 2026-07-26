@@ -125,10 +125,55 @@ Nine dangerous failures remain, all under white noise:
   different real command with high confidence.
 - Aged-GB is still the weakest voice at 88%, and contributes 4 of the 9.
 
-The next lever is the recognizer itself, not the classifier: `vosk-model-small`
-is 40 MB, and the 128 MB `vosk-model-en-us-0.22-lgraph` would likely take the
-aged voice and the white-noise column with it. Worth measuring before adding
-another round of augmentation, which is reaching diminishing returns.
+## The bigger recognizer — measured, and it loses
+
+`vosk-model-small-en-us-0.15` is 40 MB, so the obvious next lever was
+`vosk-model-en-us-0.22-lgraph` (204 MB unpacked, the only large Vosk model that
+supports dynamic grammars). It was measured on the same 770-clip grid and it is
+worse on every axis that matters:
+
+| | small 0.15 (40 MB) | lgraph 0.22 (204 MB) |
+|---|---|---|
+| Commands | **645/665 (97%)** | 616/665 (93%) |
+| Dangerous failures | **9** | 15 |
+| Safe rejections | **10** | 32 |
+| Aged voice | **86%** | 75% |
+| White noise | **89%** | 77% |
+| Off-topic refused | **105/105** | 104/105 |
+
+Not a grammar artefact either — the small model wins in both decoding modes, on
+the identical US/GB/AU × {clean, road} slice:
+
+| Configuration | Commands | Dangerous |
+|---|---|---|
+| **small + grammar (shipped)** | **114/114 (100%)** | 0 |
+| small, open vocabulary | 111/114 (97%) | 0 |
+| lgraph + grammar | 111/114 (97%) | 3 |
+| lgraph, open vocabulary | 105/114 (92%) | 2 |
+
+The failure mode explains it. A larger model carries a much stronger language
+model, and its advantage lies in long, open-ended speech where context resolves
+ambiguity. Car commands are two to five words with no context, and the big LM
+spends that strength preferring the more *fluent* hypothesis: "turn up the
+volume" → "turn off the volume" (9 clips, versus 4 for the small model), "lock
+the doors" → "like the doors", "turn on the radio" → "and on the radio", "open
+the trunk" → "open the phone". Fluency is exactly the wrong prior for a command
+grammar. Five times the size, several times the decode cost, worse results.
+
+So the lever is not the acoustic model. What is left, in order of expected value:
+
+1. **Confirmation on destructive-ish commands.** Nine of the remaining failures
+   are one command flipping into a neighbour under noise, and `media_mute` takes
+   four of them. A "say yes to confirm" step on the handful of commands that are
+   annoying to undo removes the whole class.
+2. **Aged-voice augmentation.** That voice fails mostly *safely* now (20 of its
+   23 misses are rejections: "like the doors", "and on the radio"), so it is a
+   usability problem, not a safety one — and rejections are cheap to convert
+   with another augmentation round.
+3. **A second recognition pass on rejection.** When the gate refuses, the app
+   currently says it did not understand. Re-decoding the same audio with the
+   open vocabulary and re-classifying would recover part of the 10 rejections
+   without touching the model.
 
 ## Instrumented counterpart
 
