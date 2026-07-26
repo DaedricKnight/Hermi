@@ -1,7 +1,7 @@
 package com.khateev.hermi.shared.model
 
 /**
- * Исключение, которое выбрасывается когда команда недоступна в текущей версии
+ * Thrown when a command is not available in the current app version
  */
 class CommandNotAvailableException(
     val command: Command,
@@ -13,19 +13,19 @@ class CommandNotAvailableException(
         private fun buildMessage(command: Command, requiresPro: Boolean): String {
             val commandName = CommandAccessControl.getCommandName(command)
             return if (requiresPro) {
-                "Команда '$commandName' доступна только в Pro версии"
+                "Command '$commandName' is available in the Pro version only"
             } else {
-                "Команда '$commandName' недоступна"
+                "Command '$commandName' is unavailable"
             }
         }
     }
 }
 
 /**
- * Исключение для попытки выполнить Pro команду без подписки
+ * Thrown when a Pro command is invoked without a subscription
  */
 class ProFeatureRequiredException(
     val commandName: String,
-    override val message: String = "Для использования этой функции требуется Pro версия"
+    override val message: String = "This feature requires the Pro version"
 ) : Exception(message)
 

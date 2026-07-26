@@ -1,28 +1,28 @@
 package com.khateev.hermi.shared.model
 
 /**
- * Примеры использования системы версионирования команд
+ * Worked examples of the command versioning API
  */
 object CommandUsageExamples {
 
     /**
-     * Пример 1: Проверка доступности команды перед выполнением
+     * Example 1: check availability before executing
      */
     fun example1_CheckCommandAvailability() {
         val command = Command.SeatMassageOn
-        val isPro = false  // Бесплатный пользователь
+        val isPro = false  // free user
 
         if (CommandAccessControl.isCommandAvailable(command, isPro)) {
-            println("Команда доступна, выполняем...")
+            println("Command available, executing...")
             // executeCommand(command)
         } else {
-            println("Команда недоступна. Требуется Pro версия")
+            println("Command unavailable. Pro version required")
             // showUpgradeDialog()
         }
     }
 
     /**
-     * Пример 2: Использование Validator с обработкой исключений
+     * Example 2: Validator with exception handling
      */
     fun example2_ValidateWithException() {
         val command = Command.ClimateAcOn
@@ -30,58 +30,58 @@ object CommandUsageExamples {
 
         try {
             CommandValidator.validateCommandAccess(command, isPro)
-            println("Команда доступна, выполняем...")
+            println("Command available, executing...")
             // executeCommand(command)
         } catch (e: CommandNotAvailableException) {
             if (e.requiresPro) {
-                println("${e.message} - показываем диалог обновления")
+                println("${e.message} - showing the upgrade dialog")
                 // showUpgradeToProDialog()
             } else {
-                println("Команда недоступна")
+                println("Command unavailable")
             }
         }
     }
 
     /**
-     * Пример 3: Использование extension функций
+     * Example 3: extension functions
      */
     fun example3_UsingExtensions() {
         val command = Command.MediaPlay
         val isPro = false
 
-        // Проверка доступности
+        // availability
         if (command.isAvailable(isPro)) {
-            println("Команда доступна")
+            println("Command available")
             // executeCommand(command)
         }
 
-        // Получение информации
+        // command info
         val info = command.getInfo()
-        println("Команда: ${info.name}, Требует Pro: ${info.requiresPro}")
+        println("Command: ${info.name}, requires Pro: ${info.requiresPro}")
 
-        // Проверка требования Pro
+        // does it need Pro?
         if (command.requiresPro()) {
-            println("Это Pro команда")
+            println("This is a Pro command")
         } else {
-            println("Это Free команда")
+            println("This is a Free command")
         }
     }
 
     /**
-     * Пример 4: Проверка всех доступных команд для пользователя
+     * Example 4: list every command available to the user
      */
     fun example4_GetAvailableCommands() {
-        val isPro = false  // Бесплатный пользователь
+        val isPro = false  // free user
 
         val freeCommands = CommandAccessControl.getAvailableCommands(isPro = false)
-        println("Free команды: $freeCommands")
+        println("Free commands: $freeCommands")
 
         val proCommands = CommandAccessControl.getAvailableCommands(isPro = true)
-        println("Pro команды: $proCommands")
+        println("Pro commands: $proCommands")
     }
 
     /**
-     * Пример 5: Безопасная проверка без исключений
+     * Example 5: safe check, no exceptions
      */
     fun example5_SafeCheck() {
         val command = Command.ClimateAcOn
@@ -91,61 +91,61 @@ object CommandUsageExamples {
 
         when (result) {
             CommandAccessResult.Available -> {
-                println("Команда доступна")
+                println("Command available")
                 // executeCommand(command)
             }
             CommandAccessResult.RequiresPro -> {
-                println("Требуется Pro версия")
+                println("Pro version required")
                 // showUpgradeDialog()
             }
             CommandAccessResult.Unavailable -> {
-                println("Команда недоступна")
+                println("Command unavailable")
             }
         }
     }
 
     /**
-     * Пример 6: Использование с VersionManager
+     * Example 6: together with VersionManager
      */
     suspend fun example6_WithVersionManager(versionManager: com.khateev.hermi.shared.interfaces.VersionManager) {
         val command = Command.BodyTrunkOpen
         val isPro = versionManager.isProNow()
 
         if (CommandAccessControl.isCommandAvailable(command, isPro)) {
-            println("Команда доступна для пользователя")
+            println("Command available to this user")
             // executeCommand(command)
         } else {
-            println("Требуется активировать Pro версию")
-            // Активируем Pro версию на месяц (30 дней)
+            println("Pro version needs activating")
+            // activate Pro for a month (30 days)
             if (versionManager is com.khateev.hermi.shared.manager.VersionManagerImpl) {
                 versionManager.activateProSubscription(30 * 24 * 60 * 60 * 1000L)
-                println("Pro версия активирована")
+                println("Pro version activated")
             }
         }
     }
 
     /**
-     * Пример 7: Обработка результатов команды с учетом версионирования
+     * Example 7: executing a command with the version check in place
      */
     data class CommandExecutionContext(
         val isPro: Boolean
     )
 
     fun example7_ExecuteWithVersionCheck(command: Command, context: CommandExecutionContext) {
-        // Сначала проверяем доступность
+        // availability first
         if (!CommandAccessControl.isCommandAvailable(command, context.isPro)) {
-            // Команда недоступна
+            // command not available
             val commandInfo = CommandValidator.getCommandInfo(command)
-            println("Команда '${commandInfo.name}' недоступна в текущей версии")
+            println("Command '${commandInfo.name}' is not available in the current version")
             if (commandInfo.requiresPro) {
-                println("Требуется Pro версия")
+                println("Pro version required")
                 // showUpgradeDialog()
             }
             return
         }
 
-        // Команда доступна, выполняем
-        println("Выполняем команду: ${CommandValidator.getCommandInfo(command).name}")
+        // available — execute it
+        println("Executing command: ${CommandValidator.getCommandInfo(command).name}")
         // executeCommand(command, context)
     }
 }

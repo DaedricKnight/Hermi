@@ -99,9 +99,9 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
 
                     viewModel.viewModelScope.launch {
                         viewModel.isRecording.collect { isListening ->
-                            // Если запись остановилась (VAD сработал), скрываем сессию
+                            // Recording stopped (VAD fired) — hide the session
                             if (!isListening && viewModel.isProcessing.value == false) {
-                                // Добавляем небольшую задержку перед закрытием, если нужно показать текст
+                                // Small delay before closing, so the transcript stays readable
                             }
                         }
                     }
@@ -124,15 +124,15 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
             startAssistantActivity(intent)
             hide()
         } else {
-            getWindow()?.window?.let { win ->
+            window?.window?.let { win ->
                 win.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
                 win.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
 
             hermiViewModel?.let { viewModel ->
                 viewModel.viewModelScope.launch {
-                    // Теперь мы просто запускаем запись. 
-                    // ViewModel сама остановит её через VADManager.
+                    // Just start recording here.
+                    // The ViewModel stops it itself through VADManager.
                     viewModel.startRecording()
                 }
             }

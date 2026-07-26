@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 
 class HermiViewModel(
     private val voskManager: RecognitionManager,
@@ -57,9 +56,6 @@ class HermiViewModel(
 
     private var _hasError = MutableStateFlow<Exception?>(null)
     val hasError = _hasError.asStateFlow()
-
-    private val _currentSpokenText = MutableStateFlow("")
-    val currentSpokenText: StateFlow<String> = _currentSpokenText.asStateFlow()
 
     private val _recognizedText = MutableSharedFlow<String>(replay = 1)
     val recognizedText = _recognizedText.asSharedFlow()

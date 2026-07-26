@@ -40,7 +40,7 @@ import com.khateev.hermi.shared.model.CommandCatalog
 import com.khateev.hermi.shared.model.CommandVersion
 
 /**
- * Data class для отображения информации о команде
+ * Command as shown in the list
  */
 data class CommandUIModel(
     val name: String,
@@ -51,7 +51,7 @@ data class CommandUIModel(
 )
 
 /**
- * Экран со списком доступных команд
+ * Screen listing the available commands
  */
 @Composable
 fun CommandListScreen(
@@ -80,7 +80,7 @@ fun CommandListScreen(
 }
 
 /**
- * Карточка с информацией о версии приложения
+ * Card showing which app version is active
  */
 @Composable
 private fun VersionHeaderCard(
@@ -147,7 +147,7 @@ private fun VersionHeaderCard(
 }
 
 /**
- * Список команд
+ * The command list itself
  */
 @Composable
 private fun CommandsList(
@@ -161,7 +161,7 @@ private fun CommandsList(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // FREE ВЕРСИЯ
+        // FREE version
         items(
             items = commands.filter { !it.isPro },
             key = { it.name }
@@ -173,7 +173,7 @@ private fun CommandsList(
             )
         }
 
-        // PRO ВЕРСИЯ (если есть доступ)
+        // PRO version (when the user has access)
         if (commands.any { it.isPro }) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -195,7 +195,7 @@ private fun CommandsList(
 }
 
 /**
- * Заголовок раздела Pro команд
+ * Header of the Pro command section
  */
 @Composable
 private fun ProSectionHeader(modifier: Modifier = Modifier) {
@@ -228,7 +228,7 @@ private fun ProSectionHeader(modifier: Modifier = Modifier) {
 }
 
 /**
- * Карточка с командой
+ * A single command card
  */
 @Composable
 private fun CommandCard(
@@ -306,7 +306,7 @@ private fun CommandCard(
 }
 
 /**
- * Получить список команд для отображения
+ * Commands to display, straight from the catalog
  */
 private fun getCommandsUIModels(isPro: Boolean): List<CommandUIModel> =
     CommandCatalog.specs.map { spec ->

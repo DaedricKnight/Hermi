@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.core.content.edit
 
 /**
- * Реализация VersionManager с использованием SharedPreferences
+ * VersionManager backed by SharedPreferences
  */
 class VersionManagerImpl(
     private val context: Context
@@ -42,15 +42,15 @@ class VersionManagerImpl(
     }
 
     private fun loadProStatus(): Boolean {
-        // Сначала проверяем, есть ли активная подписка
+        // Check for an active subscription first
         val isSubscriptionActive = isSubscriptionActiveSync()
 
-        // Если подписка активна, возвращаем true
+        // An active subscription means Pro
         if (isSubscriptionActive) {
             return true
         }
 
-        // Иначе проверяем сохраненный статус
+        // Otherwise fall back to the stored flag
         return prefs.getBoolean(KEY_IS_PRO, false)
     }
 
@@ -60,8 +60,8 @@ class VersionManagerImpl(
     }
 
     /**
-     * Активирует Pro версию на определенный период (в миллисекундах)
-     * @param durationMs Длительность подписки в миллисекундах
+     * Activates the Pro version for a given period (in milliseconds)
+     * @param durationMs Subscription length in milliseconds
      */
     fun activateProSubscription(durationMs: Long) {
         val validUntil = System.currentTimeMillis() + durationMs
@@ -70,7 +70,7 @@ class VersionManagerImpl(
     }
 
     /**
-     * Отменяет Pro версию
+     * Cancels the Pro version
      */
     fun cancelProVersion() {
         prefs.edit {
@@ -81,7 +81,7 @@ class VersionManagerImpl(
     }
 
     /**
-     * Получает дату истечения подписки (если активна)
+     * Subscription expiry date, when one is active
      */
     fun getSubscriptionExpiryTime(): Long {
         return prefs.getLong(KEY_PRO_UNTIL, 0L)
