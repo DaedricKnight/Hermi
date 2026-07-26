@@ -35,3 +35,4 @@ capture/
 memory_heap_dump.hprof
 *.ap_
 *.flat
+tools/__pycache__/

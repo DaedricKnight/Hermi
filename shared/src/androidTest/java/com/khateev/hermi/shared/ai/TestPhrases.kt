@@ -32,10 +32,10 @@ object TestPhrases {
             "I need to grab something from the back seat"
         ),
         "body_mirrors_fold" to listOf(
-            "Bring the mirrors tight", "Close the side mirrors", "Collapse the side mirrors",
-            "Fold 'em up", "Fold in the side view mirrors", "Fold the ears",
-            "Fold the mirrors", "Fold the wing mirrors", "Hey, can you like, fold the side view mirrors",
-            "Hide the side glass"
+            "fold the side mirrors", "Bring the mirrors tight", "Close the side mirrors",
+            "Collapse the side mirrors", "Fold 'em up", "Fold in the side view mirrors",
+            "Fold the ears", "Fold the mirrors", "Fold the wing mirrors",
+            "Hey, can you like, fold the side view mirrors"
         ),
         "body_mirrors_unfold" to listOf(
             "Bring the wings back", "Deploy the mirrors", "Extend the mirrors",
@@ -62,10 +62,10 @@ object TestPhrases {
             "Hey, can you like, shut the roof"
         ),
         "body_sunroof_open" to listOf(
-            "Crack the roof", "Drop the roof", "Give us a view of the sky",
-            "Hey, can you like, let the sun in", "I mean, I want to see the sky", "I want to feel the breeze from above",
-            "I want to look at the stars", "It's a beautiful day, let's see the sky", "It's a bit dark in here",
-            "Just, uh, open the top"
+            "open the sunroof", "Crack the roof", "Drop the roof",
+            "Give us a view of the sky", "Hey, can you like, let the sun in", "I mean, I want to see the sky",
+            "I want to feel the breeze from above", "I want to look at the stars", "It's a beautiful day, let's see the sky",
+            "It's a bit dark in here"
         ),
         "body_trunk_close" to listOf(
             "Close it up so we can drive", "Close the boot", "Close the cargo area",
@@ -74,10 +74,10 @@ object TestPhrases {
             "Hey, can you like, hit the close button for the trunk"
         ),
         "body_trunk_open" to listOf(
-            "Can't open the back from outside", "Click the trunk", "Hey, can you like, hit the trunk button",
-            "Hit the trunk button", "I mean, I need to load groceries", "I need to grab the spare tire",
-            "I need to put my bags away", "I want to put my jacket in the back", "Just, uh, pop the hatch",
-            "Let me in the back"
+            "open the trunk", "Can't open the back from outside", "Click the trunk",
+            "Hey, can you like, hit the trunk button", "Hit the trunk button", "I mean, I need to load groceries",
+            "I need to grab the spare tire", "I need to put my bags away", "I want to put my jacket in the back",
+            "Just, uh, pop the hatch"
         ),
         "camera_show_360" to listOf(
             "Activate 360 degree camera", "Am I centered in the parking spot?", "Check if there's anything around the car",
@@ -104,10 +104,10 @@ object TestPhrases {
             "Just need air, without the frost"
         ),
         "climate_ac_on" to listOf(
-            "AC go", "Activate cooling", "Air conditioning on",
-            "Give me some cold", "Hey, can you like, hit the snowflake", "Hit the snowflake",
-            "I mean, turn on the fridge", "It's blowing like a hair dryer", "It's getting kind of hot",
-            "It's hot outside, save me"
+            "turn on the air conditioning", "AC go", "Activate cooling",
+            "Air conditioning on", "Give me some cold", "Hey, can you like, hit the snowflake",
+            "Hit the snowflake", "I mean, turn on the fridge", "It's blowing like a hair dryer",
+            "It's getting kind of hot"
         ),
         "climate_air_recirculation_off" to listOf(
             "Bring in outside air", "Deactivate recirculation", "Disable internal airflow",
@@ -218,10 +218,10 @@ object TestPhrases {
             "Hey, can you like, thaw the back window"
         ),
         "heating_seats_driver_on" to listOf(
-            "Activate driver seat heater", "Could use some heat on my seat", "Heat my seat",
-            "Hey, can you like, turn on my bun warmer", "I mean, warm my spot", "I wish my seat was warmer",
-            "I'm cold sitting on this", "Just, uh, turn on the driver heater", "Like, it's cold, heat the driver seat",
-            "Like, the seat is icy, warm me up"
+            "turn on the seat heating", "Activate driver seat heater", "Could use some heat on my seat",
+            "Heat my seat", "Hey, can you like, turn on my bun warmer", "I mean, warm my spot",
+            "I wish my seat was warmer", "I'm cold sitting on this", "Just, uh, turn on the driver heater",
+            "Like, it's cold, heat the driver seat"
         ),
         "heating_seats_off" to listOf(
             "Deactivate seat heating", "Don't fry the seats", "Don't need to heat the chairs anymore",
@@ -344,16 +344,16 @@ object TestPhrases {
             "I'm tired of my playlist"
         ),
         "media_volume_down" to listOf(
-            "Decrease the audio", "Decrease the volume", "Dial it back",
-            "Drop the volume", "Hey, can you like, lower the boom", "Hit the volume down",
-            "Hush the music", "I can't hear myself think", "I mean, we are trying to talk, turn it down",
-            "I need to focus on driving"
+            "turn down the volume", "Decrease the audio", "Decrease the volume",
+            "Dial it back", "Drop the volume", "Hey, can you like, lower the boom",
+            "Hit the volume down", "Hush the music", "I can't hear myself think",
+            "I mean, we are trying to talk, turn it down"
         ),
         "media_volume_up" to listOf(
-            "Blast the speakers", "Crank it up", "Hey, can you like, pump up the volume",
-            "Hit the volume up", "I can't hear the song", "I love this part of the song",
-            "I mean, this is my favorite part, turn it up", "I want to feel the bass", "Increase the audio",
-            "Increase the volume"
+            "increase the volume", "Blast the speakers", "Crank it up",
+            "Hey, can you like, pump up the volume", "Hit the volume up", "I can't hear the song",
+            "I love this part of the song", "I mean, this is my favorite part, turn it up", "I want to feel the bass",
+            "Increase the audio"
         ),
         "navi_cancel_route" to listOf(
             "Cancel destination", "Cancel my directions", "Cancel route",
@@ -440,10 +440,10 @@ object TestPhrases {
             "I don't want to hit the curb"
         ),
         "phone_accept_call" to listOf(
-            "Accept call", "Accept the incoming call", "Answer it",
-            "Answer the horn", "Answer the phone", "Connect the call",
-            "Don't let it go to voicemail", "Grab the line", "Hey, can you like, put 'em through",
-            "Hit accept"
+            "answer the call", "Accept call", "Accept the incoming call",
+            "Answer it", "Answer the horn", "Answer the phone",
+            "Connect the call", "Don't let it go to voicemail", "Grab the line",
+            "Hey, can you like, put 'em through"
         ),
         "phone_call_contact" to listOf(
             "Buzz David", "Call John", "Call contact Alex",

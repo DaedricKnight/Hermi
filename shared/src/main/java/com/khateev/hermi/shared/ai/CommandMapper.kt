@@ -16,8 +16,13 @@ object CommandMapper {
      */
     const val CONFIDENCE_THRESHOLD = 0.95f
 
+    /** The model's reject class; it has no command of its own. */
+    const val NONE_LABEL = "none"
+
     fun mapLabelToCommand(label: String, confidence: Float, rawText: String): Command {
-        if (confidence < CONFIDENCE_THRESHOLD) return Command.Unknown(rawText)
+        if (label == NONE_LABEL || confidence < CONFIDENCE_THRESHOLD) {
+            return Command.Unknown(rawText)
+        }
         return CommandCatalog.commandForLabel(label) ?: Command.Unknown(rawText)
     }
 

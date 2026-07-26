@@ -42,6 +42,7 @@ class VoicePipelineTest {
 
     companion object {
         private lateinit var vosk: VoskManager
+        private lateinit var openVocabularyVosk: VoskManager
         private lateinit var classifier: ONNXAIProcessor
 
         @BeforeClass
@@ -50,6 +51,8 @@ class VoicePipelineTest {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             vosk = VoskManager(context)
             check(vosk.initialize()) { "Vosk init failed" }
+            openVocabularyVosk = VoskManager(context, useGrammar = false)
+            check(openVocabularyVosk.initialize()) { "open-vocabulary Vosk init failed" }
             classifier = ONNXAIProcessor(context)
         }
 
@@ -57,6 +60,7 @@ class VoicePipelineTest {
         @JvmStatic
         fun tearDown() {
             vosk.release()
+            openVocabularyVosk.release()
         }
 
         /** Minimal WAV reader for the known test fixtures (16 kHz mono PCM16). */
@@ -92,15 +96,15 @@ class VoicePipelineTest {
         }
     }
 
-    private fun recognize(wav: String): String {
-        val text = vosk.recognizeAudio(loadWavPcm("tts/$wav"))
-        assertTrue("no transcript for $wav", !text.isNullOrBlank())
-        return text!!
+    private fun runPipeline(wav: String): Pair<String, Command> = runBlocking {
+        val text = vosk.recognizeAudio(loadWavPcm("tts/$wav")).orEmpty()
+        text to classifier.parseCommand(text)
     }
 
-    private fun runPipeline(wav: String): Pair<String, Command> = runBlocking {
-        val text = recognize(wav)
-        text to classifier.parseCommand(text)
+    private fun assertRecognized(wav: String): String {
+        val (text, _) = runPipeline(wav)
+        assertTrue("no transcript for $wav", text.isNotBlank())
+        return text
     }
 
     private fun assertCommand(fixture: Fixture) {
@@ -112,6 +116,30 @@ class VoicePipelineTest {
     }
 
     private fun assertAll(fixtures: List<Fixture>) = fixtures.forEach(::assertCommand)
+
+    /** Every bundled command clip (the out-of-domain probe is asserted separately). */
+    private fun commandFixtures(): List<Fixture> = listOf(
+            Fixture("door_lock_samantha.wav", "US", Command.BodyDoorLock),
+            Fixture("sunroof_open_samantha.wav", "US", Command.BodySunroofOpen),
+            Fixture("ac_on_samantha.wav", "US", Command.ClimateAcOn),
+            Fixture("temp_up_samantha.wav", "US", Command.ClimateIncreaseTemperature),
+            Fixture("media_play_samantha.wav", "US", Command.MediaPlay),
+            Fixture("media_pause_samantha.wav", "US", Command.MediaPause),
+            Fixture("volume_up_samantha.wav", "US", Command.MediaVolumeUp),
+            Fixture("navi_home_samantha.wav", "US", Command.NavigationGoHome),
+            Fixture("find_parking_samantha.wav", "US", Command.NavigationFindParking),
+            Fixture("headlights_on_daniel.wav", "GB", Command.LightHeadlightsOn),
+            Fixture("next_track_daniel.wav", "GB", Command.MediaNextTrack),
+            Fixture("door_lock_slow_daniel.wav", "GB", Command.BodyDoorLock),
+            Fixture("door_lock_fast_daniel.wav", "GB", Command.BodyDoorLock),
+            Fixture("wipers_on_karen.wav", "AU", Command.WipersOn),
+            Fixture("zoom_in_karen.wav", "AU", Command.NavigationZoomIn),
+            Fixture("cancel_route_moira.wav", "IE", Command.NavigationCancelRoute),
+            Fixture("accept_call_rishi.wav", "IN", Command.PhoneAcceptCall),
+            Fixture("radio_on_rishi.wav", "IN", Command.RadioTurnOn),
+            Fixture("rear_camera_tessa.wav", "ZA", Command.CameraShowRear),
+            Fixture("parking_sensors_tessa.wav", "ZA", Command.ParkingSensorsOn)
+    )
 
     @Test
     fun usAccent_cabinCommands_areRecognized() = assertAll(
@@ -195,28 +223,7 @@ class VoicePipelineTest {
      */
     @Test
     fun accentSweep_passRateHoldsAcrossAllAccents() {
-        val fixtures = listOf(
-            Fixture("door_lock_samantha.wav", "US", Command.BodyDoorLock),
-            Fixture("sunroof_open_samantha.wav", "US", Command.BodySunroofOpen),
-            Fixture("ac_on_samantha.wav", "US", Command.ClimateAcOn),
-            Fixture("temp_up_samantha.wav", "US", Command.ClimateIncreaseTemperature),
-            Fixture("media_play_samantha.wav", "US", Command.MediaPlay),
-            Fixture("media_pause_samantha.wav", "US", Command.MediaPause),
-            Fixture("volume_up_samantha.wav", "US", Command.MediaVolumeUp),
-            Fixture("navi_home_samantha.wav", "US", Command.NavigationGoHome),
-            Fixture("find_parking_samantha.wav", "US", Command.NavigationFindParking),
-            Fixture("headlights_on_daniel.wav", "GB", Command.LightHeadlightsOn),
-            Fixture("next_track_daniel.wav", "GB", Command.MediaNextTrack),
-            Fixture("door_lock_slow_daniel.wav", "GB", Command.BodyDoorLock),
-            Fixture("door_lock_fast_daniel.wav", "GB", Command.BodyDoorLock),
-            Fixture("wipers_on_karen.wav", "AU", Command.WipersOn),
-            Fixture("zoom_in_karen.wav", "AU", Command.NavigationZoomIn),
-            Fixture("cancel_route_moira.wav", "IE", Command.NavigationCancelRoute),
-            Fixture("accept_call_rishi.wav", "IN", Command.PhoneAcceptCall),
-            Fixture("radio_on_rishi.wav", "IN", Command.RadioTurnOn),
-            Fixture("rear_camera_tessa.wav", "ZA", Command.CameraShowRear),
-            Fixture("parking_sensors_tessa.wav", "ZA", Command.ParkingSensorsOn)
-        )
+        val fixtures = commandFixtures()
 
         val failures = mutableListOf<String>()
         val perAccent = mutableMapOf<String, IntArray>() // accent -> [passed, total]
@@ -247,6 +254,36 @@ class VoicePipelineTest {
         assertTrue(
             "accent pass rate $passed/$total dropped below 90%:\n" + failures.joinToString("\n"),
             passed * 100 >= total * 90
+        )
+    }
+
+    /**
+     * What the decoding grammar buys, measured on the same clips: the open
+     * vocabulary is free to hear "the trying" where the grammar can only choose
+     * among phrases the car actually understands.
+     */
+    @Test
+    fun grammarDecoding_beatsOpenVocabulary() {
+        val fixtures = commandFixtures()
+        var grammarPassed = 0
+        var openPassed = 0
+        for (fixture in fixtures) {
+            val pcm = loadWavPcm("tts/${fixture.wav}")
+            val grammarText = vosk.recognizeAudio(pcm).orEmpty()
+            val openText = openVocabularyVosk.recognizeAudio(pcm).orEmpty()
+            val grammarCommand = runBlocking { classifier.parseCommand(grammarText) }
+            val openCommand = runBlocking { classifier.parseCommand(openText) }
+            if (grammarCommand::class == fixture.expected::class) grammarPassed++
+            if (openCommand::class == fixture.expected::class) openPassed++
+            if (grammarText != openText) {
+                println("  ${fixture.wav}: grammar=\"$grammarText\" open=\"$openText\"")
+            }
+        }
+        println("Grammar $grammarPassed/${fixtures.size}, " +
+                "open vocabulary $openPassed/${fixtures.size}")
+        assertTrue(
+            "grammar decoding ($grammarPassed) should not lose to open vocabulary ($openPassed)",
+            grammarPassed >= openPassed
         )
     }
 

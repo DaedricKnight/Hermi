@@ -6,7 +6,7 @@
 package com.khateev.hermi.shared.model
 
 /**
- * One object per intent the model can emit (102 commands from 110 labels;
+ * One object per intent the model can emit (102 commands from 111 labels;
  * synonym labels collapse onto a single command), plus [Unknown] for
  * everything the classifier is not confident about.
  */
