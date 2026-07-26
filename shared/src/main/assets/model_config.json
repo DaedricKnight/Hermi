@@ -78,6 +78,7 @@
     "navigation_unmute_guidance",
     "navigation_zoom_in",
     "navigation_zoom_out",
+    "none",
     "parking_sensors_off",
     "parking_sensors_on",
     "phone_accept_call",
@@ -113,5 +114,6 @@
     "wipers_wash_windshield"
   ],
   "model_type": "bert",
-  "best_accuracy": 0.9991
+  "best_accuracy": 0.9996,
+  "held_out_reject_rate": 0.96
 }

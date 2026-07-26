@@ -31,15 +31,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "shared/src/main/assets")
 VOSK_MODEL = os.environ.get("HERMI_VOSK_MODEL",
                             os.path.join(ASSETS, "models/vosk-model-small-en-us-0.15"))
+GRAMMAR_FILE = os.path.join(ASSETS, "grammar_phrases.txt")
 INTENT_MODEL = os.path.join(ASSETS, "automotive_intent_quant.onnx")
 VOCAB_FILE = os.path.join(ASSETS, "vocab.txt")
 LABELS_FILE = os.path.join(ASSETS, "labels.txt")
 CONFIG = os.path.join(ASSETS, "model_config.json")
 OUT_DIR = os.environ.get("HERMI_OUT_DIR", os.path.join(ROOT, "tools/accent_test_out"))
 
-# CommandMapper rejects anything below this. The 110-label model has no
-# `unknown` class, so the gate is the only defence against off-topic speech.
+# CommandMapper rejects anything below this, or labelled `none` (the model's
+# reject class, added in v2).
 CONFIDENCE_THRESHOLD = 0.95
+NONE_LABEL = "none"
 
 # Labels the model splits but the app treats as one command (CommandCatalog).
 SYNONYMS = {
@@ -94,8 +96,11 @@ VOICES = [
     ("Grandma (English (UK))", "GB-aged"),
 ]
 
-# (rate wpm, add_noise) — rates approximate slow / normal / fast intonation
-CONDITIONS = [(140, False), (180, False), (220, False), (180, True)]
+# (rate wpm, noise) — rates approximate slow / normal / fast intonation.
+# "road" is the realistic cabin case: engine/tyre energy concentrated low, which
+# the front-end high-pass is built for. "white" is the pessimistic case: noise
+# spread evenly across the band, including where the speech formants live.
+CONDITIONS = [(140, None), (180, None), (220, None), (180, "road"), (180, "white")]
 
 SNR_DB = 10.0
 
@@ -107,13 +112,35 @@ def synthesize(text, voice, rate, out_wav):
         check=True, capture_output=True)
 
 
-def add_noise(in_wav, out_wav, snr_db):
+def _road_noise(n, rng):
+    """
+    Cabin noise: brown-ish rumble (1/f^2) plus engine harmonics around 50-150 Hz.
+    Nothing like white noise — almost all the energy sits below 300 Hz.
+    """
+    rumble = np.cumsum(rng.normal(0, 1, n))          # brown noise
+    rumble -= np.linspace(rumble[0], rumble[-1], n)  # de-trend
+    rumble /= np.abs(rumble).max() or 1.0
+
+    t = np.arange(n) / SAMPLE_RATE
+    engine = sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 2 * np.pi)) / k
+                 for k, f in enumerate((55.0, 110.0, 165.0), start=1))
+    engine /= np.abs(engine).max() or 1.0
+
+    mix = 0.75 * rumble + 0.25 * engine
+    return mix / (np.sqrt(np.mean(mix ** 2)) or 1.0)
+
+
+def add_noise(in_wav, out_wav, snr_db, kind="white"):
     with wave.open(in_wav) as w:
         params = w.getparams()
         pcm = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float64)
     signal_power = np.mean(pcm ** 2) or 1.0
     noise_power = signal_power / (10 ** (snr_db / 10))
-    noise = np.random.default_rng(42).normal(0, np.sqrt(noise_power), len(pcm))
+    rng = np.random.default_rng(42)
+    if kind == "road":
+        noise = _road_noise(len(pcm), rng) * np.sqrt(noise_power)
+    else:
+        noise = rng.normal(0, np.sqrt(noise_power), len(pcm))
     noisy = np.clip(pcm + noise, -32768, 32767).astype(np.int16)
     with wave.open(out_wav, "w") as w:
         w.setparams(params)
@@ -121,22 +148,40 @@ def add_noise(in_wav, out_wav, snr_db):
 
 
 class VoskTranscriber:
-    """Mirrors VoskManager: one Recognizer at 16 kHz, result JSON -> "text"."""
+    """
+    Mirrors VoskManager: one Recognizer at 16 kHz, result JSON -> "text", with
+    the same optional grammar constraint and the same `[unk]` stripping.
+    """
 
-    def __init__(self):
+    def __init__(self, grammar=True):
         from vosk import KaldiRecognizer, Model, SetLogLevel
         SetLogLevel(-1)
         if not os.path.isdir(VOSK_MODEL):
             sys.exit(f"Vosk model not found: {VOSK_MODEL}")
         self.model = Model(VOSK_MODEL)
         self._recognizer_cls = KaldiRecognizer
+        self.grammar = None
+        if grammar:
+            if not os.path.exists(GRAMMAR_FILE):
+                sys.exit(f"grammar not found: {GRAMMAR_FILE} "
+                         "(run tools/generate_command_catalog.py)")
+            with open(GRAMMAR_FILE) as f:
+                phrases = [line.strip() for line in f if line.strip()]
+            self.grammar = json.dumps(phrases + ["[unk]"])
+            print(f"grammar: {len(phrases)} phrases")
+        # One recognizer for the whole run: with a 4800-phrase grammar the
+        # decoding graph costs far more to build than the recognition itself,
+        # and VoskManager builds it once too.
+        self._rec = (self._recognizer_cls(self.model, float(SAMPLE_RATE), self.grammar)
+                     if self.grammar else self._recognizer_cls(self.model, float(SAMPLE_RATE)))
 
     def transcribe(self, path):
         with wave.open(path) as w:
             pcm = w.readframes(w.getnframes())
-        rec = self._recognizer_cls(self.model, float(SAMPLE_RATE))
-        rec.AcceptWaveform(pcm)
-        return json.loads(rec.FinalResult()).get("text", "").strip()
+        self._rec.Reset()
+        self._rec.AcceptWaveform(pcm)
+        text = json.loads(self._rec.FinalResult()).get("text", "")
+        return " ".join(w for w in text.split() if w != "[unk]").strip()
 
 
 class IntentClassifier:
@@ -209,8 +254,8 @@ class IntentClassifier:
 def verdict_for(expected, transcript, label, confidence):
     if not transcript:
         return "NO_SPEECH"
-    accepted = confidence >= CONFIDENCE_THRESHOLD
     label = canonical(label)
+    accepted = label != NONE_LABEL and confidence >= CONFIDENCE_THRESHOLD
     if expected == "none":
         # Out-of-domain: anything the app would act on is a dangerous failure.
         return "PASS" if not accepted else "WRONG_INTENT"
@@ -225,13 +270,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--quick", action="store_true",
                         help="3 accents x 2 conditions instead of the full grid")
+    parser.add_argument("--open-vocabulary", action="store_true",
+                        help="decode without the command grammar (pre-grammar baseline)")
     args = parser.parse_args()
 
     voices = VOICES[:3] if args.quick else VOICES
-    conditions = CONDITIONS[1:3] if args.quick else CONDITIONS
+    conditions = [CONDITIONS[1], CONDITIONS[3]] if args.quick else CONDITIONS
 
     os.makedirs(OUT_DIR, exist_ok=True)
-    asr = VoskTranscriber()
+    asr = VoskTranscriber(grammar=not args.open_vocabulary)
     clf = IntentClassifier()
 
     # Baseline: the written phrase straight into the classifier. Anything that
@@ -251,10 +298,10 @@ def main():
     done = 0
 
     for voice, accent in voices:
-        for rate, noisy in conditions:
+        for rate, noise in conditions:
             for phrase, expected in PHRASES:
                 done += 1
-                cond = f"{rate}wpm{'+noise' if noisy else ''}"
+                cond = f"{rate}wpm{'+' + noise if noise else ''}"
                 with tempfile.TemporaryDirectory() as tmp:
                     wav = os.path.join(tmp, "clip.wav")
                     try:
@@ -264,9 +311,9 @@ def main():
                                      "<synthesis failed>", "", 0.0, "SYNTH_FAIL",
                                      baseline[phrase][0], baseline[phrase][1]])
                         continue
-                    if noisy:
+                    if noise:
                         noisy_wav = os.path.join(tmp, "noisy.wav")
-                        add_noise(wav, noisy_wav, SNR_DB)
+                        add_noise(wav, noisy_wav, SNR_DB, kind=noise)
                         wav = noisy_wav
                     transcript = asr.transcribe(wav)
                 label, conf = ("", 0.0)
@@ -297,8 +344,8 @@ def main():
         print(f"{accent:10} {p:5} {rej:9} {w:6} {len(acc_rows):6}  {p / len(acc_rows):.0%}")
 
     print("\n=== SUMMARY by condition ===")
-    for rate, noisy in conditions:
-        cond = f"{rate}wpm{'+noise' if noisy else ''}"
+    for rate, noise in conditions:
+        cond = f"{rate}wpm{'+' + noise if noise else ''}"
         c_rows = [r for r in rows if r[2] == cond]
         p = sum(r[8] == "PASS" for r in c_rows)
         w = sum(r[8] == "WRONG_INTENT" for r in c_rows)

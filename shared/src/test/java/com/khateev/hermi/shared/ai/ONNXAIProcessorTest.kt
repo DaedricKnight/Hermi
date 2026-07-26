@@ -21,20 +21,31 @@ class ONNXAIProcessorTest {
 
     @Test
     fun `every model label maps to a command`() {
-        val unmapped = labels.filter { CommandCatalog.commandForLabel(it) == null }
+        val unmapped = labels
+            .filterNot { it == CommandMapper.NONE_LABEL }
+            .filter { CommandCatalog.commandForLabel(it) == null }
         assertTrue("labels with no command: $unmapped", unmapped.isEmpty())
     }
 
     @Test
     fun `catalog covers exactly the shipped label set`() {
         val catalogLabels = CommandCatalog.specs.flatMap { listOf(it.label) + it.aliases }.toSet()
-        assertEquals(labels.toSet(), catalogLabels)
-        assertEquals("110 labels collapse onto 102 commands", 102, CommandCatalog.specs.size)
+        assertEquals(labels.toSet() - CommandMapper.NONE_LABEL, catalogLabels)
+        assertEquals("110 command labels collapse onto 102 commands", 102, CommandCatalog.specs.size)
+    }
+
+    @Test
+    fun `the model ships a reject class`() {
+        assertTrue(
+            "labels.txt has no `none` class — the gate would be the only defence " +
+                    "against off-topic speech",
+            CommandMapper.NONE_LABEL in labels
+        )
     }
 
     @Test
     fun `mapping a label above the gate returns its command`() {
-        for (label in labels) {
+        for (label in labels.filterNot { it == CommandMapper.NONE_LABEL }) {
             val expected = CommandCatalog.commandForLabel(label)
             val actual = CommandMapper.mapLabelToCommand(label, 0.99f, "some text")
             assertEquals("mapping failed for $label", expected, actual)
@@ -95,6 +106,39 @@ class ONNXAIProcessorTest {
             assertEquals(spec, CommandCatalog.specForLabel(spec.label))
         }
         assertNull(CommandCatalog.specFor(Command.Unknown("nothing")))
+    }
+
+    /**
+     * Vosk decodes against grammar_phrases.txt, so anything missing from it
+     * becomes unsayable — every command needs at least one phrasing in there.
+     */
+    @Test
+    fun `decoding grammar covers every command`() {
+        val grammar = File("src/main/assets/grammar_phrases.txt")
+            .readLines().map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        assertTrue("grammar looks empty: ${grammar.size} phrases", grammar.size > 1000)
+
+        val missing = CommandCatalog.specs.filter { spec ->
+            spec.examples.none { example ->
+                example.lowercase().replace(Regex("[^a-z0-9 ]"), " ")
+                    .split(" ").filter { it.isNotEmpty() }.joinToString(" ") in grammar
+            }
+        }
+        assertTrue("commands absent from the decoding grammar: " +
+                missing.map { it.label }, missing.isEmpty())
+    }
+
+    @Test
+    fun `grammar phrases are lowercase and free of punctuation`() {
+        val offenders = File("src/main/assets/grammar_phrases.txt").readLines()
+            .filter { it.isNotBlank() && !it.matches(Regex("[a-z0-9 ]+")) }
+        assertTrue("Vosk cannot decode these: ${offenders.take(5)}", offenders.isEmpty())
+    }
+
+    @Test
+    fun `none label maps to Unknown`() {
+        val result = CommandMapper.mapLabelToCommand(CommandMapper.NONE_LABEL, 1.0f, "order a pizza")
+        assertTrue("the reject class must never become a command", result is Command.Unknown)
     }
 
     @Test

@@ -1,136 +1,152 @@
-# Accent & Intonation Stress Test — Report (2026-07-25)
+# Accent & Intonation Stress Test — Report (2026-07-26)
 
 Harness: `tools/accent_stress_test.py` — 22 phrases (19 cabin commands + 3
-out-of-domain) × 7 macOS TTS accents (US/GB/AU/IE/IN/ZA + aged-GB) × 4 conditions
-(140/180/220 wpm, plus 180 wpm with white noise at SNR 10 dB) = 616 clips through
-the exact production pipeline: Vosk (`vosk-model-small-en-us-0.15`) → the
-WordPiece tokenizer ported from `ONNXAIProcessor` → the 110-label
-`automotive_intent_quant.onnx` → CommandMapper's **0.95** confidence gate.
+out-of-domain) × 7 macOS TTS accents (US/GB/AU/IE/IN/ZA + aged-GB) × 5 conditions
+(140/180/220 wpm clean, plus 180 wpm with road noise and with white noise, both
+at SNR 10 dB) = 770 clips through the exact production pipeline: Vosk with the
+command grammar → the WordPiece tokenizer ported from `ONNXAIProcessor` → the
+111-label `automotive_intent_quant.onnx` (v2.2) → CommandMapper's 0.95 gate.
 
-Verdicts: **PASS** (correct command above the gate, or rejection for an
-out-of-domain phrase), **REJECTED** (below the gate — safe, the app answers
-"I don't know how to do that"), **WRONG_INTENT** (confident wrong command —
+Verdicts: **PASS** (correct command above the gate, or a refusal for an
+out-of-domain phrase), **REJECTED** (below the gate or `none` — safe, the app
+says it did not understand), **WRONG_INTENT** (confident wrong command —
 dangerous, the app acts on it).
 
-Every row also carries the *text baseline*: the written phrase straight into the
-classifier, so a model error is never mistaken for an accent error.
+Every row also carries the *text baseline* — the written phrase straight into the
+classifier — so a model error is never mistaken for an accent error.
 
-## Headline results
+## Where it landed
 
-| | Count | Share |
-|---|---|---|
-| Commands recognized | 371/532 | **70%** |
-| Commands safely rejected | 112 | 21% |
-| Commands wrongly executed | 49 | 9% |
-| Off-topic phrases kept safe | 38/84 | 45% |
-
-Split by condition, the picture is much sharper:
-
-| Commands | Pass |
-|---|---|
-| clean speech (140/180/220 wpm) | 320/399 (**80%**) |
-| 180 wpm + white noise, SNR 10 dB | 51/133 (**38%**) |
-
-**Noise is what breaks this pipeline.** Speech rate barely matters (77% / 74% /
-75% across 140-220 wpm); adding noise halves the pass rate and doubles the
-dangerous failures.
-
-## Per-accent pass rate (commands only)
-
-| Accent | Voice | Pass | Rejected | Wrong |
+| | Commands | Rejected (safe) | Wrong (dangerous) | Off-topic kept safe |
 |---|---|---|---|---|
-| IE | Moira | **86%** | 7 | 4 |
-| US | Samantha | 80% | 10 | 5 |
-| AU | Karen | 76% | 11 | 7 |
-| GB | Daniel | 75% | 14 | 5 |
-| ZA | Tessa | 75% | 16 | 3 |
-| IN | Rishi | 66% | 22 | 4 |
-| GB-aged | Grandma (UK) | **30%** | 32 | 21 |
+| v1 — 110 labels, open vocabulary | 371/532 (70%) | 112 | 49 | 38/84 (45%) |
+| v2 — `none` class + grammar | 490/532 (92%) | 29 | 12 | 33/84 (39%) |
+| v2.1 — + ASR augmentation, `none` in grammar | 637/665 (96%) | 14 | 13 | 104/105 (99%) |
+| **v2.2 — + second augmentation round** | **645/665 (97%)** | **10** | **9** | **105/105 (100%)** |
 
-The aged voice is the outlier by a wide margin — 21 of the 49 dangerous failures
-across the whole grid come from it. Any deployment expecting older drivers needs
-a stronger recognizer than `vosk-model-small`.
+Overall 750/770 (97.4%).
 
-## Weakest phrases
-
-| Phrase | Pass | What goes wrong |
+| Condition | Commands | Wrong |
 |---|---|---|
-| `fold the mirrors` | 12/28 (43%) | Vosk hears "for/build/though the mirrors" → **`body_mirrors_unfold`** at 0.99 — the opposite action |
-| `turn on the seat heating` | 0/28 | classifies correctly (`heating_seats_driver_on`) but at **0.927**, just under the gate → always rejected |
-| `answer the call` | 16/28 (57%) | "the sort of the call" → `phone_end_call` |
-| `cancel the route` | 18/28 (64%) | "cancel the roots/routes" survives, noise does not |
-| `open the trunk` | 18/28 (64%) | "open the term/trying" → `phone_end_call`, `media_source_bluetooth`, `body_door_unlock` |
+| 140 wpm | 131/133 (98%) | 0 |
+| 180 wpm | 132/133 (99%) | 0 |
+| 220 wpm | 132/133 (99%) | 0 |
+| **180 wpm + road noise** | **132/133 (99%)** | **0** |
+| 180 wpm + white noise | 118/133 (89%) | 9 |
 
-Two patterns worth designing around:
-
-- **Antonym pairs are one phoneme apart.** fold/unfold, open/close trunk,
-  headlights/high beams. A garbled verb does not fail safe — it executes the
-  opposite command with high confidence. These pairs deserve either confirmation
-  before acting or ASR-confusion augmentation ("for the mirrors" →
-  `body_mirrors_fold`).
-- **A correct prediction can still sit under the gate.** "turn on the seat
-  heating" peaks at 0.927 because the model splits driver/passenger/rear seat
-  heating; the probability mass is divided between siblings. Merging or
-  re-training those three, or accepting the top-2 sum when the siblings agree,
-  recovers this class.
-
-## Out-of-domain: the model has no `unknown` class
-
-| Phrase | Kept safe | What it fires |
+| Accent | Voice | Pass rate |
 |---|---|---|
-| `remind me to buy milk` | 28/28 | — |
-| `tell me a joke about penguins` | 10/28 | `navi_unmute_guidance` at 0.969 |
-| `what time is the meeting tomorrow` | 0/28 | `navi_go_work` at **1.000** |
+| IN / ZA | Rishi / Tessa | 100% |
+| US | Samantha | 99% |
+| GB / AU / IE | Daniel / Karen / Moira | 98% |
+| GB-aged | Grandma (UK) | 88% |
 
-On the text baseline (no audio at all), 25 everyday non-car phrases go through
-the classifier: **16 are rejected by the gate, 9 fire a real command** — "order a
-pizza" → find restaurant, "what is your name" → zoom in, "book a table for two" →
-dial number, "sing me a song" → play. The gate cannot fix this: the model assigns
-1.000 to `navi_go_work` for a calendar question.
+## What each step was worth
 
-The 110-label set has no `none`/`unknown` class, so out-of-domain speech has
-nowhere to go. **This is the top item to fix on the model side** — train a `none`
-class from generic phone/media/small-talk utterances, the way the medical model
-was fixed. `ONNXAIProcessorIntegrationTest.outOfDomainSpeechIsMostlyRejected`
-measures the rate on device (currently 16/25) and fails if it regresses.
+**1. The `none` reject class** (LocalLLM `training_data_automotive_none.py`).
+497 negatives from three sources — curated everyday utterances, template
+expansion, and the medical/industrial phrase banks in the training repo —
+filtered so nothing containing car vocabulary can leak into the reject class.
+25 phrases are held out of training entirely and used as the evaluation set.
+Held-out refusal went 16/25 → 22/25 → **25/25** across v1 → v2 → v2.2.
 
-## Gate choice
+**2. The confidence gate.** With a reject class the gate stopped being the main
+defence: in-domain accuracy is 100% of the phrase bank at every gate from 0.70 to
+0.98, and off-topic refusal is flat from 0.95 up. 0.95 stays, now as a second
+line rather than the only one (`tools/measure_gate.py` reproduces the sweep).
 
-| Gate | Phrase bank (4296 trained phrases) | Off-topic rejected (25 phrases) |
+**3. Constrained decoding.** Vosk decodes against the command phrase bank instead
+of the open vocabulary. On the hard subset this took commands from 88% to 93%
+and dangerous failures from 5 to 0 — it removes the recognizer's freedom to
+invent words: "the on the headlights" → "turn on the headlights", "cancel the
+roots" → "cancel the route".
+
+*The trap:* with only command phrases in the grammar, off-topic speech has
+nowhere to go and gets forced into a command — off-topic safety collapsed to 39%
+even though the model itself refused those phrases as text. Putting the
+reject-class phrasings **into the grammar** (4795 phrases now) fixed it: 39% →
+100%. Grammar decoding and a reject class only work as a pair.
+
+**4. ASR-confusion augmentation.** 67 pairs of (what the recognizer produced,
+what the driver meant), mined from the grid over three rounds. The rule: a
+mangling is added only when it cannot plausibly be a different real command.
+
+| Heard | Was | Now |
 |---|---|---|
-| 0.70 | 100% | 14/25 |
-| 0.90 | 100% | 14/25 |
-| **0.95 (shipped)** | **100%** | **16/25** |
-| 0.99 | 99.5% | 19/25 |
+| "cancel the roof" | `body_sunroof_close` — closed the roof instead of ending the route | `navi_cancel_route` 0.9996 |
+| "the mirrors" | `body_mirrors_unfold` — the opposite action | `body_mirrors_fold` 0.9997 |
+| "so the call" | random commands | `phone_accept_call` 0.9996 |
+| "log the doors" | rejected | `body_door_lock` 0.9999 |
 
-0.95 is free in-domain and buys two more rejections; 0.99 starts dropping real
-commands. The cost shows up on real audio instead: 112 of 532 command clips land
-below 0.95 and are rejected — a safe failure (the app re-prompts) but a usability
-one.
+**5. Phrasing** (`tools/candidate_phrases_test.py`, 7 accents × rates × noise).
+After augmentation the canonical phrasings all reach 100%, so nothing needed
+renaming — except the one failure augmentation must not touch:
 
-## Duplicate labels
+| Phrase | Pass | Note |
+|---|---|---|
+| "turn up the volume" | 8/14 | heard as **"turn off the volume"** → mutes the car |
+| "volume up" | 11/14 | |
+| **"increase the volume"** | **13/14** | now what `CommandCatalog` teaches |
+| "louder" | 0/14 | transcribes perfectly, but one word carries too little signal for a 111-class model (0.54 confidence, under the gate) |
 
-Eight label pairs mean the same user action and their phrase banks overlap
-outright ("Stop navigation" sits in `navi_cancel_route`, "Cancel navigation" in
-`navigation_stop_route`). They split probability mass between siblings and can
-push a correct prediction below the gate. The app collapses them onto one command
-each in `CommandCatalog` (110 labels → 102 commands); the model should merge them
-at training time.
+That last row is the reusable lesson: **one-word commands are fragile** — not in
+the recognizer, in the classifier. The A/B also shows which alternates users
+might reach for and would not be understood: "pop the trunk" 11%, "pick up" 39%,
+"unlock the trunk" 50% (heard as "lock the trunk" — an antonym flip), "accept the
+call" 71% ("zip the call"). Those went into the augmentation rather than into
+user education.
+
+**6. Audio front-end — measured and dropped.** A 110 Hz high-pass plus AGC was
+built, measured and removed:
+
+| Noise | SNR | With front-end | Without |
+|---|---|---|---|
+| road | 10 / 5 / 0 dB | 18/18 | 18/18 |
+| white | 10 dB | 16/18 | 16/18 |
+| white | 5 dB | 14/18 | 13/18 |
+| white | 0 dB | 4/18 | 4/18 |
+
+Quiet speech (−20/−30/−36 dB) was unchanged too — Vosk normalizes levels itself.
+The hypothesis that a car needs a high-pass was right about the spectrum and
+wrong about the consequence: **road noise is harmless even at SNR 0 dB**, because
+its energy sits below the formants. White noise is the one that hurts, and no
+front-end fixes that. Shipping the filter would have been unmeasured complexity,
+so it was deleted; the road-noise condition it motivated stays in the stand.
+
+## What is still open
+
+Nine dangerous failures remain, all under white noise:
+
+- "turn up the volume" → "turn off the volume" → mute (4 clips, 3 accents). The
+  phrase is now demoted in the catalog; the residual risk is a driver saying the
+  old phrasing anyway. A confirmation step for `media_mute` would close it.
+- "open the trunk" → "open the phone" → Bluetooth source, "lock the doors" → "my
+  phone" (aged voice). Both are the same shape: a garbled command landing on a
+  different real command with high confidence.
+- Aged-GB is still the weakest voice at 88%, and contributes 4 of the 9.
+
+The next lever is the recognizer itself, not the classifier: `vosk-model-small`
+is 40 MB, and the 128 MB `vosk-model-en-us-0.22-lgraph` would likely take the
+aged voice and the white-noise column with it. Worth measuring before adding
+another round of augmentation, which is reaching diminishing returns.
 
 ## Instrumented counterpart
 
-`shared/src/androidTest/.../VoicePipelineTest.kt` runs 21 bundled clips (7
-accents, slow/fast delivery, a synonym probe, an out-of-domain probe) through the
-same chain on a real device — accent sweep 20/20 on
-`Automotive_1408p_landscape` (API 34), phrase bank 1020/1020. That is the
-regression gate; this stand is the exploration.
+`shared/src/androidTest/.../VoicePipelineTest.kt` and
+`ONNXAIProcessorIntegrationTest` run the same chain on a real device
+(`Automotive_1408p_landscape`, API 34), 17 tests: phrase bank 1020/1020, accent
+sweep 20/20, off-topic 25/25 refused, grammar 20/20 against open vocabulary
+19/20. That is the regression gate; this stand is the exploration.
 
 ## Reproduce
 
 ```
-python3 tools/accent_stress_test.py           # full 616-clip grid (~35 min)
-python3 tools/accent_stress_test.py --quick   # 3 accents x 2 conditions
-./tools/generate_test_wavs.sh                 # regenerate androidTest fixtures
+python3 tools/accent_stress_test.py             # full 770-clip grid (~12 min)
+python3 tools/accent_stress_test.py --quick     # 3 accents x 2 conditions
+python3 tools/accent_stress_test.py --open-vocabulary   # pre-grammar baseline
+python3 tools/candidate_phrases_test.py         # phrasing A/B
+python3 tools/measure_gate.py                   # gate sweep
+./tools/generate_test_wavs.sh                   # regenerate device fixtures
 ./gradlew :shared:connectedDebugAndroidTest -Pandroid.injected.build.abi=arm64-v8a
 ```
 

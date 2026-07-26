@@ -85,11 +85,11 @@ class ONNXAIProcessorIntegrationTest {
     }
 
     /**
-     * Known limitation, measured rather than wished away: the 110-label model has
-     * no `unknown` class, so ordinary non-car speech has nowhere to go and the
-     * confidence gate is the only defence. About two thirds of off-topic phrases
-     * are rejected; the rest fire a real command. Fix is on the model side —
-     * train a `none` class. This test fails if the rate gets worse.
+     * Off-topic speech, measured on phrases the model was never trained on (the
+     * held-out set from training_data_automotive_none.py). The `none` reject
+     * class plus the confidence gate refuse all 25 of them on v2.2 — the floor
+     * sits below that so an unlucky retrain fails loudly rather than silently
+     * drifting back to v1's 16/25.
      */
     @Test
     fun outOfDomainSpeechIsMostlyRejected() = runTest {
@@ -116,7 +116,7 @@ class ONNXAIProcessorIntegrationTest {
 
         assertTrue(
             "off-topic rejection dropped to $rejected/${offTopic.size}; firing: $fired",
-            rejected * 100 >= offTopic.size * 60
+            rejected * 100 >= offTopic.size * 90
         )
     }
 
