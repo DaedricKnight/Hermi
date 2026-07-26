@@ -2,6 +2,7 @@ package com.khateev.hermi.shared.ai
 
 import com.khateev.hermi.shared.model.Command
 import com.khateev.hermi.shared.model.CommandCatalog
+import kotlin.math.exp
 
 object CommandMapper {
 
@@ -10,7 +11,7 @@ object CommandMapper {
      *
      * The 110-label model has no `unknown` class, so this gate is the *only*
      * thing between out-of-domain speech and a car command. Measured on the
-     * accent stand (tools/accent_stress_test.py): everyday non-car utterances
+     * accent stand (tools/accent_stress_test.py): every day non-car utterances
      * land in the 0.4-0.6 band, while in-domain commands stay above 0.99 even
      * when the recognizer garbles a word.
      */
@@ -33,7 +34,7 @@ object CommandMapper {
         val exp = FloatArray(logits.size)
         var sum = 0f
         for (i in logits.indices) {
-            exp[i] = Math.exp((logits[i] - maxLogit).toDouble()).toFloat()
+            exp[i] = exp((logits[i] - maxLogit).toDouble()).toFloat()
             sum += exp[i]
         }
         for (i in logits.indices) exp[i] /= sum

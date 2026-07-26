@@ -33,7 +33,7 @@ import kotlinx.coroutines.Job
 class HermiViewModel(
     private val voskManager: RecognitionManager,
     private val audioRecorderImpl: AudioRecorder,
-    private val vhalReader: VhalReader,
+    vhalReader: VhalReader,
     private val aiProcessor: AIProcessor,
     private val voiceManager: VoiceInterfaceManager,
     private val versionManager: VersionManager,
@@ -65,7 +65,6 @@ class HermiViewModel(
 
     private var vadJob: Job? = null
     private var fallbackJob: Job? = null
-    private val TAG = "HermiVM"
 
     init {
         viewModelScope.launch {
@@ -230,6 +229,7 @@ class HermiViewModel(
             "navi_go_home" to "home",
             "navi_go_work" to "work",
         )
+        const val TAG = "HermiVM"
     }
 
     override fun onCleared() {

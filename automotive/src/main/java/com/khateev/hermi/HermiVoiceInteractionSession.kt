@@ -1,7 +1,6 @@
 package com.khateev.hermi
 
 import android.Manifest
-import android.R
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -51,7 +50,7 @@ class HermiVoiceInteractionSession(context: Context) : VoiceInteractionSession(c
     override fun onCreate() {
         savedStateRegistryController.performRestore(null)
         super.onCreate()
-        window?.window?.setBackgroundDrawableResource(R.color.transparent)
+        window?.window?.setBackgroundDrawableResource(android.R.color.transparent)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 

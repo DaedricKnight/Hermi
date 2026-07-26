@@ -11,7 +11,7 @@ import androidx.core.content.edit
  * VersionManager backed by SharedPreferences
  */
 class VersionManagerImpl(
-    private val context: Context
+    context: Context
 ) : VersionManager {
 
     companion object {
@@ -30,7 +30,7 @@ class VersionManagerImpl(
     }
 
     override suspend fun setProVersion(isPro: Boolean) {
-        prefs.edit().putBoolean(KEY_IS_PRO, isPro).apply()
+        prefs.edit { putBoolean(KEY_IS_PRO, isPro) }
         _isProVersion.value = isPro
     }
 
@@ -67,24 +67,6 @@ class VersionManagerImpl(
         val validUntil = System.currentTimeMillis() + durationMs
         prefs.edit { putLong(KEY_PRO_UNTIL, validUntil) }
         _isProVersion.value = true
-    }
-
-    /**
-     * Cancels the Pro version
-     */
-    fun cancelProVersion() {
-        prefs.edit {
-            putBoolean(KEY_IS_PRO, false)
-                .putLong(KEY_PRO_UNTIL, 0L)
-        }
-        _isProVersion.value = false
-    }
-
-    /**
-     * Subscription expiry date, when one is active
-     */
-    fun getSubscriptionExpiryTime(): Long {
-        return prefs.getLong(KEY_PRO_UNTIL, 0L)
     }
 }
 

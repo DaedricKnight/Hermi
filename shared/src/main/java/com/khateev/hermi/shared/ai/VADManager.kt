@@ -56,7 +56,7 @@ class VADManager(
                         this.cancel() 
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore exceptions in tests where Log.e might cause RuntimeException
             }
         }

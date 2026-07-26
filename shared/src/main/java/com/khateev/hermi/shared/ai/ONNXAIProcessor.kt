@@ -15,13 +15,13 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
     private val env = OrtEnvironment.getEnvironment()
     private val vocab = mutableMapOf<String, Int>()
     private val labels = mutableListOf<String>()
-    private val MAX_SEQ_LEN = 32
 
     companion object {
         private const val TAG = "ONNXAIProcessor"
         private const val MODEL_FILE = "automotive_intent_quant.onnx"
         private const val VOCAB_FILE = "vocab.txt"
         private const val LABELS_FILE = "labels.txt"
+        private const val MAX_SEQ_LEN = 32
     }
 
     init {
@@ -123,7 +123,7 @@ class ONNXAIProcessor(private val context: Context) : AIProcessor {
             resultIds.add(vocab["[SEP]"]?.toLong() ?: 102L)
         }
 
-        val finalIds = LongArray(MAX_SEQ_LEN) { 0L }
+        val finalIds = LongArray(MAX_SEQ_LEN)
         for (i in 0 until resultIds.size.coerceAtMost(MAX_SEQ_LEN)) {
             finalIds[i] = resultIds[i]
         }

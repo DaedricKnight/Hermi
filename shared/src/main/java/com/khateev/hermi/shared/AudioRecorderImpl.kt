@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
+import kotlin.math.sqrt
 
 class AudioRecorderImpl: AudioRecorder {
 
@@ -68,10 +69,10 @@ class AudioRecorderImpl: AudioRecorder {
                         }
                         
                         // Check volume level
-                        val rms = Math.sqrt(sum / read)
+                        val rms = sqrt(sum / read)
                         if (rms > 0.01) {
                              // Log significant audio levels for debugging
-                             // Log.d(TAG, "Audio Level (RMS): $rms")
+                              Log.d(TAG, "Audio Level (RMS): $rms")
                         }
                         
                         // Emit float array to the shared flow
